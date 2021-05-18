@@ -27,7 +27,7 @@ exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, v
                 const num = getRandomNumber_1.getRandomNumber(0, 274936);
                 const word = an_array_of_english_words_1.default[num];
                 if (!arr.includes(word)) {
-                    const def = yield getDefinition(word, language);
+                    const def = yield exports.getDefinition(word, language);
                     if (def) {
                         results.push(def);
                         arr.push(word);
@@ -44,7 +44,7 @@ exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, v
                 const num = getRandomNumber_1.getRandomNumber(0, 1680837);
                 const word = all_the_german_words_1.default[num];
                 if (!arr.includes(word)) {
-                    const def = yield getDefinition(word, language);
+                    const def = yield exports.getDefinition(word, language);
                     if (def) {
                         results.push(def);
                         arr.push(word);
@@ -61,7 +61,7 @@ exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, v
                 const num = getRandomNumber_1.getRandomNumber(0, 336523);
                 const word = an_array_of_french_words_1.default[num];
                 if (!arr.includes(word)) {
-                    const def = yield getDefinition(word, language);
+                    const def = yield exports.getDefinition(word, language);
                     if (def) {
                         results.push(def);
                         arr.push(word);
@@ -78,7 +78,7 @@ exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, v
                 const num = getRandomNumber_1.getRandomNumber(0, 636597);
                 const word = an_array_of_spanish_words_1.default[num];
                 if (!arr.includes(word)) {
-                    const def = yield getDefinition(word, language);
+                    const def = yield exports.getDefinition(word, language);
                     if (def) {
                         results.push(def);
                         arr.push(word);
@@ -94,7 +94,7 @@ exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, v
     }
     return results;
 });
-const getDefinition = (word, language) => __awaiter(this, void 0, void 0, function* () {
+exports.getDefinition = (word, language) => __awaiter(this, void 0, void 0, function* () {
     const res = yield superagent_1.default
         .get(`https://api.dictionaryapi.dev/api/v2/entries/${language}/${word}`)
         .catch(() => {

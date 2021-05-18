@@ -92,7 +92,7 @@ export const getDailyRandomWords = async (
   return results;
 };
 
-const getDefinition = async (word: string, language: string) => {
+export const getDefinition = async (word: string, language: string) => {
   const res = await superagent
     .get(`https://api.dictionaryapi.dev/api/v2/entries/${language}/${word}`)
     .catch(() => {

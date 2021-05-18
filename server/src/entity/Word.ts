@@ -16,23 +16,23 @@ import { User } from "./User";
 
 @Entity()
 export class Word {
-  @PrimaryColumn()
-  value: string;
-
-  @ManyToMany(() => User, (user) => user.learnedWords)
-  learners: User[];
-
-  @ManyToMany(() => User, (user) => user.ignoredWords)
-  ignoredUsers: User[];
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   @Column()
-  type: string;
+  value: string;
+
+  @Column*()
+  learnerId: string
+  @ManyToOne(() => User, (user) => user.learnedWords)
+  learner: User;
+
 
   @Column()
   language: string;
 
-  @Column()
-  position: string;
+  @Column({ default: "0" })
+  position: number;
 
   @OneToMany(() => Definition, (definition) => definition.word)
   definitions: Definition[];

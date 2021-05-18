@@ -11,8 +11,6 @@ export async function createUser(
 ) {
   const userRepo = getRepository(User);
 
-  console.log(nativeLanguageId);
-
   await userRepo.insert({
     username,
     email,
@@ -22,16 +20,36 @@ export async function createUser(
   });
 }
 
+export async function createOauthUser(
+  oauthId: string,
+  username: string,
+  email?: string,
+  avatar?: string
+) {
+  const userRepo = getRepository(User);
+
+  await userRepo.insert({
+    oauthId,
+    email,
+    username,
+    avatar,
+  });
+}
+
 export async function getOneUser(usernameOrEmail: string) {
   const userRepo = getRepository(User);
 
-  const user = await userRepo
+  return await userRepo
     .createQueryBuilder("user")
     .where("user.username = :username", { username: usernameOrEmail })
     .orWhere("user.email = :email", { email: usernameOrEmail })
     .getOne();
+}
 
-  return user;
+export async function getOneOauthUser(oauthId: string) {
+  const userRepo = getRepository(User);
+
+  return await userRepo.findOne({ oauthId });
 }
 
 export async function saveRefreshToken(userId: string, refreshToken: string) {

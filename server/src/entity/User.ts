@@ -54,7 +54,7 @@ export class User {
   @OneToMany(() => Notification, (notification) => notification.sender)
   sentNotifications: Notification;
 
-  @Column()
+  @Column({ nullable: true })
   nativeLanguageId: string;
   @ManyToOne(() => Language, (language) => language.natives)
   nativeLanguage: Language;
@@ -80,13 +80,8 @@ export class User {
   @OneToMany(() => ChatImage, (image) => image.user)
   chatMessages: ChatMessage[];
 
-  @ManyToMany(() => Word, (word) => word.learners)
-  @JoinTable()
+  @OneToMany(() => Word, (word) => word.learner)
   learnedWords: Word[];
-
-  @ManyToMany(() => Word, (word) => word.ignoredUsers)
-  @JoinTable()
-  ignoredWords: Word[];
 
   @CreateDateColumn()
   createdAt: Date;

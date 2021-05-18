@@ -23,6 +23,9 @@ export class Definition {
   meaning: string;
 
   @Column()
+  partOfSpeech: string;
+
+  @Column()
   example: string;
 
   @CreateDateColumn()

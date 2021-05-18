@@ -12,6 +12,8 @@ import { User } from "./entity/User";
 import { Word } from "./entity/Word";
 import express from "express";
 import auth from "./routes/auth";
+import word from "./routes/word";
+
 import { UserRefreshToken } from "./entity/UserRefreshToken";
 
 createConnection({
@@ -41,6 +43,7 @@ createConnection({
     app.use(express.json());
 
     app.use("/auth", auth);
+    app.use("/word", word);
 
     app.listen(4000, () => {
       console.log("Server is running on port 4000");

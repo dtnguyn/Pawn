@@ -2,50 +2,95 @@ import dotenv from "dotenv";
 dotenv.config();
 import { Request, Response, Router } from "express";
 import {
+  createOauthUser,
   createUser,
   findOneRefreshToken,
+  getOneOauthUser,
   getOneUser,
   saveRefreshToken,
 } from "../controllers/UserController";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import express from "express";
+import passport from "passport";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { VerifyCallback } from "passport-google-oauth20";
 
 const router = Router();
 router.use(express.json());
 
+const handleAuth = async (
+  _accessToken: string,
+  _refreshToken: string,
+  profile: any,
+  cb: VerifyCallback
+) => {
+  try {
+    const { id, emails, displayName, photos } = profile;
+    console.log(id, emails, displayName, photos, profile);
+    let user = await getOneOauthUser(id);
+    if (!user) {
+      //Register
+      await createOauthUser(
+        id,
+        displayName,
+        emails && emails[0].value,
+        photos && photos[0].value
+      );
+      user = await getOneOauthUser(id);
+    }
+    if (user) return cb(null, user);
+    else throw new Error("There's something wrong");
+  } catch (error) {
+    return cb(error, undefined);
+  }
+};
+
+router.use(passport.initialize());
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      callbackURL: process.env.GOOGLE_CLIENT_SECRET as string,
+    },
+    handleAuth
+  )
+);
+
 //Middlewares
 const checkAuthentication = (req: Request, res: Response, next: Function) => {
   const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-  if (token == null) return res.sendStatus(401);
+  let token = authHeader && authHeader.split(" ")[1];
 
-  jwt.verify(
-    token,
-    process.env.ACCESS_TOKEN_SECRET!,
-    (err: any, decoded: any) => {
-      console.log(err);
-      if (err) {
-        res.sendStatus(403);
-      } else {
-        (req as any).user = decoded.user;
-        next();
+  if (!token) res.sendStatus(401);
+  else {
+    jwt.verify(
+      token,
+      process.env.ACCESS_TOKEN_SECRET!,
+      (err: any, decoded: any) => {
+        console.log(err);
+        if (err) {
+          res.sendStatus(403);
+        } else {
+          (req as any).user = decoded.user;
+          next();
+        }
       }
-    }
-  );
+    );
+  }
 };
 
+//Routes
 router.get("/", checkAuthentication, (req, res) => {
   const user = req && (req as any).user;
   if (user) {
-    console.log(user);
     res.json(user);
   } else {
     res.sendStatus(404);
   }
 });
 
-//Routes
 router.post("/register", async (req, res) => {
   try {
     const username = req.body.username;
@@ -54,7 +99,6 @@ router.post("/register", async (req, res) => {
     const avatar = req.body.avatar;
     const native = req.body.nativeLanguage;
 
-    console.log(req.body);
     //Check user input
     if (!username || !email || !password || !native)
       throw new Error("Please provide the required information");
@@ -95,7 +139,7 @@ router.post("/login", async (req, res) => {
 
     //Create new tokens and save to database
     const accessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET!, {
-      expiresIn: "30s",
+      expiresIn: process.env.TOKEN_EXPIRATION,
     });
     const refreshToken = jwt.sign({ user }, process.env.REFRESH_TOKEN_SECRET!);
     await saveRefreshToken(user.id, refreshToken);
@@ -110,18 +154,72 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/token", (req, res) => {
-  const refreshToken = req.body.token;
-  if (refreshToken == null) return res.sendStatus(401);
-  if (!findOneRefreshToken(refreshToken)) return res.sendStatus(403);
-  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!, (err, user) => {
-    if (err) return res.sendStatus(403);
-    else {
-      const accessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET!, {
-        expiresIn: "30s",
-      });
-      res.json({ accessToken: accessToken });
+  try {
+    const refreshToken = req.body.token;
+
+    //Verify user input
+    if (refreshToken == null) throw new Error("Unauthorized");
+
+    //Check if the refresh token is stored in the database
+    if (!findOneRefreshToken(refreshToken)) throw new Error("Forbidden");
+
+    // Verify the refresh token
+    jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET!,
+      (err: any, decoded: any) => {
+        if (err) res.sendStatus(403);
+        else {
+          const accessToken = jwt.sign(
+            { user: decoded.user },
+            process.env.ACCESS_TOKEN_SECRET!,
+            {
+              expiresIn: process.env.TOKEN_EXPIRATION,
+            }
+          );
+          res.json({ accessToken: accessToken });
+        }
+      }
+    );
+  } catch (error) {
+    if (error.message === "Unauthorized") {
+      res.sendStatus(401);
+    } else if (error.message === "Forbidden") {
+      res.sendStatus(403);
+    } else {
+      res.sendStatus(400);
     }
-  });
+  }
 });
+
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+router.get(
+  "/google/callback",
+  passport.authenticate("google", { session: false }),
+  async (req, res) => {
+    //Create new tokens and save to database
+    const accessToken = jwt.sign(
+      { user: (req as any).user },
+      process.env.ACCESS_TOKEN_SECRET!,
+      {
+        expiresIn: process.env.TOKEN_EXPIRATION,
+      }
+    );
+    const refreshToken = jwt.sign(
+      { user: (req as any).user },
+      process.env.REFRESH_TOKEN_SECRET!
+    );
+    await saveRefreshToken((req as any).user.id, refreshToken);
+
+    res.json({
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    });
+  }
+);
 
 export default router;

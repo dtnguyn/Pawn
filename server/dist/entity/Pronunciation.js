@@ -10,7 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const Word_1 = require("./Word");
+const SavedWord_1 = require("./SavedWord");
 let Pronunciation = class Pronunciation {
 };
 __decorate([
@@ -30,8 +30,8 @@ __decorate([
     __metadata("design:type", String)
 ], Pronunciation.prototype, "wordId", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => Word_1.Word, (word) => word.pronunciations),
-    __metadata("design:type", Word_1.Word)
+    typeorm_1.ManyToOne(() => SavedWord_1.SavedWord, (word) => word.pronunciations),
+    __metadata("design:type", SavedWord_1.SavedWord)
 ], Pronunciation.prototype, "word", void 0);
 __decorate([
     typeorm_1.CreateDateColumn(),

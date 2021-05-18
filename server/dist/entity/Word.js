@@ -10,39 +10,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const Definition_1 = require("./Definition");
-const Pronunciation_1 = require("./Pronunciation");
-const User_1 = require("./User");
+const SavedWord_1 = require("./SavedWord");
 let Word = class Word {
 };
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn("uuid"),
-    __metadata("design:type", String)
-], Word.prototype, "id", void 0);
-__decorate([
-    typeorm_1.Column(),
+    typeorm_1.PrimaryColumn(),
     __metadata("design:type", String)
 ], Word.prototype, "value", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => User_1.User, (user) => user.learnedWords),
-    __metadata("design:type", User_1.User)
-], Word.prototype, "learner", void 0);
-__decorate([
-    typeorm_1.Column(),
+    typeorm_1.PrimaryColumn(),
     __metadata("design:type", String)
 ], Word.prototype, "language", void 0);
 __decorate([
-    typeorm_1.Column({ default: "0" }),
-    __metadata("design:type", Number)
-], Word.prototype, "position", void 0);
-__decorate([
-    typeorm_1.OneToMany(() => Definition_1.Definition, (definition) => definition.word),
+    typeorm_1.OneToMany(() => SavedWord_1.SavedWord, (savedWord) => savedWord.word),
     __metadata("design:type", Array)
-], Word.prototype, "definitions", void 0);
-__decorate([
-    typeorm_1.OneToMany(() => Pronunciation_1.Pronunciation, (pronunciation) => pronunciation.word),
-    __metadata("design:type", Array)
-], Word.prototype, "pronunciations", void 0);
+], Word.prototype, "savedWords", void 0);
 __decorate([
     typeorm_1.CreateDateColumn(),
     __metadata("design:type", Date)

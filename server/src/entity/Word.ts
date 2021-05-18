@@ -2,43 +2,22 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToMany,
-  ManyToOne,
   OneToMany,
   PrimaryColumn,
-  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { Definition } from "./Definition";
-import { Notification } from "./Notification";
-import { Pronunciation } from "./Pronunciation";
-import { User } from "./User";
+import { SavedWord } from "./SavedWord";
 
 @Entity()
 export class Word {
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
-
-  @Column()
+  @PrimaryColumn()
   value: string;
 
-  @Column*()
-  learnerId: string
-  @ManyToOne(() => User, (user) => user.learnedWords)
-  learner: User;
-
-
-  @Column()
+  @PrimaryColumn()
   language: string;
 
-  @Column({ default: "0" })
-  position: number;
-
-  @OneToMany(() => Definition, (definition) => definition.word)
-  definitions: Definition[];
-
-  @OneToMany(() => Pronunciation, (pronunciation) => pronunciation.word)
-  pronunciations: Pronunciation[];
+  @OneToMany(() => SavedWord, (savedWord) => savedWord.word)
+  savedWords: SavedWord[];
 
   @CreateDateColumn()
   createdAt: Date;

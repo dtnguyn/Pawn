@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { SavedWord } from "./SavedWord";
 import { Word } from "./Word";
 
 @Entity()
@@ -16,8 +17,8 @@ export class Definition {
 
   @Column()
   wordId: string;
-  @ManyToOne(() => Word, (word) => word.definitions)
-  word: Word;
+  @ManyToOne(() => SavedWord, (word) => word.definitions)
+  word: SavedWord;
 
   @Column()
   meaning: string;

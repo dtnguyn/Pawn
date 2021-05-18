@@ -27,6 +27,7 @@ const express_1 = __importDefault(require("express"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const word_1 = __importDefault(require("./routes/word"));
 const UserRefreshToken_1 = require("./entity/UserRefreshToken");
+const SavedWord_1 = require("./entity/SavedWord");
 typeorm_1.createConnection({
     type: "postgres",
     host: "localhost",
@@ -37,6 +38,7 @@ typeorm_1.createConnection({
     synchronize: true,
     entities: [
         Word_1.Word,
+        SavedWord_1.SavedWord,
         User_1.User,
         UserRefreshToken_1.UserRefreshToken,
         Topic_1.Topic,

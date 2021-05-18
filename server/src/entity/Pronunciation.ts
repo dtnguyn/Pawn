@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { SavedWord } from "./SavedWord";
 import { Word } from "./Word";
 
 @Entity()
@@ -21,8 +22,8 @@ export class Pronunciation {
 
   @Column()
   wordId: string;
-  @ManyToOne(() => Word, (word) => word.pronunciations)
-  word: Word;
+  @ManyToOne(() => SavedWord, (word) => word.pronunciations)
+  word: SavedWord;
 
   @CreateDateColumn()
   createdAt: Date;

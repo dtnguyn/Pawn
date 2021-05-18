@@ -17,6 +17,8 @@ const an_array_of_spanish_words_1 = __importDefault(require("an-array-of-spanish
 const all_the_german_words_1 = __importDefault(require("all-the-german-words"));
 const getRandomNumber_1 = require("../utils/getRandomNumber");
 const superagent_1 = __importDefault(require("superagent"));
+const typeorm_1 = require("typeorm");
+const Word_1 = require("../entity/Word");
 exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, void 0, function* () {
     const results = [];
     switch (language) {
@@ -137,5 +139,71 @@ exports.getDefinition = (word, language) => __awaiter(this, void 0, void 0, func
     }
     else
         return null;
+});
+exports.getWordAutoCompletes = (language, text) => __awaiter(this, void 0, void 0, function* () {
+    const wordRepo = typeorm_1.getRepository(Word_1.Word);
+    const autoCompletes = yield wordRepo
+        .createQueryBuilder("word")
+        .where("LOWER(word.value) LIKE LOWER(:text)", { text: `${text}%` })
+        .andWhere("word.language = :language", { language })
+        .limit(10)
+        .getMany();
+    console.log(autoCompletes);
+    return autoCompletes;
+});
+exports.importAllWords = () => __awaiter(this, void 0, void 0, function* () {
+    const wordRepo = typeorm_1.getRepository(Word_1.Word);
+    const enArr = yield wordRepo.find({ language: "en_US" });
+    if (!enArr.length)
+        yield importEnWords();
+    console.log("Finish import all English words");
+    const frArr = yield wordRepo.find({ language: "fr" });
+    if (!frArr.length)
+        yield importFrWords();
+    console.log("Finish import all French words");
+    const esArr = yield wordRepo.find({ language: "es" });
+    if (!esArr.length)
+        yield importEsWords();
+    console.log("Finish import all Spanish words");
+    const deArr = yield wordRepo.find({ language: "de" });
+    if (!deArr.length)
+        yield importDeWords();
+    console.log("Finish import all German words");
+});
+const importEnWords = () => __awaiter(this, void 0, void 0, function* () {
+    const wordRepo = typeorm_1.getRepository(Word_1.Word);
+    for (const word of an_array_of_english_words_1.default) {
+        yield wordRepo.insert({
+            value: word,
+            language: "en_US",
+        });
+    }
+});
+const importDeWords = () => __awaiter(this, void 0, void 0, function* () {
+    const wordRepo = typeorm_1.getRepository(Word_1.Word);
+    for (const word of all_the_german_words_1.default) {
+        yield wordRepo.insert({
+            value: word,
+            language: "de",
+        });
+    }
+});
+const importFrWords = () => __awaiter(this, void 0, void 0, function* () {
+    const wordRepo = typeorm_1.getRepository(Word_1.Word);
+    for (const word of an_array_of_french_words_1.default) {
+        yield wordRepo.insert({
+            value: word,
+            language: "fr",
+        });
+    }
+});
+const importEsWords = () => __awaiter(this, void 0, void 0, function* () {
+    const wordRepo = typeorm_1.getRepository(Word_1.Word);
+    for (const word of an_array_of_spanish_words_1.default) {
+        yield wordRepo.insert({
+            value: word,
+            language: "es",
+        });
+    }
 });
 //# sourceMappingURL=WordController.js.map

@@ -14,9 +14,9 @@ const ChatImage_1 = require("./ChatImage");
 const GroupChat_1 = require("./GroupChat");
 const Language_1 = require("./Language");
 const Notification_1 = require("./Notification");
+const SavedWord_1 = require("./SavedWord");
 const Topic_1 = require("./Topic");
 const UserRefreshToken_1 = require("./UserRefreshToken");
-const Word_1 = require("./Word");
 let User = class User {
 };
 __decorate([
@@ -51,6 +51,10 @@ __decorate([
     typeorm_1.Column({ default: true }),
     __metadata("design:type", Boolean)
 ], User.prototype, "notificationEnabled", void 0);
+__decorate([
+    typeorm_1.OneToMany(() => SavedWord_1.SavedWord, (word) => word.user),
+    __metadata("design:type", Array)
+], User.prototype, "savedWords", void 0);
 __decorate([
     typeorm_1.OneToMany(() => UserRefreshToken_1.UserRefreshToken, (token) => token.user),
     __metadata("design:type", Array)
@@ -99,10 +103,6 @@ __decorate([
     typeorm_1.OneToMany(() => ChatImage_1.ChatImage, (image) => image.user),
     __metadata("design:type", Array)
 ], User.prototype, "chatMessages", void 0);
-__decorate([
-    typeorm_1.OneToMany(() => Word_1.Word, (word) => word.learner),
-    __metadata("design:type", Array)
-], User.prototype, "learnedWords", void 0);
 __decorate([
     typeorm_1.CreateDateColumn(),
     __metadata("design:type", Date)

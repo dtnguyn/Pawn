@@ -15,6 +15,8 @@ import auth from "./routes/auth";
 import word from "./routes/word";
 
 import { UserRefreshToken } from "./entity/UserRefreshToken";
+import { SavedWord } from "./entity/SavedWord";
+import { importAllWords } from "./controllers/WordController";
 
 createConnection({
   type: "postgres",
@@ -26,6 +28,7 @@ createConnection({
   synchronize: true,
   entities: [
     Word,
+    SavedWord,
     User,
     UserRefreshToken,
     Topic,
@@ -44,6 +47,8 @@ createConnection({
 
     app.use("/auth", auth);
     app.use("/word", word);
+
+    //await importAllWords();
 
     app.listen(4000, () => {
       console.log("Server is running on port 4000");

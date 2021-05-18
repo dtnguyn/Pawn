@@ -14,6 +14,7 @@ import { ChatMessage } from "./ChatMessage";
 import { GroupChat } from "./GroupChat";
 import { Language } from "./Language";
 import { Notification } from "./Notification";
+import { SavedWord } from "./SavedWord";
 import { Topic } from "./Topic";
 import { UserRefreshToken } from "./UserRefreshToken";
 import { Word } from "./Word";
@@ -43,6 +44,9 @@ export class User {
 
   @Column({ default: true })
   notificationEnabled: boolean;
+
+  @OneToMany(() => SavedWord, (word) => word.user)
+  savedWords: SavedWord[];
 
   @OneToMany(() => UserRefreshToken, (token) => token.user)
   refreshTokens: UserRefreshToken[];
@@ -79,9 +83,6 @@ export class User {
 
   @OneToMany(() => ChatImage, (image) => image.user)
   chatMessages: ChatMessage[];
-
-  @OneToMany(() => Word, (word) => word.learner)
-  learnedWords: Word[];
 
   @CreateDateColumn()
   createdAt: Date;

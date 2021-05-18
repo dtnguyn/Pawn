@@ -34,7 +34,24 @@ router.get("/definition", (req, res) => __awaiter(this, void 0, void 0, function
         if (!word || !language)
             throw new Error("Please provide the word and definition language");
         const definition = yield WordController_1.getDefinition(word, language);
+        if (!definition)
+            throw new Error("Couldn't find definition for the word provided!");
         res.json(definition);
+    }
+    catch (error) {
+        res.status(400).send({
+            message: error.message,
+        });
+    }
+}));
+router.get("/autocomplete", (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const text = req.query.text;
+        const language = req.query.language;
+        if (!text || !language)
+            throw new Error("Please provide text and language!");
+        const results = yield WordController_1.getWordAutoCompletes(language, text);
+        res.send(results);
     }
     catch (error) {
         res.status(400).send({

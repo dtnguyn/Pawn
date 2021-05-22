@@ -46,14 +46,13 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: process.env.GOOGLE_CLIENT_SECRET,
 }, handleAuth));
-const checkAuthentication = (req, res, next) => {
+exports.checkAuthentication = (req, res, next) => {
     const authHeader = req.headers["authorization"];
     let token = authHeader && authHeader.split(" ")[1];
     if (!token)
         res.sendStatus(401);
     else {
         jsonwebtoken_1.default.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-            console.log(err);
             if (err) {
                 res.sendStatus(403);
             }
@@ -64,7 +63,7 @@ const checkAuthentication = (req, res, next) => {
         });
     }
 };
-router.get("/", checkAuthentication, (req, res) => {
+router.get("/", exports.checkAuthentication, (req, res) => {
     const user = req && req.user;
     if (user) {
         res.json(user);

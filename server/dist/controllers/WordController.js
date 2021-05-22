@@ -19,6 +19,9 @@ const getRandomNumber_1 = require("../utils/getRandomNumber");
 const superagent_1 = __importDefault(require("superagent"));
 const typeorm_1 = require("typeorm");
 const Word_1 = require("../entity/Word");
+const SavedWord_1 = require("../entity/SavedWord");
+const Pronunciation_1 = require("../entity/Pronunciation");
+const Definition_1 = require("../entity/Definition");
 exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, void 0, function* () {
     const results = [];
     switch (language) {
@@ -148,8 +151,82 @@ exports.getWordAutoCompletes = (language, text) => __awaiter(this, void 0, void 
         .andWhere("word.language = :language", { language })
         .limit(10)
         .getMany();
-    console.log(autoCompletes);
     return autoCompletes;
+});
+exports.toggleSaveWord = (word, language, userId) => __awaiter(this, void 0, void 0, function* () {
+    const savedWordRepo = typeorm_1.getRepository(SavedWord_1.SavedWord);
+    const wordRepo = typeorm_1.getRepository(Word_1.Word);
+    const savedWord = yield savedWordRepo.findOne({
+        wordValue: word,
+        language,
+        userId,
+    });
+    if (savedWord) {
+        yield savedWordRepo.delete({
+            id: savedWord.id,
+        });
+    }
+    else {
+        const def = yield exports.getDefinition(word, language);
+        const wordDb = yield wordRepo.findOne({
+            value: word,
+            language,
+        });
+        if (!wordDb)
+            throw new Error("Not found word!");
+        if (def) {
+            const queryRunner = typeorm_1.getConnection().createQueryRunner();
+            yield queryRunner.connect();
+            yield queryRunner.startTransaction();
+            try {
+                const manager = queryRunner.manager;
+                const length = yield savedWordRepo.count({ userId });
+                const savedWordDb = manager.create(SavedWord_1.SavedWord, {
+                    wordId: wordDb.id,
+                    userId,
+                    wordValue: word,
+                    language,
+                    position: length + 1,
+                });
+                yield manager.save(SavedWord_1.SavedWord, savedWordDb);
+                for (const pron of def.pronunciations) {
+                    yield manager.insert(Pronunciation_1.Pronunciation, {
+                        savedWordId: savedWordDb.id,
+                        symbol: pron.symbol,
+                        audio: pron.audio,
+                    });
+                }
+                for (const definition of def.definitions) {
+                    yield manager.insert(Definition_1.Definition, {
+                        savedWordId: savedWordDb.id,
+                        meaning: definition.meaning,
+                        example: definition.example,
+                        partOfSpeech: definition.partOfSpeech,
+                    });
+                }
+                yield queryRunner.commitTransaction();
+                yield queryRunner.release();
+            }
+            catch (error) {
+                yield queryRunner.rollbackTransaction();
+                throw error;
+            }
+        }
+        else
+            throw new Error("Not found definition");
+    }
+});
+exports.getSavedWords = (userId) => __awaiter(this, void 0, void 0, function* () {
+    const savedWordRepo = typeorm_1.getRepository(SavedWord_1.SavedWord);
+    const savedWords = yield savedWordRepo
+        .createQueryBuilder("savedWord")
+        .leftJoinAndSelect("savedWord.word", "word")
+        .leftJoinAndSelect("savedWord.pronunciations", "pronunciations")
+        .leftJoinAndSelect("savedWord.definitions", "definitions")
+        .leftJoinAndSelect("savedWord.user", "user")
+        .getMany();
+    console.log(savedWords);
+    return savedWords;
 });
 exports.importAllWords = () => __awaiter(this, void 0, void 0, function* () {
     const wordRepo = typeorm_1.getRepository(Word_1.Word);

@@ -21,23 +21,33 @@ __decorate([
     __metadata("design:type", String)
 ], SavedWord.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column(),
+    typeorm_1.Column("uuid"),
     __metadata("design:type", String)
-], SavedWord.prototype, "wordValue", void 0);
+], SavedWord.prototype, "wordId", void 0);
 __decorate([
     typeorm_1.ManyToOne(() => Word_1.Word, (word) => word.savedWords),
+    typeorm_1.JoinColumn({ name: "wordId" }),
     __metadata("design:type", Word_1.Word)
 ], SavedWord.prototype, "word", void 0);
 __decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)
+], SavedWord.prototype, "wordValue", void 0);
+__decorate([
+    typeorm_1.Column(),
+    __metadata("design:type", String)
+], SavedWord.prototype, "language", void 0);
+__decorate([
+    typeorm_1.Column("uuid"),
+    __metadata("design:type", String)
 ], SavedWord.prototype, "userId", void 0);
 __decorate([
     typeorm_1.ManyToOne(() => User_1.User, (user) => user.savedWords),
+    typeorm_1.JoinColumn({ name: "userId" }),
     __metadata("design:type", User_1.User)
 ], SavedWord.prototype, "user", void 0);
 __decorate([
-    typeorm_1.Column({ default: "0" }),
+    typeorm_1.Column(),
     __metadata("design:type", Number)
 ], SavedWord.prototype, "position", void 0);
 __decorate([

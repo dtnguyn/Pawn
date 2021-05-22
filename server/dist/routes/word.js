@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const WordController_1 = require("../controllers/WordController");
+const auth_1 = require("./auth");
 const router = express_1.Router();
 router.get("/daily", (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
@@ -54,6 +55,33 @@ router.get("/autocomplete", (req, res) => __awaiter(this, void 0, void 0, functi
         res.send(results);
     }
     catch (error) {
+        res.status(400).send({
+            message: error.message,
+        });
+    }
+}));
+router.get("/save", auth_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const userId = req.user.id;
+        const savedWords = yield WordController_1.getSavedWords(userId);
+        res.json(savedWords);
+    }
+    catch (error) {
+        res.status(400).send({
+            message: error.message,
+        });
+    }
+}));
+router.post("/save", auth_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const word = req.body.word;
+        const language = req.body.language;
+        const userId = req.user.id;
+        yield WordController_1.toggleSaveWord(word, language, userId);
+        res.json({ status: true });
+    }
+    catch (error) {
+        console.log(error);
         res.status(400).send({
             message: error.message,
         });

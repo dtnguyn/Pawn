@@ -2,13 +2,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { SavedWord } from "./SavedWord";
-import { Word } from "./Word";
 
 @Entity()
 export class Definition {
@@ -16,17 +16,21 @@ export class Definition {
   id: string;
 
   @Column()
-  wordId: string;
-  @ManyToOne(() => SavedWord, (word) => word.definitions)
+  savedWordId: string;
+  @ManyToOne(() => SavedWord, (word) => word.definitions, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
+  @JoinColumn({ name: "savedWordId" })
   word: SavedWord;
 
-  @Column()
+  @PrimaryColumn()
   meaning: string;
 
   @Column()
   partOfSpeech: string;
 
-  @Column()
+  @Column({ nullable: true })
   example: string;
 
   @CreateDateColumn()

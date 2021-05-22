@@ -2,9 +2,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Generated,
+  JoinColumn,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -19,17 +20,25 @@ export class SavedWord {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column()
-  wordValue: string;
+  @Column("uuid")
+  wordId: string;
   @ManyToOne(() => Word, (word) => word.savedWords)
+  @JoinColumn({ name: "wordId" })
   word: Word;
 
   @Column()
+  wordValue: string;
+
+  @Column()
+  language: string;
+
+  @Column("uuid")
   userId: string;
   @ManyToOne(() => User, (user) => user.savedWords)
+  @JoinColumn({ name: "userId" })
   user: User;
 
-  @Column({ default: "0" })
+  @Column()
   position: number;
 
   @OneToMany(() => Definition, (definition) => definition.word)

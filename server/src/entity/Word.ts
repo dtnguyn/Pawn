@@ -4,16 +4,20 @@ import {
   Entity,
   OneToMany,
   PrimaryColumn,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { SavedWord } from "./SavedWord";
 
 @Entity()
 export class Word {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
+
+  @Column()
   value: string;
 
-  @PrimaryColumn()
+  @Column()
   language: string;
 
   @OneToMany(() => SavedWord, (savedWord) => savedWord.word)

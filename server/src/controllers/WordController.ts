@@ -5,8 +5,11 @@ import deWords from "all-the-german-words";
 import { getRandomNumber } from "../utils/getRandomNumber";
 import superagent from "superagent";
 import { WordJSON } from "../utils/types";
-import { getRepository } from "typeorm";
+import { getConnection, getRepository } from "typeorm";
 import { Word } from "../entity/Word";
+import { SavedWord } from "../entity/SavedWord";
+import { Pronunciation } from "../entity/Pronunciation";
+import { Definition } from "../entity/Definition";
 
 export const getDailyRandomWords = async (
   wordCount: number,
@@ -147,9 +150,97 @@ export const getWordAutoCompletes = async (language: string, text: string) => {
     .andWhere("word.language = :language", { language })
     .limit(10)
     .getMany();
-  console.log(autoCompletes);
   // const autoCompletes = await wordRepo.find({ language, value: text });
   return autoCompletes;
+};
+
+export const toggleSaveWord = async (
+  word: string,
+  language: string,
+  userId: string
+) => {
+  const savedWordRepo = getRepository(SavedWord);
+  const wordRepo = getRepository(Word);
+
+  const savedWord = await savedWordRepo.findOne({
+    wordValue: word,
+    language,
+    userId,
+  });
+
+  if (savedWord) {
+    //Remove save word
+    await savedWordRepo.delete({
+      id: savedWord.id,
+    });
+  } else {
+    const def = await getDefinition(word, language);
+
+    const wordDb = await wordRepo.findOne({
+      value: word,
+      language,
+    });
+
+    if (!wordDb) throw new Error("Not found word!");
+
+    if (def) {
+      const queryRunner = getConnection().createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      try {
+        const manager = queryRunner.manager;
+        const length = await savedWordRepo.count({ userId });
+        const savedWordDb = manager.create(SavedWord, {
+          wordId: wordDb.id,
+          userId,
+          wordValue: word,
+          language,
+          position: length + 1,
+        });
+
+        await manager.save(SavedWord, savedWordDb);
+
+        for (const pron of def.pronunciations) {
+          await manager.insert(Pronunciation, {
+            savedWordId: savedWordDb.id,
+            symbol: pron.symbol,
+            audio: pron.audio,
+          });
+        }
+
+        for (const definition of def.definitions) {
+          await manager.insert(Definition, {
+            savedWordId: savedWordDb.id,
+            meaning: definition.meaning,
+            example: definition.example,
+            partOfSpeech: definition.partOfSpeech,
+          });
+        }
+        await queryRunner.commitTransaction();
+        await queryRunner.release();
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+
+        throw error;
+      }
+    } else throw new Error("Not found definition");
+  }
+};
+
+export const getSavedWords = async (userId: string) => {
+  const savedWordRepo = getRepository(SavedWord);
+
+  const savedWords = await savedWordRepo
+    .createQueryBuilder("savedWord")
+    .leftJoinAndSelect("savedWord.word", "word")
+    .leftJoinAndSelect("savedWord.pronunciations", "pronunciations")
+    .leftJoinAndSelect("savedWord.definitions", "definitions")
+    .leftJoinAndSelect("savedWord.user", "user")
+    .getMany();
+
+  // const savedWords = await savedWordRepo.find();
+  console.log(savedWords);
+  return savedWords;
 };
 
 export const importAllWords = async () => {

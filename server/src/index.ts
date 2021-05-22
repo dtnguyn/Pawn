@@ -48,7 +48,8 @@ createConnection({
     app.use("/auth", auth);
     app.use("/word", word);
 
-    //await importAllWords();
+    // await importAllWords();
+    console.log(await getRepository(SavedWord).find());
 
     app.listen(4000, () => {
       console.log("Server is running on port 4000");

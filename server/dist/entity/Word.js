@@ -14,11 +14,15 @@ const SavedWord_1 = require("./SavedWord");
 let Word = class Word {
 };
 __decorate([
-    typeorm_1.PrimaryColumn(),
+    typeorm_1.PrimaryGeneratedColumn("uuid"),
+    __metadata("design:type", String)
+], Word.prototype, "id", void 0);
+__decorate([
+    typeorm_1.Column(),
     __metadata("design:type", String)
 ], Word.prototype, "value", void 0);
 __decorate([
-    typeorm_1.PrimaryColumn(),
+    typeorm_1.Column(),
     __metadata("design:type", String)
 ], Word.prototype, "language", void 0);
 __decorate([

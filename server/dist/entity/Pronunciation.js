@@ -22,15 +22,19 @@ __decorate([
     __metadata("design:type", String)
 ], Pronunciation.prototype, "symbol", void 0);
 __decorate([
-    typeorm_1.Column(),
+    typeorm_1.PrimaryColumn(),
     __metadata("design:type", String)
 ], Pronunciation.prototype, "audio", void 0);
 __decorate([
-    typeorm_1.Column(),
+    typeorm_1.PrimaryColumn("uuid"),
     __metadata("design:type", String)
-], Pronunciation.prototype, "wordId", void 0);
+], Pronunciation.prototype, "savedWordId", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => SavedWord_1.SavedWord, (word) => word.pronunciations),
+    typeorm_1.ManyToOne(() => SavedWord_1.SavedWord, (word) => word.pronunciations, {
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+    }),
+    typeorm_1.JoinColumn({ name: "savedWordId" }),
     __metadata("design:type", SavedWord_1.SavedWord)
 ], Pronunciation.prototype, "word", void 0);
 __decorate([

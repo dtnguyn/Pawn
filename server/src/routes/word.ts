@@ -2,9 +2,12 @@ import { Request, Response, Router } from "express";
 import {
   getDailyRandomWords,
   getDefinition,
+  getSavedWords,
   getWordAutoCompletes,
+  toggleSaveWord,
 } from "../controllers/WordController";
 import { User } from "../entity/User";
+import { checkAuthentication } from "./auth";
 
 const router = Router();
 
@@ -57,6 +60,34 @@ router.get("/autocomplete", async (req, res) => {
     // console.log(results);
     res.send(results);
   } catch (error) {
+    res.status(400).send({
+      message: error.message,
+    });
+  }
+});
+
+router.get("/save", checkAuthentication, async (req, res) => {
+  try {
+    const userId = (req as any).user.id;
+    const savedWords = await getSavedWords(userId);
+    res.json(savedWords);
+  } catch (error) {
+    res.status(400).send({
+      message: error.message,
+    });
+  }
+});
+
+//Post routes
+router.post("/save", checkAuthentication, async (req, res) => {
+  try {
+    const word = req.body.word;
+    const language = req.body.language;
+    const userId = (req as any).user.id;
+    await toggleSaveWord(word, language, userId);
+    res.json({ status: true });
+  } catch (error) {
+    console.log(error);
     res.status(400).send({
       message: error.message,
     });

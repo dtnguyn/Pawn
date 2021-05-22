@@ -2,12 +2,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
+  PrimaryColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { SavedWord } from "./SavedWord";
-import { Word } from "./Word";
 
 @Entity()
 export class Pronunciation {
@@ -17,12 +18,16 @@ export class Pronunciation {
   @Column()
   symbol: string;
 
-  @Column()
+  @PrimaryColumn()
   audio: string;
 
-  @Column()
-  wordId: string;
-  @ManyToOne(() => SavedWord, (word) => word.pronunciations)
+  @PrimaryColumn("uuid")
+  savedWordId: string;
+  @ManyToOne(() => SavedWord, (word) => word.pronunciations, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
+  @JoinColumn({ name: "savedWordId" })
   word: SavedWord;
 
   @CreateDateColumn()

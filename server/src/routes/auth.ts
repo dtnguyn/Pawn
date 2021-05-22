@@ -59,7 +59,11 @@ passport.use(
 );
 
 //Middlewares
-const checkAuthentication = (req: Request, res: Response, next: Function) => {
+export const checkAuthentication = (
+  req: Request,
+  res: Response,
+  next: Function
+) => {
   const authHeader = req.headers["authorization"];
   let token = authHeader && authHeader.split(" ")[1];
 
@@ -69,7 +73,6 @@ const checkAuthentication = (req: Request, res: Response, next: Function) => {
       token,
       process.env.ACCESS_TOKEN_SECRET!,
       (err: any, decoded: any) => {
-        console.log(err);
         if (err) {
           res.sendStatus(403);
         } else {

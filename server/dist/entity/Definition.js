@@ -20,13 +20,17 @@ __decorate([
 __decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)
-], Definition.prototype, "wordId", void 0);
+], Definition.prototype, "savedWordId", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => SavedWord_1.SavedWord, (word) => word.definitions),
+    typeorm_1.ManyToOne(() => SavedWord_1.SavedWord, (word) => word.definitions, {
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+    }),
+    typeorm_1.JoinColumn({ name: "savedWordId" }),
     __metadata("design:type", SavedWord_1.SavedWord)
 ], Definition.prototype, "word", void 0);
 __decorate([
-    typeorm_1.Column(),
+    typeorm_1.PrimaryColumn(),
     __metadata("design:type", String)
 ], Definition.prototype, "meaning", void 0);
 __decorate([
@@ -34,7 +38,7 @@ __decorate([
     __metadata("design:type", String)
 ], Definition.prototype, "partOfSpeech", void 0);
 __decorate([
-    typeorm_1.Column(),
+    typeorm_1.Column({ nullable: true }),
     __metadata("design:type", String)
 ], Definition.prototype, "example", void 0);
 __decorate([

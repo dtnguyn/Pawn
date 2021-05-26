@@ -24,8 +24,11 @@ export class Definition {
   @JoinColumn({ name: "savedWordId" })
   word: SavedWord;
 
-  @PrimaryColumn()
+  @Column()
   meaning: string;
+
+  @Column()
+  position: number;
 
   @Column()
   partOfSpeech: string;

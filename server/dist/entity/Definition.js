@@ -30,9 +30,13 @@ __decorate([
     __metadata("design:type", SavedWord_1.SavedWord)
 ], Definition.prototype, "word", void 0);
 __decorate([
-    typeorm_1.PrimaryColumn(),
+    typeorm_1.Column(),
     __metadata("design:type", String)
 ], Definition.prototype, "meaning", void 0);
+__decorate([
+    typeorm_1.Column(),
+    __metadata("design:type", Number)
+], Definition.prototype, "position", void 0);
 __decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)

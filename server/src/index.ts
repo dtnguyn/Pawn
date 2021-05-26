@@ -49,7 +49,7 @@ createConnection({
     app.use("/word", word);
 
     // await importAllWords();
-    console.log(await getRepository(SavedWord).find());
+    console.log(await getRepository(Definition).find());
 
     app.listen(4000, () => {
       console.log("Server is running on port 4000");

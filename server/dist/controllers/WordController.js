@@ -180,7 +180,7 @@ exports.toggleSaveWord = (word, language, userId) => __awaiter(this, void 0, voi
             yield queryRunner.startTransaction();
             try {
                 const manager = queryRunner.manager;
-                const length = yield savedWordRepo.count({ userId });
+                const length = yield savedWordRepo.count({ userId, language });
                 const savedWordDb = manager.create(SavedWord_1.SavedWord, {
                     wordId: wordDb.id,
                     userId,
@@ -196,12 +196,14 @@ exports.toggleSaveWord = (word, language, userId) => __awaiter(this, void 0, voi
                         audio: pron.audio,
                     });
                 }
-                for (const definition of def.definitions) {
+                for (let i = 0; i < def.definitions.length; i++) {
+                    const definition = def.definitions[i];
                     yield manager.insert(Definition_1.Definition, {
                         savedWordId: savedWordDb.id,
                         meaning: definition.meaning,
                         example: definition.example,
                         partOfSpeech: definition.partOfSpeech,
+                        position: i + 1,
                     });
                 }
                 yield queryRunner.commitTransaction();
@@ -223,7 +225,9 @@ exports.getSavedWords = (userId) => __awaiter(this, void 0, void 0, function* ()
         .leftJoinAndSelect("savedWord.word", "word")
         .leftJoinAndSelect("savedWord.pronunciations", "pronunciations")
         .leftJoinAndSelect("savedWord.definitions", "definitions")
+        .orderBy("definitions.position", "ASC")
         .leftJoinAndSelect("savedWord.user", "user")
+        .orderBy("savedWord.position", "ASC")
         .getMany();
     console.log(savedWords);
     return savedWords;
@@ -246,6 +250,40 @@ exports.importAllWords = () => __awaiter(this, void 0, void 0, function* () {
     if (!deArr.length)
         yield importDeWords();
     console.log("Finish import all German words");
+});
+exports.rearrangeSavedWords = (wordIds) => __awaiter(this, void 0, void 0, function* () {
+    const savedWordRepo = typeorm_1.getRepository(SavedWord_1.SavedWord);
+    yield new Promise((resolve, reject) => {
+        let counter = 0;
+        for (let i = 0; i < wordIds.length; i++) {
+            savedWordRepo
+                .update({ id: wordIds[i] }, { position: i + 1 })
+                .then(() => {
+                counter += 1;
+                if (counter === wordIds.length) {
+                    resolve(true);
+                }
+            })
+                .catch((e) => reject(e));
+        }
+    });
+});
+exports.rearrangeDefinition = (definitionIds) => __awaiter(this, void 0, void 0, function* () {
+    const definitionRepo = typeorm_1.getRepository(Definition_1.Definition);
+    yield new Promise((resolve, reject) => {
+        let counter = 0;
+        for (let i = 0; i < definitionIds.length; i++) {
+            definitionRepo
+                .update({ id: definitionIds[i] }, { position: i + 1 })
+                .then(() => {
+                counter += 1;
+                if (counter === definitionIds.length) {
+                    resolve(true);
+                }
+            })
+                .catch((e) => reject(e));
+        }
+    });
 });
 const importEnWords = () => __awaiter(this, void 0, void 0, function* () {
     const wordRepo = typeorm_1.getRepository(Word_1.Word);

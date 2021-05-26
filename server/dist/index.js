@@ -56,7 +56,7 @@ typeorm_1.createConnection({
     app.use(express_1.default.json());
     app.use("/auth", auth_1.default);
     app.use("/word", word_1.default);
-    console.log(yield typeorm_1.getRepository(SavedWord_1.SavedWord).find());
+    console.log(yield typeorm_1.getRepository(Definition_1.Definition).find());
     app.listen(4000, () => {
         console.log("Server is running on port 4000");
     });

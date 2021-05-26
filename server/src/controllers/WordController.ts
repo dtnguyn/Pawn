@@ -10,6 +10,7 @@ import { Word } from "../entity/Word";
 import { SavedWord } from "../entity/SavedWord";
 import { Pronunciation } from "../entity/Pronunciation";
 import { Definition } from "../entity/Definition";
+import { rejects } from "assert";
 
 export const getDailyRandomWords = async (
   wordCount: number,
@@ -189,7 +190,7 @@ export const toggleSaveWord = async (
       await queryRunner.startTransaction();
       try {
         const manager = queryRunner.manager;
-        const length = await savedWordRepo.count({ userId });
+        const length = await savedWordRepo.count({ userId, language });
         const savedWordDb = manager.create(SavedWord, {
           wordId: wordDb.id,
           userId,
@@ -208,12 +209,14 @@ export const toggleSaveWord = async (
           });
         }
 
-        for (const definition of def.definitions) {
+        for (let i = 0; i < def.definitions.length; i++) {
+          const definition = def.definitions[i];
           await manager.insert(Definition, {
             savedWordId: savedWordDb.id,
             meaning: definition.meaning,
             example: definition.example,
             partOfSpeech: definition.partOfSpeech,
+            position: i + 1,
           });
         }
         await queryRunner.commitTransaction();
@@ -235,7 +238,9 @@ export const getSavedWords = async (userId: string) => {
     .leftJoinAndSelect("savedWord.word", "word")
     .leftJoinAndSelect("savedWord.pronunciations", "pronunciations")
     .leftJoinAndSelect("savedWord.definitions", "definitions")
+    .orderBy("definitions.position", "ASC")
     .leftJoinAndSelect("savedWord.user", "user")
+    .orderBy("savedWord.position", "ASC")
     .getMany();
 
   // const savedWords = await savedWordRepo.find();
@@ -261,6 +266,43 @@ export const importAllWords = async () => {
   const deArr = await wordRepo.find({ language: "de" });
   if (!deArr.length) await importDeWords();
   console.log("Finish import all German words");
+};
+
+export const rearrangeSavedWords = async (wordIds: string[]) => {
+  const savedWordRepo = getRepository(SavedWord);
+
+  await new Promise((resolve, reject) => {
+    let counter = 0;
+    for (let i = 0; i < wordIds.length; i++) {
+      savedWordRepo
+        .update({ id: wordIds[i] }, { position: i + 1 })
+        .then(() => {
+          counter += 1;
+          if (counter === wordIds.length) {
+            resolve(true);
+          }
+        })
+        .catch((e) => reject(e));
+    }
+  });
+};
+
+export const rearrangeDefinition = async (definitionIds: string[]) => {
+  const definitionRepo = getRepository(Definition);
+  await new Promise((resolve, reject) => {
+    let counter = 0;
+    for (let i = 0; i < definitionIds.length; i++) {
+      definitionRepo
+        .update({ id: definitionIds[i] }, { position: i + 1 })
+        .then(() => {
+          counter += 1;
+          if (counter === definitionIds.length) {
+            resolve(true);
+          }
+        })
+        .catch((e) => reject(e));
+    }
+  });
 };
 
 const importEnWords = async () => {

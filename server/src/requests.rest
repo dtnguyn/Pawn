@@ -58,7 +58,7 @@ Content-Type: application/json
 
 {
     "language": "en_US",
-    "word": "apple"
+    "word": "test"
 }
 
 
@@ -66,3 +66,31 @@ Content-Type: application/json
 GET http://localhost:4000/word/save
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNzhjMGI4NTktYTA2Ni00ZGExLWEyNmYtYTFiZDdlMDFmYWU0Iiwib2F1dGhJZCI6bnVsbCwidXNlcm5hbWUiOiJhZHJvbiIsInBhc3N3b3JkIjoiJDJiJDEwJFZpNERTN1pSLnVJSGJ2UUxUaHJJUXVkT1dWR3BBVXFoV2g2bXlUUWN3cHJ0MEUuaXpkcUZtIiwiZW1haWwiOiJhZHJvbjA5MTRAZ21haWwuY29tIiwiYXZhdGFyIjpudWxsLCJkYWlseVdvcmRDb3VudCI6Mywibm90aWZpY2F0aW9uRW5hYmxlZCI6dHJ1ZSwibmF0aXZlTGFuZ3VhZ2VJZCI6InZpZSIsImNyZWF0ZWRBdCI6IjIwMjEtMDUtMjJUMjA6MDQ6MjcuMDg1WiIsInVwZGF0ZWRBdCI6IjIwMjEtMDUtMjJUMjA6MDQ6MjcuMDg1WiJ9LCJpYXQiOjE2MjE3MTM4NzMsImV4cCI6MTYyMjMxODY3M30.HFDOu8xJCcgy-8blhsfOba7oQB-CCtbVeFihvNI7fqk
 
+
+###
+
+PATCH http://localhost:4000/word/rearrange
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNzhjMGI4NTktYTA2Ni00ZGExLWEyNmYtYTFiZDdlMDFmYWU0Iiwib2F1dGhJZCI6bnVsbCwidXNlcm5hbWUiOiJhZHJvbiIsInBhc3N3b3JkIjoiJDJiJDEwJFZpNERTN1pSLnVJSGJ2UUxUaHJJUXVkT1dWR3BBVXFoV2g2bXlUUWN3cHJ0MEUuaXpkcUZtIiwiZW1haWwiOiJhZHJvbjA5MTRAZ21haWwuY29tIiwiYXZhdGFyIjpudWxsLCJkYWlseVdvcmRDb3VudCI6Mywibm90aWZpY2F0aW9uRW5hYmxlZCI6dHJ1ZSwibmF0aXZlTGFuZ3VhZ2VJZCI6InZpZSIsImNyZWF0ZWRBdCI6IjIwMjEtMDUtMjJUMjA6MDQ6MjcuMDg1WiIsInVwZGF0ZWRBdCI6IjIwMjEtMDUtMjJUMjA6MDQ6MjcuMDg1WiJ9LCJpYXQiOjE2MjE3MTM4NzMsImV4cCI6MTYyMjMxODY3M30.HFDOu8xJCcgy-8blhsfOba7oQB-CCtbVeFihvNI7fqk
+Content-Type: application/json
+
+{
+    "wordIds": [
+        "9285580b-c212-4d49-9f22-f621091d0fef",
+        "f7eac6d0-19b7-4a86-8321-3d2a7ab54ec3",
+        "f7eac6d0-19b7-4a86-8321-3d2a7ab54ec3"
+    ]
+}
+
+###
+
+PATCH http://localhost:4000/word/definition/rearrange
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNzhjMGI4NTktYTA2Ni00ZGExLWEyNmYtYTFiZDdlMDFmYWU0Iiwib2F1dGhJZCI6bnVsbCwidXNlcm5hbWUiOiJhZHJvbiIsInBhc3N3b3JkIjoiJDJiJDEwJFZpNERTN1pSLnVJSGJ2UUxUaHJJUXVkT1dWR3BBVXFoV2g2bXlUUWN3cHJ0MEUuaXpkcUZtIiwiZW1haWwiOiJhZHJvbjA5MTRAZ21haWwuY29tIiwiYXZhdGFyIjpudWxsLCJkYWlseVdvcmRDb3VudCI6Mywibm90aWZpY2F0aW9uRW5hYmxlZCI6dHJ1ZSwibmF0aXZlTGFuZ3VhZ2VJZCI6InZpZSIsImNyZWF0ZWRBdCI6IjIwMjEtMDUtMjJUMjA6MDQ6MjcuMDg1WiIsInVwZGF0ZWRBdCI6IjIwMjEtMDUtMjJUMjA6MDQ6MjcuMDg1WiJ9LCJpYXQiOjE2MjE3MTM4NzMsImV4cCI6MTYyMjMxODY3M30.HFDOu8xJCcgy-8blhsfOba7oQB-CCtbVeFihvNI7fqk
+Content-Type: application/json
+
+{
+    "definitionIds": [
+        "ec263413-fd91-4bac-afac-fe5ddc0aded8",
+        "92de77b8-df6c-402b-bc8b-579aba61eef9",
+        "b0cbc08d-45e6-4c7c-b21e-c9feb0ec07bf"
+    ]
+}

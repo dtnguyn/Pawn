@@ -87,5 +87,35 @@ router.post("/save", auth_1.checkAuthentication, (req, res) => __awaiter(this, v
         });
     }
 }));
+router.patch("/rearrange", auth_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const wordIds = req.body.wordIds;
+        if (!wordIds || !wordIds.length)
+            throw new Error("Please provide a list of saved words!");
+        yield WordController_1.rearrangeSavedWords(wordIds);
+        res.json({ status: true });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(400).send({
+            message: error.message,
+        });
+    }
+}));
+router.patch("/definition/rearrange", auth_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const definitionIds = req.body.definitionIds;
+        if (!definitionIds || !definitionIds.length)
+            throw new Error("Please provide a list of definitions!");
+        yield WordController_1.rearrangeDefinition(definitionIds);
+        res.json({ status: true });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(400).send({
+            message: error.message,
+        });
+    }
+}));
 exports.default = router;
 //# sourceMappingURL=word.js.map

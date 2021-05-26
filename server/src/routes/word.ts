@@ -1,9 +1,12 @@
 import { Request, Response, Router } from "express";
+import { SavedWord } from "src/entity/SavedWord";
 import {
   getDailyRandomWords,
   getDefinition,
   getSavedWords,
   getWordAutoCompletes,
+  rearrangeDefinition,
+  rearrangeSavedWords,
   toggleSaveWord,
 } from "../controllers/WordController";
 import { User } from "../entity/User";
@@ -85,6 +88,43 @@ router.post("/save", checkAuthentication, async (req, res) => {
     const language = req.body.language;
     const userId = (req as any).user.id;
     await toggleSaveWord(word, language, userId);
+    res.json({ status: true });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({
+      message: error.message,
+    });
+  }
+});
+
+//Patch routes
+router.patch("/rearrange", checkAuthentication, async (req, res) => {
+  try {
+    const wordIds = req.body.wordIds as string[];
+
+    if (!wordIds || !wordIds.length)
+      throw new Error("Please provide a list of saved words!");
+
+    await rearrangeSavedWords(wordIds);
+
+    res.json({ status: true });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({
+      message: error.message,
+    });
+  }
+});
+
+router.patch("/definition/rearrange", checkAuthentication, async (req, res) => {
+  try {
+    const definitionIds = req.body.definitionIds as string[];
+
+    if (!definitionIds || !definitionIds.length)
+      throw new Error("Please provide a list of definitions!");
+
+    await rearrangeDefinition(definitionIds);
+
     res.json({ status: true });
   } catch (error) {
     console.log(error);

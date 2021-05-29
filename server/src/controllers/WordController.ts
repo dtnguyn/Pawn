@@ -240,32 +240,13 @@ export const getSavedWords = async (userId: string) => {
     .leftJoinAndSelect("savedWord.definitions", "definitions")
     .orderBy("definitions.position", "ASC")
     .leftJoinAndSelect("savedWord.user", "user")
+    .where("user.id = :userId", { userId })
     .orderBy("savedWord.position", "ASC")
     .getMany();
 
   // const savedWords = await savedWordRepo.find();
   console.log(savedWords);
   return savedWords;
-};
-
-export const importAllWords = async () => {
-  const wordRepo = getRepository(Word);
-
-  const enArr = await wordRepo.find({ language: "en_US" });
-  if (!enArr.length) await importEnWords();
-  console.log("Finish import all English words");
-
-  const frArr = await wordRepo.find({ language: "fr" });
-  if (!frArr.length) await importFrWords();
-  console.log("Finish import all French words");
-
-  const esArr = await wordRepo.find({ language: "es" });
-  if (!esArr.length) await importEsWords();
-  console.log("Finish import all Spanish words");
-
-  const deArr = await wordRepo.find({ language: "de" });
-  if (!deArr.length) await importDeWords();
-  console.log("Finish import all German words");
 };
 
 export const rearrangeSavedWords = async (wordIds: string[]) => {
@@ -303,6 +284,26 @@ export const rearrangeDefinition = async (definitionIds: string[]) => {
         .catch((e) => reject(e));
     }
   });
+};
+
+export const importAllWords = async () => {
+  const wordRepo = getRepository(Word);
+
+  const enArr = await wordRepo.find({ language: "en_US" });
+  if (!enArr.length) await importEnWords();
+  console.log("Finish import all English words");
+
+  const frArr = await wordRepo.find({ language: "fr" });
+  if (!frArr.length) await importFrWords();
+  console.log("Finish import all French words");
+
+  const esArr = await wordRepo.find({ language: "es" });
+  if (!esArr.length) await importEsWords();
+  console.log("Finish import all Spanish words");
+
+  const deArr = await wordRepo.find({ language: "de" });
+  if (!deArr.length) await importDeWords();
+  console.log("Finish import all German words");
 };
 
 const importEnWords = async () => {

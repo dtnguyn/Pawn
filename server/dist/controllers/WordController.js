@@ -227,29 +227,11 @@ exports.getSavedWords = (userId) => __awaiter(this, void 0, void 0, function* ()
         .leftJoinAndSelect("savedWord.definitions", "definitions")
         .orderBy("definitions.position", "ASC")
         .leftJoinAndSelect("savedWord.user", "user")
+        .where("user.id = :userId", { userId })
         .orderBy("savedWord.position", "ASC")
         .getMany();
     console.log(savedWords);
     return savedWords;
-});
-exports.importAllWords = () => __awaiter(this, void 0, void 0, function* () {
-    const wordRepo = typeorm_1.getRepository(Word_1.Word);
-    const enArr = yield wordRepo.find({ language: "en_US" });
-    if (!enArr.length)
-        yield importEnWords();
-    console.log("Finish import all English words");
-    const frArr = yield wordRepo.find({ language: "fr" });
-    if (!frArr.length)
-        yield importFrWords();
-    console.log("Finish import all French words");
-    const esArr = yield wordRepo.find({ language: "es" });
-    if (!esArr.length)
-        yield importEsWords();
-    console.log("Finish import all Spanish words");
-    const deArr = yield wordRepo.find({ language: "de" });
-    if (!deArr.length)
-        yield importDeWords();
-    console.log("Finish import all German words");
 });
 exports.rearrangeSavedWords = (wordIds) => __awaiter(this, void 0, void 0, function* () {
     const savedWordRepo = typeorm_1.getRepository(SavedWord_1.SavedWord);
@@ -284,6 +266,25 @@ exports.rearrangeDefinition = (definitionIds) => __awaiter(this, void 0, void 0,
                 .catch((e) => reject(e));
         }
     });
+});
+exports.importAllWords = () => __awaiter(this, void 0, void 0, function* () {
+    const wordRepo = typeorm_1.getRepository(Word_1.Word);
+    const enArr = yield wordRepo.find({ language: "en_US" });
+    if (!enArr.length)
+        yield importEnWords();
+    console.log("Finish import all English words");
+    const frArr = yield wordRepo.find({ language: "fr" });
+    if (!frArr.length)
+        yield importFrWords();
+    console.log("Finish import all French words");
+    const esArr = yield wordRepo.find({ language: "es" });
+    if (!esArr.length)
+        yield importEsWords();
+    console.log("Finish import all Spanish words");
+    const deArr = yield wordRepo.find({ language: "de" });
+    if (!deArr.length)
+        yield importDeWords();
+    console.log("Finish import all German words");
 });
 const importEnWords = () => __awaiter(this, void 0, void 0, function* () {
     const wordRepo = typeorm_1.getRepository(Word_1.Word);

@@ -16,6 +16,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.nguyen.pawn.R
+import com.nguyen.pawn.ui.theme.Typography
 
 @Composable
 fun HomeAppBar(){
@@ -36,35 +37,11 @@ fun HomeAppBar(){
                     .clickable(onClick = {})
             )
             Column( modifier =  Modifier.align(Alignment.CenterVertically).padding(10.dp)) {
-                Text(text = "Adron", color = Color.White)
-                Text(text = "Welcome back!", color = Color.White)
+                Text(text = "Adron", color = Color.White, style = Typography.h6)
+                Text(text = "Welcome back!", color = Color.White, style = Typography.body1)
             }
         }
-        
-
-        Card(
-            Modifier
-                .clip(CircleShape)
-                .align(Alignment.CenterVertically)
-                .clickable(onClick = {}),
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(55.dp)
-                    .background(Color.White)
-
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.settings),
-                    contentDescription = "avatar",
-                    modifier = Modifier
-                        .width(36.dp)
-                        .height(36.dp)
-                        .background(Color.White)
-                        .align(Alignment.Center)
-                )
-            }
-        }
+        RoundButton(backgroundColor = Color.White, size = 55.dp, icon = R.drawable.settings, onClick = {})
 
     }
 

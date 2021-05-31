@@ -26,7 +26,7 @@ fun DailyWordCard(word: String, definition: String, pronunciation: String) {
         modifier = Modifier
             .fillMaxWidth()
             .height(250.dp)
-            .padding(10.dp),
+            .padding(horizontal = 30.dp),
         backgroundColor = ReallyRed
     ){
         Column(Modifier.padding(25.dp)) {
@@ -35,29 +35,7 @@ fun DailyWordCard(word: String, definition: String, pronunciation: String) {
                     Text(text = word, style = Typography.h1, color = Color.White)
                     Text(text = pronunciation, style = Typography.body2, color = Color.White)
                 }
-                Card(
-                    Modifier
-                        .clip(CircleShape)
-                        .align(Alignment.CenterVertically)
-                        .clickable(onClick = {}),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(45.dp)
-                            .background(Color.White)
-
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.speaker),
-                            contentDescription = "avatar",
-                            modifier = Modifier
-                                .width(36.dp)
-                                .height(36.dp)
-                                .background(Color.White)
-                                .align(Alignment.Center)
-                        )
-                    }
-                }
+                RoundButton(backgroundColor = Color.White, size = 45.dp, icon = R.drawable.speaker, onClick = {})
             }
             Spacer(Modifier.padding(5.dp))
             Text(text = definition, style = Typography.body1, color = Color.White)

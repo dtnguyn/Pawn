@@ -41,7 +41,7 @@ fun HomeAppBar(){
                 Text(text = "Welcome back!", color = Color.White, style = Typography.body1)
             }
         }
-        RoundButton(backgroundColor = Color.White, size = 55.dp, icon = R.drawable.settings, onClick = {})
+        RoundButton(backgroundColor = Color.White, size = 55.dp, icon = R.drawable.settings, padding = 12.dp, onClick = {})
 
     }
 

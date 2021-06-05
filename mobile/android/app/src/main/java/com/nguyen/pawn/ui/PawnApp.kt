@@ -1,5 +1,6 @@
 package com.nguyen.pawn.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.*
@@ -19,6 +20,8 @@ import com.nguyen.pawn.ui.screens.HomeScreen
 import com.nguyen.pawn.ui.theme.PawnTheme
 import com.nguyen.pawn.ui.utils.BottomNavigationScreens
 
+@ExperimentalFoundationApi
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PawnApp() {
 

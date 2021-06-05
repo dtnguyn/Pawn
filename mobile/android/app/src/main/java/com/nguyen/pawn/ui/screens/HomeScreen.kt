@@ -1,15 +1,12 @@
 package com.nguyen.pawn.ui.screens
 
+import android.content.res.Resources
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,8 +21,23 @@ import com.nguyen.pawn.model.Word
 import com.nguyen.pawn.ui.components.*
 import com.nguyen.pawn.ui.theme.*
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.runtime.*
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
+import androidx.lifecycle.MutableLiveData
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.launch
 
+@ExperimentalMaterialApi
 @ExperimentalFoundationApi
 @OptIn(ExperimentalPagerApi::class)
 @Preview
@@ -111,100 +123,116 @@ fun HomeScreen() {
         )
 
     val pagerState = rememberPagerState(pageCount = words.size)
+    var height = remember { MutableLiveData<Dp>() }
 
     Surface(
         color = AlmostBlack,
     ) {
         Scaffold(
             Modifier
-                .fillMaxHeight()
+//                .fillMaxHeight()
                 .fillMaxWidth()
+                .onSizeChanged {
+                    height.value = it.height.dp
+                }
         ) {
-            Column {
-                HomeAppBar()
-                Card(
-                    shape = RoundedCornerShape(topStart = 60.dp, topEnd = 60.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
-                    elevation = 10.dp
-                ) {
-                    LazyColumn(Modifier.padding(bottom = 50.dp)) {
-                        item {
-                            Column {
-                                Text(
-                                    text = "Daily words",
-                                    modifier = Modifier.padding(horizontal = 30.dp, vertical = 20.dp),
-                                    style = Typography.h6,
-                                    fontSize = 18.sp
 
-                                )
+            Column() {
+                val scope = rememberCoroutineScope()
+                val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+                    bottomSheetState = rememberBottomSheetState(
+                        initialValue = BottomSheetValue.Collapsed
+                    )
+                )
+                BottomSheetScaffold(
+                    sheetShape = RoundedCornerShape(topStart = 60.dp, topEnd = 60.dp),
+                    sheetContent = {
+                        Card(
+                            shape = RoundedCornerShape(topStart = 60.dp, topEnd = 60.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(),
+                            elevation = 10.dp,
 
-                                HorizontalPager(
-                                    state = pagerState,
-                                    modifier = Modifier.fillMaxWidth()
-                                ) { page ->
-                                    DailyWordCard(
-                                        word = words[page].value,
-                                        definition = words[page].definition,
-                                        pronunciation = words[page].pronunciation
+                        ) {
+                            LazyColumn(Modifier.padding(bottom = 50.dp)) {
+                                item {
+                                    DailyWordSection(pagerState = pagerState, words = words)
+                                }
+
+                                stickyHeader {
+                                    Column(
+                                        Modifier
+                                            .background(Color.White)
+                                            .padding(start = 30.dp, top = 20.dp)
+                                            .fillMaxWidth()
+                                    ) {
+                                        Text(
+                                            text = "Your saved words ${Resources.getSystem().displayMetrics.heightPixels.dp}",
+                                            style = Typography.h6,
+                                            fontSize = 18.sp
+                                        )
+
+                                        Row(Modifier.padding(vertical = 5.dp)) {
+                                            RoundButton(
+                                                backgroundColor = Blue,
+                                                size = 32.dp,
+                                                icon = R.drawable.add,
+                                                onClick = {})
+                                            Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+                                            RoundButton(
+                                                backgroundColor = Grey,
+                                                size = 32.dp,
+                                                icon = R.drawable.review,
+                                                onClick = {})
+                                        }
+                                    }
+                                }
+
+                                items(savedWords.size) { index ->
+                                    SavedWordItem(
+                                        word = savedWords[index].value,
+                                        pronunciation = savedWords[index].pronunciation,
+                                        index = index
                                     )
                                 }
-                                HorizontalPagerIndicator(
-                                    pagerState = pagerState,
-                                    modifier = Modifier
-                                        .align(Alignment.CenterHorizontally)
-                                        .padding(30.dp)
-                                )
-
-
-                                Row(
-                                    horizontalArrangement = Arrangement.SpaceEvenly,
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    DailyWordButton(LightGreen, R.drawable.next2, onClick = {})
-                                    DailyWordButton(Grey, R.drawable.trash, onClick = {})
-                                    DailyWordButton(LightRed, R.drawable.heart, onClick = {})
-                                    DailyWordButton(LightOrange, R.drawable.next2, onClick = {})
-                                }
-
                             }
                         }
+                    },
+                    scaffoldState = bottomSheetScaffoldState,
+                    topBar = {
+                        HomeAppBar()
+                    },
 
-                        stickyHeader {
-                            Column(Modifier.background(Color.White).padding(start = 30.dp, top = 20.dp).fillMaxWidth()) {
-                                Text(
-                                    text = "Your saved words",
-                                    style = Typography.h6,
-                                    fontSize = 18.sp
-                                )
-
-                                Row(Modifier.padding(vertical = 5.dp)) {
-                                    RoundButton(
-                                        backgroundColor = Blue,
-                                        size = 32.dp,
-                                        icon = R.drawable.add,
-                                        onClick = {})
-                                    Spacer(modifier = Modifier.padding(horizontal = 5.dp))
-                                    RoundButton(
-                                        backgroundColor = Grey,
-                                        size = 32.dp,
-                                        icon = R.drawable.review,
-                                        onClick = {})
-                                }
+                    sheetPeekHeight = 670.dp,
+                    drawerContent = {
+                        Column(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .background(Purple200),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("Drawer content")
+                            Spacer(Modifier.height(20.dp))
+                            Button(onClick = { scope.launch { bottomSheetScaffoldState.drawerState.close() } }) {
+                                Text("Click to close drawer")
                             }
-                        }
-
-                        items(savedWords.size){index ->
-                            SavedWordItem(word = savedWords[index].value, pronunciation = savedWords[index].pronunciation, index = index)
                         }
                     }
+                ) { innerPadding ->
 
                 }
 
 
-            }
 
+
+
+
+
+
+
+            }
         }
     }
 }

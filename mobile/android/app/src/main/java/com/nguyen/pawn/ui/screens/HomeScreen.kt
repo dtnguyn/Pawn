@@ -15,10 +15,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
+import androidx.navigation.NavController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
 import com.nguyen.pawn.R
@@ -36,9 +38,8 @@ import com.nguyen.pawn.ui.theme.Typography
 @ExperimentalMaterialApi
 @ExperimentalFoundationApi
 @OptIn(ExperimentalPagerApi::class)
-@Preview
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavController) {
 
     val words = listOf(
         Word(
@@ -156,7 +157,7 @@ fun HomeScreen() {
 
                         LazyColumn(Modifier.padding(bottom = 50.dp)) {
                             item {
-                                DailyWordSection(pagerState = pagerState, words = words)
+                                DailyWordSection(pagerState = pagerState, navController = navController, words = words)
                             }
 
                             stickyHeader {

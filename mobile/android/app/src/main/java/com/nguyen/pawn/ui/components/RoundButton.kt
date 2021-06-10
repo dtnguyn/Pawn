@@ -35,11 +35,10 @@ fun RoundButton(
             .size(size)
             .clip(CircleShape)
             .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(bounded = false), // You can also change the color and radius of the ripple
                 onClick = onClick
             ),
         backgroundColor = backgroundColor,
+        elevation = 100.dp,
     ) {
         Image(
             painter = painterResource(icon),

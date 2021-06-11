@@ -1,5 +1,6 @@
 package com.nguyen.pawn.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -7,10 +8,12 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.nguyen.pawn.R
 import com.nguyen.pawn.ui.theme.*
+import com.nguyen.pawn.util.UtilFunction.generateColor
 
 @Composable
 fun SavedWordItem(word: String, pronunciation: String, index: Int) {
@@ -19,7 +22,9 @@ fun SavedWordItem(word: String, pronunciation: String, index: Int) {
         modifier = Modifier
             .padding(horizontal = 30.dp, vertical = 15.dp)
             .fillMaxWidth()
-            .height(70.dp),
+            .height(70.dp)
+            .clip(RoundedCornerShape(15.dp))
+            .clickable {  },
         backgroundColor = generateColor(index + 1)
     ) {
         Row(
@@ -39,11 +44,3 @@ fun SavedWordItem(word: String, pronunciation: String, index: Int) {
     }
 }
 
-fun generateColor(index: Int): Color {
-    return when {
-        index % 4 == 0 -> LightGreen
-        index % 3 == 0 -> LightOrange
-        index % 2 == 0 -> Neon
-        else -> LightRed
-    }
-}

@@ -1,5 +1,6 @@
 package com.nguyen.pawn.ui
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -23,6 +24,7 @@ import com.nguyen.pawn.ui.navigation.PawnScreens
 import com.nguyen.pawn.ui.screens.WordScreen
 
 
+@ExperimentalAnimationApi
 @ExperimentalFoundationApi
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -76,7 +78,7 @@ fun PawnApp() {
                 composable(PawnScreens.Home.route) { HomeScreen(navController = navController) }
                 composable(PawnScreens.Feeds.route) { FeedScreen() }
                 composable(PawnScreens.Chat.route) { ChatScreen() }
-                composable(PawnScreens.Word.route) { WordScreen() }
+                composable(PawnScreens.Word.route) { WordScreen(navController = navController) }
             }
         }
     }

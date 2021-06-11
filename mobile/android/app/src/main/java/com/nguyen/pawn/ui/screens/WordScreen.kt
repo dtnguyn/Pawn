@@ -20,18 +20,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavController
 import com.nguyen.pawn.R
 import com.nguyen.pawn.model.Definition
 import com.nguyen.pawn.ui.components.RoundButton
 import com.nguyen.pawn.ui.components.RoundedSquareButton
 import com.nguyen.pawn.ui.components.SavedWordItem
 import com.nguyen.pawn.ui.components.word.DefinitionItem
+import com.nguyen.pawn.ui.components.word.WordCollapseSection
+import com.nguyen.pawn.ui.components.word.WordTopBar
 import com.nguyen.pawn.ui.theme.*
 
 @ExperimentalAnimationApi
 @ExperimentalFoundationApi
 @Composable
-fun WordScreen() {
+fun WordScreen(navController: NavController) {
 
     val definitions = listOf(
         Definition(
@@ -73,8 +76,6 @@ fun WordScreen() {
     )
 
     val lazyListState = rememberLazyListState()
-
-
     Surface {
         Scaffold(
             modifier = Modifier
@@ -82,74 +83,10 @@ fun WordScreen() {
                 .fillMaxWidth(),
             backgroundColor = Color.White,
             topBar = {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp)
-                        .background(ReallyRed)
-                        .padding(horizontal = 5.dp),
-                ) {
-
-                    IconButton(modifier = Modifier.align(Alignment.CenterStart),onClick = { /*TODO*/ }) {
-                        Image(
-                            painter = painterResource(id = R.drawable.back_32_white),
-                            contentDescription = "Back icon"
-                        )
-                    }
-//                    if(lazyListState.firstVisibleItemIndex >= 1) {
-//
-//                    }
-                    AnimatedVisibility(
-                        visible = lazyListState.firstVisibleItemIndex >= 1,
-                        enter = slideInVertically(initialOffsetY = { 400 }) + expandVertically(expandFrom = Alignment.Top) + fadeIn(initialAlpha = 0.3f),
-                        exit = slideOutVertically(targetOffsetY = { 400 }) + shrinkVertically() + fadeOut(),
-                        modifier = Modifier.align(
-                            Alignment.Center
-                        )
-                    ) {
-                        Text(
-                            text = "Pepper",
-                            style = Typography.h4,
-                            color = Color.White,
-
-                        )
-                    }
-
-                }
+                WordTopBar(lazyListState = lazyListState, word = "Pepper", onBackClick = { navController.popBackStack() })
             }
         ) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(220.dp),
-                backgroundColor = ReallyRed,
-                elevation = 0.dp,
-                shape = RectangleShape
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .padding(bottom = 50.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = "Pepper", style = Typography.h1, color = Color.White)
-                    Spacer(modifier = Modifier.padding(5.dp))
-                    Text(
-                        text = "UK /ˈpepə(r)/",
-                        style = Typography.body2,
-                        color = Color.White
-                    )
-                    Text(
-                        text = "UK /ˈpepə(r)/",
-                        style = Typography.body2,
-                        color = Color.White
-                    )
-                    Spacer(modifier = Modifier.padding(10.dp))
-                }
-            }
-
+            WordCollapseSection()
             LazyColumn(
                 modifier = Modifier.fillMaxHeight(),
                 state = lazyListState,

@@ -9,19 +9,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
@@ -36,8 +28,7 @@ import com.nguyen.pawn.ui.theme.Blue
 import com.nguyen.pawn.ui.theme.Grey
 import com.nguyen.pawn.ui.theme.Typography
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import com.nguyen.pawn.ui.viewmodels.HomeViewModel
+import com.nguyen.pawn.ui.viewmodels.WordViewModel
 
 
 @ExperimentalAnimationApi
@@ -45,7 +36,7 @@ import com.nguyen.pawn.ui.viewmodels.HomeViewModel
 @ExperimentalFoundationApi
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
+fun HomeScreen(viewModel: WordViewModel, navController: NavController) {
 
     val words: ArrayList<Word> by viewModel.dailyWords
 
@@ -84,16 +75,15 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
                         ) {
 
                         LazyColumn(Modifier.padding(bottom = 50.dp)) {
-                            println("Test: ${words.size}")
-                            if (words.isNotEmpty()) {
-                                item {
-                                    DailyWordSection(
-                                        pagerState = pagerState,
-                                        navController = navController,
-                                        words = words,
-                                        savedWords = savedWords
-                                    )
-                                }
+
+                            item {
+                                DailyWordSection(
+                                    viewModel = viewModel,
+                                    pagerState = pagerState,
+                                    navController = navController,
+                                    words = words,
+                                    savedWords = savedWords
+                                )
                             }
 
 

@@ -7,11 +7,11 @@ import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import com.nguyen.pawn.ui.PawnApp
-import com.nguyen.pawn.ui.viewmodels.HomeViewModel
+import com.nguyen.pawn.ui.viewmodels.WordViewModel
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: WordViewModel by viewModels()
 
     @ExperimentalAnimationApi
     @OptIn(ExperimentalFoundationApi::class)

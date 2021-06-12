@@ -1,6 +1,7 @@
 package com.nguyen.pawn.ui.screens
 
 import android.util.DisplayMetrics
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -8,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -33,94 +35,23 @@ import com.nguyen.pawn.ui.theme.AlmostBlack
 import com.nguyen.pawn.ui.theme.Blue
 import com.nguyen.pawn.ui.theme.Grey
 import com.nguyen.pawn.ui.theme.Typography
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import com.nguyen.pawn.ui.viewmodels.HomeViewModel
 
 
+@ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @ExperimentalFoundationApi
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
 
-    val words = listOf(
-        Word(
-            "Pepper",
-            "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-            "/ˈpepə(r)/"
-        ),
-        Word(
-            "Pepper",
-            "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-            "/ˈpepə(r)/"
-        ),
-        Word(
-            "Pepper",
-            "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-            "/ˈpepə(r)/"
-        ),
-    )
+    val words: ArrayList<Word> by viewModel.dailyWords
 
-    val savedWords = listOf(
-        Word(
-            "Phenomenal",
-            "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-            "/fəˈnɑːmɪnl/"
-        ),
-        Word(
-            "Phenomenal",
-            "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-            "/fəˈnɑːmɪnl/"
-        ),
-        Word(
-            "Phenomenal",
-            "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-            "/fəˈnɑːmɪnl/"
-        ),
-        Word(
-            "Phenomenal",
-            "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-            "/fəˈnɑːmɪnl/"
-        ),
-        Word(
-            "Phenomenal",
-            "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-            "/fəˈnɑːmɪnl/"
-        ),
-        Word(
-            "Phenomenal",
-            "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-            "/fəˈnɑːmɪnl/"
-        ),
-        Word(
-            "Phenomenal",
-            "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-            "/fəˈnɑːmɪnl/"
-        ),
-        Word(
-            "Phenomenal",
-            "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-            "/fəˈnɑːmɪnl/"
-        ),
-        Word(
-            "Phenomenal",
-            "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-            "/fəˈnɑːmɪnl/"
-        ),
-        Word(
-            "Phenomenal",
-            "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-            "/fəˈnɑːmɪnl/"
-        ),
-        Word(
-            "Phenomenal",
-            "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-            "/fəˈnɑːmɪnl/"
-        ),
-
-
-        )
+    val savedWords: ArrayList<Word> by viewModel.savedWords
 
     val pagerState = rememberPagerState(pageCount = words.size)
-    var height = remember { MutableLiveData<Dp>() }
 
 
     Surface(
@@ -130,12 +61,9 @@ fun HomeScreen(navController: NavController) {
             Modifier
                 .fillMaxHeight()
                 .fillMaxWidth()
-                .onSizeChanged {
-                    height.value = it.height.dp
-                }
+
         ) {
 
-            val scope = rememberCoroutineScope()
             val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
                 bottomSheetState = rememberBottomSheetState(
                     initialValue = BottomSheetValue.Collapsed,
@@ -156,9 +84,18 @@ fun HomeScreen(navController: NavController) {
                         ) {
 
                         LazyColumn(Modifier.padding(bottom = 50.dp)) {
-                            item {
-                                DailyWordSection(pagerState = pagerState, navController = navController, words = words)
+                            println("Test: ${words.size}")
+                            if (words.isNotEmpty()) {
+                                item {
+                                    DailyWordSection(
+                                        pagerState = pagerState,
+                                        navController = navController,
+                                        words = words,
+                                        savedWords = savedWords
+                                    )
+                                }
                             }
+
 
                             stickyHeader {
                                 Column(

@@ -22,13 +22,14 @@ import com.nguyen.pawn.ui.screens.HomeScreen
 import com.nguyen.pawn.ui.theme.PawnTheme
 import com.nguyen.pawn.ui.navigation.PawnScreens
 import com.nguyen.pawn.ui.screens.WordScreen
+import com.nguyen.pawn.ui.viewmodels.HomeViewModel
 
 
 @ExperimentalAnimationApi
 @ExperimentalFoundationApi
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun PawnApp() {
+fun PawnApp(homeViewModel: HomeViewModel) {
 
     val navController = rememberNavController()
     val items = listOf(
@@ -75,7 +76,7 @@ fun PawnApp() {
         ) {
 
             NavHost(navController, startDestination = PawnScreens.Home.route) {
-                composable(PawnScreens.Home.route) { HomeScreen(navController = navController) }
+                composable(PawnScreens.Home.route) { HomeScreen(viewModel = homeViewModel, navController = navController) }
                 composable(PawnScreens.Feeds.route) { FeedScreen() }
                 composable(PawnScreens.Chat.route) { ChatScreen() }
                 composable(PawnScreens.Word.route) { WordScreen(navController = navController) }

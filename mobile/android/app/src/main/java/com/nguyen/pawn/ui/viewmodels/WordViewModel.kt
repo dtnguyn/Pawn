@@ -4,12 +4,16 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.nguyen.pawn.model.Definition
 import com.nguyen.pawn.model.Word
 
-class WordViewModel: ViewModel() {
+class WordViewModel : ViewModel() {
 
     private val _dailyWords: MutableState<ArrayList<Word>> = mutableStateOf(arrayListOf())
     private val _savedWords: MutableState<ArrayList<Word>> = mutableStateOf(arrayListOf())
+    private val _wordDefinition: MutableState<Definition?> = mutableStateOf(null)
+
+    private val savedWordMap = HashMap<String, Boolean>()
 
     val dailyWords: State<ArrayList<Word>> = _dailyWords
     val savedWords: State<ArrayList<Word>> = _savedWords
@@ -104,6 +108,10 @@ class WordViewModel: ViewModel() {
 //                "/fəˈnɑːmɪnl/"
 //            ),
         )
+
+        for (word in _savedWords.value) {
+            savedWordMap[word.id] = true
+        }
     }
 
     fun removeDailyWords(wordId: String) {
@@ -112,8 +120,21 @@ class WordViewModel: ViewModel() {
         } as ArrayList<Word>
     }
 
-    fun addSavedWord(word: Word){
-        _savedWords.value = (_savedWords.value + arrayListOf(word)) as ArrayList<Word>
+    fun toggleSavedWord(word: Word) {
+        if (savedWordMap[word.id] == true) {
+            _savedWords.value = _savedWords.value.filter { savedWord ->
+                savedWord.id != word.id
+            } as ArrayList<Word>
+            savedWordMap[word.id] = false
+        } else {
+            _savedWords.value = (arrayListOf(word) + _savedWords.value) as ArrayList<Word>
+            savedWordMap[word.id] = true
+        }
     }
+
+    fun checkIsSaved(wordId: String): Boolean{
+        return savedWordMap[wordId] == true
+    }
+
 
 }

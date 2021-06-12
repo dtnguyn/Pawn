@@ -4,6 +4,8 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +34,7 @@ fun DailyWordSection(
 ) {
 
     val coroutineScope = rememberCoroutineScope()
+    val isSaved = remember { mutableStateOf(false)}
 
     if (words.size > 0)
         Column {
@@ -87,9 +90,19 @@ fun DailyWordSection(
                     viewModel.removeDailyWords(words[pagerState.currentPage].id)
 
                 }
-                RoundedSquareButton(LightRed, R.drawable.heart, onClick = {
-                    viewModel.addSavedWord(words[pagerState.currentPage])
-                })
+                if(viewModel.checkIsSaved(words[pagerState.currentPage].id)){
+                    RoundedSquareButton(LightRed, R.drawable.heart_red , onClick = {
+                        isSaved.value = !isSaved.value
+                        viewModel.toggleSavedWord(words[pagerState.currentPage])
+                    })
+                } else {
+                    RoundedSquareButton(LightRed, R.drawable.heart , onClick = {
+                        isSaved.value = !isSaved.value
+                        viewModel.toggleSavedWord(words[pagerState.currentPage])
+                    })
+                }
+
+
                 RoundedSquareButton(LightOrange, R.drawable.next2_right, onClick = {
                     coroutineScope.launch {
                         val nextPage =

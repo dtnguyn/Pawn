@@ -120,7 +120,10 @@ fun HomeScreen(viewModel: WordViewModel, navController: NavController) {
                                 SavedWordItem(
                                     word = savedWords[index].value,
                                     pronunciation = savedWords[index].pronunciation,
-                                    index = index
+                                    index = index,
+                                    onClick = {
+                                        navController.navigate("word")
+                                    }
                                 )
                             }
                         }

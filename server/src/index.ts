@@ -17,6 +17,7 @@ import word from "./routes/word";
 import { UserRefreshToken } from "./entity/UserRefreshToken";
 import { SavedWord } from "./entity/SavedWord";
 import { importAllWords } from "./controllers/WordController";
+import { VerificationCode } from "./entity/VerificationCode";
 
 createConnection({
   type: "postgres",
@@ -39,6 +40,7 @@ createConnection({
     Definition,
     ChatMessage,
     ChatImage,
+    VerificationCode,
   ],
 })
   .then(async (connection) => {
@@ -49,7 +51,7 @@ createConnection({
     app.use("/word", word);
 
     // await importAllWords();
-    console.log(await getRepository(Definition).find());
+    // console.log(await getRepository(Definition).find());
 
     app.listen(4000, () => {
       console.log("Server is running on port 4000");

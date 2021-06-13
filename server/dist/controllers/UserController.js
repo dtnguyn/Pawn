@@ -7,10 +7,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const UserRefreshToken_1 = require("../entity/UserRefreshToken");
 const typeorm_1 = require("typeorm");
 const User_1 = require("../entity/User");
+const VerificationCode_1 = require("../entity/VerificationCode");
+const nodemailer_1 = __importDefault(require("nodemailer"));
 function createUser(username, nativeLanguageId, email, password, avatar) {
     return __awaiter(this, void 0, void 0, function* () {
         const userRepo = typeorm_1.getRepository(User_1.User);
@@ -68,4 +73,57 @@ function findOneRefreshToken(token) {
     });
 }
 exports.findOneRefreshToken = findOneRefreshToken;
+exports.verifyCode = (email, code) => __awaiter(this, void 0, void 0, function* () {
+    const verifyRepo = typeorm_1.getRepository(VerificationCode_1.VerificationCode);
+    if (yield verifyRepo.findOne({ email, code })) {
+        yield verifyRepo.delete({ email });
+        return true;
+    }
+    else {
+        return false;
+    }
+});
+exports.sendVerificationCode = (email) => __awaiter(this, void 0, void 0, function* () {
+    const userRepo = typeorm_1.getRepository(User_1.User);
+    if (email && (yield userRepo.findOne({ email }))) {
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        const verifyRepo = typeorm_1.getRepository(VerificationCode_1.VerificationCode);
+        if (yield verifyRepo.findOne({ email })) {
+            yield verifyRepo.update({ email }, { code });
+        }
+        else {
+            yield verifyRepo.insert({ email, code });
+        }
+        let testAccount = yield nodemailer_1.default.createTestAccount();
+        const transporter = nodemailer_1.default.createTransport({
+            host: "smtp.ethereal.email",
+            port: 587,
+            secure: false,
+            auth: {
+                user: testAccount.user,
+                pass: testAccount.pass,
+            },
+        });
+        let info = yield transporter.sendMail({
+            from: testAccount.user,
+            to: email,
+            subject: "Verification code",
+            text: `Please use this code to verify your account: ${code}`,
+        });
+        console.log("Message sent to: ", email);
+        console.log("Preview URL: %s", nodemailer_1.default.getTestMessageUrl(info));
+        return code;
+    }
+    else {
+        throw new Error("Please provide a valid email!");
+    }
+});
+exports.changePassword = (email, code, hashPW) => __awaiter(this, void 0, void 0, function* () {
+    if (yield exports.verifyCode(email, code)) {
+        const userRepo = typeorm_1.getRepository(User_1.User);
+        yield userRepo.update({ email }, { password: hashPW });
+    }
+    else
+        throw new Error("Invalid verification code!");
+});
 //# sourceMappingURL=UserController.js.map

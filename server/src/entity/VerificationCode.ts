@@ -2,21 +2,17 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
   PrimaryColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { User } from "./User";
 
 @Entity()
-export class UserRefreshToken {
+export class VerificationCode {
   @PrimaryColumn()
-  token: string;
+  email: string;
 
   @Column()
-  userId: string;
-  @ManyToOne(() => User, (user) => user.refreshTokens)
-  user: User;
+  code: string;
 
   @CreateDateColumn()
   createdAt: Date;

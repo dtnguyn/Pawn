@@ -28,6 +28,7 @@ const auth_1 = __importDefault(require("./routes/auth"));
 const word_1 = __importDefault(require("./routes/word"));
 const UserRefreshToken_1 = require("./entity/UserRefreshToken");
 const SavedWord_1 = require("./entity/SavedWord");
+const VerificationCode_1 = require("./entity/VerificationCode");
 typeorm_1.createConnection({
     type: "postgres",
     host: "localhost",
@@ -49,6 +50,7 @@ typeorm_1.createConnection({
         Definition_1.Definition,
         ChatMessage_1.ChatMessage,
         ChatImage_1.ChatImage,
+        VerificationCode_1.VerificationCode,
     ],
 })
     .then((connection) => __awaiter(this, void 0, void 0, function* () {
@@ -56,7 +58,6 @@ typeorm_1.createConnection({
     app.use(express_1.default.json());
     app.use("/auth", auth_1.default);
     app.use("/word", word_1.default);
-    console.log(yield typeorm_1.getRepository(Definition_1.Definition).find());
     app.listen(4000, () => {
         console.log("Server is running on port 4000");
     });

@@ -315,7 +315,7 @@ const importFrWords = () => __awaiter(this, void 0, void 0, function* () {
 });
 const importEsWords = () => __awaiter(this, void 0, void 0, function* () {
     const wordRepo = typeorm_1.getRepository(Word_1.Word);
-    for (const word of an_array_of_spanish_words_1.default) {
+    for (constword of an_array_of_spanish_words_1.default) {
         yield wordRepo.insert({
             value: word,
             language: "es",

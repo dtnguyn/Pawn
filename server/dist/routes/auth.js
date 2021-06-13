@@ -72,6 +72,31 @@ router.get("/", exports.checkAuthentication, (req, res) => {
         res.sendStatus(404);
     }
 });
+router.get("/verify/code", (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const email = req.body.email;
+        const code = yield UserController_1.sendVerificationCode(email);
+        res.json(code);
+    }
+    catch (error) {
+        res.status(400).send({
+            message: error.message,
+        });
+    }
+}));
+router.post("/verify/code", (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const email = req.body.email;
+        const code = req.body.code;
+        const result = yield UserController_1.verifyCode(email, code);
+        res.json(result);
+    }
+    catch (error) {
+        res.status(400).send({
+            message: error.message,
+        });
+    }
+}));
 router.post("/register", (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         const username = req.body.username;
@@ -112,6 +137,21 @@ router.post("/login", (req, res) => __awaiter(this, void 0, void 0, function* ()
     }
     catch (error) {
         return res.status(400).send({
+            message: error.message,
+        });
+    }
+}));
+router.patch("/password", (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const email = req.body.email;
+        const newPassword = req.body.newPassword;
+        const code = req.body.code;
+        const hashPW = bcrypt_1.default.hashSync(newPassword, parseInt(process.env.SALT_ROUNDS));
+        yield UserController_1.changePassword(email, code, hashPW);
+        res.json(true);
+    }
+    catch (error) {
+        res.status(400).send({
             message: error.message,
         });
     }

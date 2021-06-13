@@ -151,7 +151,6 @@ export const getWordAutoCompletes = async (language: string, text: string) => {
     .andWhere("word.language = :language", { language })
     .limit(10)
     .getMany();
-  // const autoCompletes = await wordRepo.find({ language, value: text });
   return autoCompletes;
 };
 
@@ -338,7 +337,7 @@ const importFrWords = async () => {
 
 const importEsWords = async () => {
   const wordRepo = getRepository(Word);
-  for (const word of esWords as string[]) {
+  for (constword of esWords as string[]) {
     await wordRepo.insert({
       value: word,
       language: "es",

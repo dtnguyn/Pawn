@@ -2,12 +2,15 @@ import dotenv from "dotenv";
 dotenv.config();
 import { Request, Response, Router } from "express";
 import {
+  changePassword,
   createOauthUser,
   createUser,
   findOneRefreshToken,
   getOneOauthUser,
   getOneUser,
   saveRefreshToken,
+  sendVerificationCode,
+  verifyCode,
 } from "../controllers/UserController";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -15,6 +18,10 @@ import express from "express";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { VerifyCallback } from "passport-google-oauth20";
+import nodemailer from "nodemailer";
+import { getRepository } from "typeorm";
+import { User } from "../entity/User";
+import { VerificationCode } from "../entity/VerificationCode";
 
 const router = Router();
 router.use(express.json());
@@ -94,6 +101,35 @@ router.get("/", checkAuthentication, (req, res) => {
   }
 });
 
+router.get("/verify/code", async (req, res) => {
+  try {
+    const email = req.body.email;
+
+    const code = await sendVerificationCode(email);
+
+    res.json(code);
+  } catch (error) {
+    res.status(400).send({
+      message: error.message,
+    });
+  }
+});
+
+router.post("/verify/code", async (req, res) => {
+  try {
+    const email = req.body.email;
+    const code = req.body.code;
+
+    const result = await verifyCode(email, code);
+
+    res.json(result);
+  } catch (error) {
+    res.status(400).send({
+      message: error.message,
+    });
+  }
+});
+
 router.post("/register", async (req, res) => {
   try {
     const username = req.body.username;
@@ -151,6 +187,25 @@ router.post("/login", async (req, res) => {
     return res.json({ accessToken, refreshToken });
   } catch (error) {
     return res.status(400).send({
+      message: error.message,
+    });
+  }
+});
+
+router.patch("/password", async (req, res) => {
+  try {
+    const email = req.body.email;
+    const newPassword = req.body.newPassword;
+    const code = req.body.code;
+    const hashPW = bcrypt.hashSync(
+      newPassword,
+      parseInt(process.env.SALT_ROUNDS!)
+    );
+    await changePassword(email, code, hashPW);
+
+    res.json(true);
+  } catch (error) {
+    res.status(400).send({
       message: error.message,
     });
   }

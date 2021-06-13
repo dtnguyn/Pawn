@@ -26,6 +26,23 @@ Authorization: Bearer .eyJ1c2VyIjp7ImlkIjoiNDJmMjBjYWQtNDkyNS00MjY4LWJhMDctM2VjN
 
 
 ###
+GET http://localhost:4000/auth/verify/code
+Content-Type: application/json
+
+{
+    "email": "adron0914@gmail.com"
+}
+
+###
+POST http://localhost:4000/auth/verify/code
+Content-Type: application/json
+
+{
+    "email": "adron0914@gmail.com",
+    "code": "548106"
+}
+
+###
 
 POST http://localhost:4000/auth/token
 Content-Type: application/json
@@ -94,3 +111,6 @@ Content-Type: application/json
         "b0cbc08d-45e6-4c7c-b21e-c9feb0ec07bf"
     ]
 }
+
+
+

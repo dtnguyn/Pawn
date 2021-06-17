@@ -2,6 +2,7 @@ package com.nguyen.pawn.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,7 +29,6 @@ fun RoundedSquareButton(backgroundColor: Color, icon: Int, size: Dp = 56.dp, onC
             contentDescription = "button icon",
             modifier = Modifier
                 .align(Alignment.CenterVertically)
-
         )
     }
 

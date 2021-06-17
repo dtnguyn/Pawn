@@ -15,12 +15,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.nguyen.pawn.R
-import com.nguyen.pawn.ui.screens.ChatScreen
-import com.nguyen.pawn.ui.screens.FeedScreen
-import com.nguyen.pawn.ui.screens.HomeScreen
 import com.nguyen.pawn.ui.theme.PawnTheme
 import com.nguyen.pawn.ui.navigation.PawnScreens
-import com.nguyen.pawn.ui.screens.WordScreen
+import com.nguyen.pawn.ui.screens.*
 import com.nguyen.pawn.ui.viewmodels.WordViewModel
 
 
@@ -79,6 +76,8 @@ fun PawnApp(wordViewModel: WordViewModel) {
                 composable(PawnScreens.Feeds.route) { FeedScreen() }
                 composable(PawnScreens.Chat.route) { ChatScreen() }
                 composable(PawnScreens.Word.route) { WordScreen(navController = navController) }
+                composable(PawnScreens.Auth.route) { AuthScreen(navController = navController) }
+
             }
         }
     }

@@ -42,71 +42,71 @@ class WordViewModel : ViewModel() {
 
         _savedWords.value = arrayListOf(
             Word(
-                "",
+                "1",
                 "Phenomenal",
                 "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
                 "/fəˈnɑːmɪnl/"
             ),
-//            Word(
-//                "2",
-//                "Phenomenal",
-//                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-//                "/fəˈnɑːmɪnl/"
-//            ),
-//            Word(
-//                "3",
-//                "Phenomenal",
-//                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-//                "/fəˈnɑːmɪnl/"
-//            ),
-//            Word(
-//                "4",
-//                "Phenomenal",
-//                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-//                "/fəˈnɑːmɪnl/"
-//            ),
-//            Word(
-//                "5",
-//                "Phenomenal",
-//                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-//                "/fəˈnɑːmɪnl/"
-//            ),
-//            Word(
-//                "6",
-//                "Phenomenal",
-//                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-//                "/fəˈnɑːmɪnl/"
-//            ),
-//            Word(
-//                "7",
-//                "Phenomenal",
-//                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-//                "/fəˈnɑːmɪnl/"
-//            ),
-//            Word(
-//                "8",
-//                "Phenomenal",
-//                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-//                "/fəˈnɑːmɪnl/"
-//            ),
-//            Word(
-//                "9",
-//                "Phenomenal",
-//                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-//                "/fəˈnɑːmɪnl/"
-//            ),
-//            Word(
-//                "10",
-//                "Phenomenal",
-//                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-//                "/fəˈnɑːmɪnl/"
-//            ),
-//            Word(
-//                "11",
-//                "Phenomenal",
-//                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
-//                "/fəˈnɑːmɪnl/"
-//            ),
+            Word(
+                "2",
+                "Phenomenal",
+                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
+                "/fəˈnɑːmɪnl/"
+            ),
+            Word(
+                "3",
+                "Phenomenal",
+                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
+                "/fəˈnɑːmɪnl/"
+            ),
+            Word(
+                "4",
+                "Phenomenal",
+                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
+                "/fəˈnɑːmɪnl/"
+            ),
+            Word(
+                "5",
+                "Phenomenal",
+                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
+                "/fəˈnɑːmɪnl/"
+            ),
+            Word(
+                "6",
+                "Phenomenal",
+                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
+                "/fəˈnɑːmɪnl/"
+            ),
+            Word(
+                "7",
+                "Phenomenal",
+                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
+                "/fəˈnɑːmɪnl/"
+            ),
+            Word(
+                "8",
+                "Phenomenal",
+                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
+                "/fəˈnɑːmɪnl/"
+            ),
+            Word(
+                "9",
+                "Phenomenal",
+                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
+                "/fəˈnɑːmɪnl/"
+            ),
+            Word(
+                "10",
+                "Phenomenal",
+                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
+                "/fəˈnɑːmɪnl/"
+            ),
+            Word(
+                "11",
+                "Phenomenal",
+                "A pungent, hot-tasting powder prepared from dried and ground peppercorns, commonly used as a spice or condiment to flavor food.",
+                "/fəˈnɑːmɪnl/"
+            ),
         )
 
         for (word in _savedWords.value) {

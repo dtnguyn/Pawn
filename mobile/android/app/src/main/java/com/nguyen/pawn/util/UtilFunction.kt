@@ -1,5 +1,6 @@
 package com.nguyen.pawn.util
 
+import android.util.DisplayMetrics
 import androidx.compose.ui.graphics.Color
 import com.nguyen.pawn.ui.theme.LightGreen
 import com.nguyen.pawn.ui.theme.LightOrange
@@ -15,5 +16,9 @@ object UtilFunction {
             index % 2 == 0 -> Neon
             else -> LightRed
         }
+    }
+
+    fun convertHeightToDp(pixel: Int, displayMetrics: DisplayMetrics): Int {
+        return (pixel / (displayMetrics.density)).toInt()
     }
 }

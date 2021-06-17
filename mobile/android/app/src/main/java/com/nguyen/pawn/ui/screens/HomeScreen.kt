@@ -29,6 +29,7 @@ import com.nguyen.pawn.ui.theme.Grey
 import com.nguyen.pawn.ui.theme.Typography
 import androidx.compose.runtime.getValue
 import com.nguyen.pawn.ui.viewmodels.WordViewModel
+import com.nguyen.pawn.util.UtilFunction.convertHeightToDp
 
 
 @ExperimentalAnimationApi
@@ -131,7 +132,7 @@ fun HomeScreen(viewModel: WordViewModel, navController: NavController) {
                 },
                 scaffoldState = bottomSheetScaffoldState,
                 topBar = {
-                    HomeAppBar()
+                    HomeAppBar(navController)
                 },
 
                 sheetPeekHeight = (convertHeightToDp(
@@ -149,6 +150,3 @@ fun HomeScreen(viewModel: WordViewModel, navController: NavController) {
 }
 
 
-fun convertHeightToDp(pixel: Int, displayMetrics: DisplayMetrics): Int {
-    return (pixel / (displayMetrics.density)).toInt()
-}

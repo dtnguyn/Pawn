@@ -138,7 +138,7 @@ fun HomeScreen(viewModel: WordViewModel, navController: NavController) {
                 sheetPeekHeight = (convertHeightToDp(
                     LocalContext.current.resources.displayMetrics.heightPixels,
                     LocalContext.current.resources.displayMetrics
-                )).dp - 140.dp,
+                )).dp - 150.dp,
 
                 ) {
 

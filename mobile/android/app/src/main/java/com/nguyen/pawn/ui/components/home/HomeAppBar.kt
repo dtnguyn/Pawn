@@ -24,7 +24,8 @@ fun HomeAppBar(navController: NavController){
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(20.dp),
+            .height(120.dp)
+            .padding(horizontal = 20.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

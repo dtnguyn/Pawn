@@ -64,15 +64,35 @@ fun AuthScreen(navController: NavController) {
                     shape = CircleShape,
                     content = {}
                 )
-                Column {
-                    Text(
-                        text = "Sign in to your account!",
-                        style = Typography.h2,
-                        color = Color.White,
-                        modifier = Modifier
-                            .requiredWidth((deviceWidthDp * 0.6).dp)
-                            .padding(10.dp)
-                    )
+                Column(modifier = Modifier
+                    .requiredWidth((deviceWidthDp * 0.6).dp)
+                    .padding(10.dp)) {
+                    if(currentTab == AuthTab.LOGIN){
+                        Text(
+                            text = "Sign in to your account",
+                            style = Typography.h2,
+                            color = Color.White,
+                        )
+                        Spacer(modifier = Modifier.padding(10.dp))
+                        Text(
+                            text = "Welcome back!",
+                            style = Typography.h6,
+                            color = Color.White,
+                        )
+                    } else {
+                        Text(
+                            text = "Welcome to Pawn!",
+                            style = Typography.h2,
+                            color = Color.White,
+                        )
+                        Spacer(modifier = Modifier.padding(10.dp))
+                        Text(
+                            text = "Learn multiple languages in one place",
+                            style = Typography.h6,
+                            color = Color.White,
+                        )
+                    }
+
                 }
                 Box(
                     modifier = Modifier
@@ -84,7 +104,9 @@ fun AuthScreen(navController: NavController) {
                         size = 64.dp,
                         icon = R.drawable.home,
                         padding = 15.dp,
-                        onClick = {})
+                        onClick = {
+                            navController.popBackStack()
+                        })
                 }
             }
 
@@ -139,8 +161,6 @@ fun AuthScreen(navController: NavController) {
 
                 if (currentTab == AuthTab.LOGIN) Login()
                 else Register()
-
-
             }
 
 

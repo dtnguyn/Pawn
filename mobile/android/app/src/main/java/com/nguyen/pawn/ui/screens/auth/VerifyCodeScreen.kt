@@ -68,7 +68,7 @@ fun VerifyCodeScreen(navController: NavController) {
                 value = code,
                 onValueChange = { newValue -> code = newValue },
                 label = {
-                    Text(text = "Enter the verification code")
+                    Text(text = "Enter the verification code", style = Typography.body2, color = Color.Gray)
                 },
                 singleLine = true,
                 colors = TextFieldDefaults.textFieldColors(

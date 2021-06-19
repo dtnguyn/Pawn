@@ -53,7 +53,7 @@ fun ChangePasswordScreen(navController: NavController) {
                 value = email,
                 onValueChange = { newValue -> email = newValue },
                 label = {
-                    Text(text = "Enter your email")
+                    Text(text = "Enter your email", style = Typography.body2, color = Color.Gray)
                 },
                 singleLine = true,
                 colors = TextFieldDefaults.textFieldColors(
@@ -72,7 +72,7 @@ fun ChangePasswordScreen(navController: NavController) {
                 onValueChange = { newValue -> newPassword = newValue },
                 visualTransformation = PasswordVisualTransformation(),
                 label = {
-                    Text(text = "Enter your new password")
+                    Text(text = "Enter your new password", style = Typography.body2, color = Color.Gray)
                 },
                 singleLine = true,
                 colors = TextFieldDefaults.textFieldColors(
@@ -91,7 +91,7 @@ fun ChangePasswordScreen(navController: NavController) {
                 onValueChange = { newValue -> newPasswordVerify = newValue },
                 visualTransformation = PasswordVisualTransformation(),
                 label = {
-                    Text(text = "Enter your new password again")
+                    Text(text = "Enter your new password again", style = Typography.body2, color = Color.Gray)
                 },
                 singleLine = true,
                 colors = TextFieldDefaults.textFieldColors(

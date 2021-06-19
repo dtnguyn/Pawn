@@ -34,7 +34,7 @@ fun Login(navController: NavController) {
             value = email,
             onValueChange = { newValue -> email = newValue },
             label = {
-                Text(text = "Enter your email")
+                Text(text = "Enter your email", style = Typography.body2, color = Color.Gray)
             },
             singleLine = true,
             colors = TextFieldDefaults.textFieldColors(
@@ -53,7 +53,7 @@ fun Login(navController: NavController) {
             onValueChange = { newValue -> password = newValue },
             visualTransformation = PasswordVisualTransformation(),
             label = {
-                Text(text = "Enter your password")
+                Text(text = "Enter your password", style = Typography.body2, color = Color.Gray)
             },
             singleLine = true,
             colors = TextFieldDefaults.textFieldColors(

@@ -3,6 +3,7 @@ package com.nguyen.pawn.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -64,10 +65,12 @@ fun AuthScreen(navController: NavController) {
                     shape = CircleShape,
                     content = {}
                 )
-                Column(modifier = Modifier
-                    .requiredWidth((deviceWidthDp * 0.6).dp)
-                    .padding(10.dp)) {
-                    if(currentTab == AuthTab.LOGIN){
+                Column(
+                    modifier = Modifier
+                        .requiredWidth((deviceWidthDp * 0.6).dp)
+                        .padding(10.dp)
+                ) {
+                    if (currentTab == AuthTab.LOGIN) {
                         Text(
                             text = "Sign in to your account",
                             style = Typography.h2,
@@ -122,6 +125,12 @@ fun AuthScreen(navController: NavController) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .fillMaxHeight()
+                            .clip(RoundedCornerShape(20.dp))
+                            .clickable {
+                                currentTab = if (currentTab == AuthTab.LOGIN) AuthTab.REGISTER
+                                else AuthTab.LOGIN
+                            }
+
                     ) {
                         Box(
                             modifier = Modifier
@@ -131,10 +140,7 @@ fun AuthScreen(navController: NavController) {
                                     color = if (currentTab == AuthTab.LOGIN) DarkBlue else Color.Transparent,
                                     RoundedCornerShape(20.dp)
                                 )
-                                .clip(RoundedCornerShape(20.dp))
-                                .clickable {
-                                    currentTab = AuthTab.LOGIN
-                                },
+                                .clip(RoundedCornerShape(20.dp)),
                             contentAlignment = Center
                         ) {
                             Text(text = "Log in", style = Typography.h6, color = Color.White)
@@ -148,10 +154,7 @@ fun AuthScreen(navController: NavController) {
                                     color = if (currentTab == AuthTab.REGISTER) DarkBlue else Color.Transparent,
                                     RoundedCornerShape(20.dp)
                                 )
-                                .clip(RoundedCornerShape(20.dp))
-                                .clickable {
-                                    currentTab = AuthTab.REGISTER
-                                },
+                                .clip(RoundedCornerShape(20.dp)),
                             contentAlignment = Center
                         ) {
                             Text(text = "Register", style = Typography.h6, color = Color.White)

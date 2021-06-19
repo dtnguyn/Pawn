@@ -18,6 +18,8 @@ import com.nguyen.pawn.R
 import com.nguyen.pawn.ui.theme.PawnTheme
 import com.nguyen.pawn.ui.navigation.PawnScreens
 import com.nguyen.pawn.ui.screens.*
+import com.nguyen.pawn.ui.screens.auth.ChangePasswordScreen
+import com.nguyen.pawn.ui.screens.auth.VerifyCodeScreen
 import com.nguyen.pawn.ui.viewmodels.WordViewModel
 
 
@@ -77,6 +79,8 @@ fun PawnApp(wordViewModel: WordViewModel) {
                 composable(PawnScreens.Chat.route) { ChatScreen() }
                 composable(PawnScreens.Word.route) { WordScreen(navController = navController) }
                 composable(PawnScreens.Auth.route) { AuthScreen(navController = navController) }
+                composable(PawnScreens.ChangePassword.route) { ChangePasswordScreen(navController = navController) }
+                composable(PawnScreens.VerifyCode.route) { VerifyCodeScreen(navController = navController) }
 
             }
         }

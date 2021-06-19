@@ -162,7 +162,7 @@ fun AuthScreen(navController: NavController) {
                     }
                 }
 
-                if (currentTab == AuthTab.LOGIN) Login()
+                if (currentTab == AuthTab.LOGIN) Login(navController)
                 else Register()
             }
 

@@ -9,4 +9,6 @@ sealed class PawnScreens(val route: String, @DrawableRes val icon: Int?) {
     object Chat : PawnScreens("chat", R.drawable.chat)
     object Word : PawnScreens("word", null)
     object Auth : PawnScreens("auth", null)
+    object ChangePassword : PawnScreens("password", null)
+    object VerifyCode : PawnScreens("verify", null)
 }

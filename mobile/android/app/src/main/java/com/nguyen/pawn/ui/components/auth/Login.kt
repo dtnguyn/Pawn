@@ -2,6 +2,7 @@ package com.nguyen.pawn.ui.components.auth
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -10,20 +11,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.nguyen.pawn.R
-import com.nguyen.pawn.ui.theme.Blue
 import com.nguyen.pawn.ui.theme.LightGrey
 import com.nguyen.pawn.ui.theme.ReallyRed
 import com.nguyen.pawn.ui.theme.Typography
 
 @Composable
-fun Login() {
+fun Login(navController: NavController) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -70,7 +71,14 @@ fun Login() {
             text = "Forgot your password? Reset",
             style = Typography.body2,
             color = Color.Black,
-            modifier = Modifier.padding(top = 5.dp, end = 40.dp, start = 40.dp, bottom = 10.dp)
+            modifier = Modifier
+                .padding(top = 5.dp, end = 40.dp, start = 40.dp, bottom = 10.dp)
+                .clip(
+                    RoundedCornerShape(5.dp)
+                )
+                .clickable {
+                    navController.navigate("password")
+                }
         )
         Button(
             onClick = { /*TODO*/ },
@@ -108,7 +116,12 @@ fun Login() {
                     contentDescription = "google icon",
                     modifier = Modifier.size(64.dp)
                 )
-                Text(text = "Log in with Google", style = Typography.body1, color = Color.Black, modifier = Modifier.padding(start = 20.dp))
+                Text(
+                    text = "Log in with Google",
+                    style = Typography.body1,
+                    color = Color.Black,
+                    modifier = Modifier.padding(start = 20.dp)
+                )
             }
         }
     }

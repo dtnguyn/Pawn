@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -46,6 +48,15 @@ android {
 dependencies {
 
     implementation "com.google.accompanist:accompanist-pager:0.10.0"
+
+    def ktor_version = "1.6.0"
+    implementation "io.ktor:ktor-client-core:$ktor_version"
+    implementation "io.ktor:ktor-client-android:$ktor_version"
+    implementation "io.ktor:ktor-client-gson:$ktor_version"
+
+    def hilt_version = "2.37"
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
 
     // If using indicators, also depend on
     implementation "com.google.accompanist:accompanist-pager-indicators:0.10.0"

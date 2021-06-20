@@ -31,11 +31,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import com.nguyen.pawn.ui.components.auth.LanguageBottomSheetContent
 import com.nguyen.pawn.ui.components.auth.Register
+import com.nguyen.pawn.ui.viewmodels.AuthViewModel
 import kotlinx.coroutines.launch
 
 @ExperimentalMaterialApi
 @Composable
-fun AuthScreen(navController: NavController) {
+fun AuthScreen(viewModel: AuthViewModel, navController: NavController) {
+
+
     val deviceWidthDp = (convertHeightToDp(
         LocalContext.current.resources.displayMetrics.widthPixels,
         LocalContext.current.resources.displayMetrics
@@ -192,12 +195,16 @@ fun AuthScreen(navController: NavController) {
                 }
 
                 if (currentTab == AuthTab.LOGIN) Login(navController)
-                else Register(nativeLanguage, onClickNativeLanguage = {
-                    toggleBottomSheet()
-                })
+                else Register(
+                    nativeLanguage,
+                    onClickNativeLanguage = {
+                        toggleBottomSheet()
+                    },
+                    onRegister = {email, username, password, passwordVerify, nativeLanguage ->
+                        viewModel.registerAccount(email, username, password, passwordVerify, nativeLanguage)
+                    }
+                )
             }
-
-
         }
 
     }

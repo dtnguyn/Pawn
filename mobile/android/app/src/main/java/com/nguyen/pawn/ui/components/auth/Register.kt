@@ -17,7 +17,11 @@ import com.nguyen.pawn.ui.theme.Typography
 
 @ExperimentalMaterialApi
 @Composable
-fun Register(nativeLanguage: String, onClickNativeLanguage: () -> Unit) {
+fun Register(
+    nativeLanguage: String,
+    onClickNativeLanguage: () -> Unit,
+    onRegister: (email: String, username: String, password: String, passwordVerify: String, nativeLanguage: String) -> Unit
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
@@ -136,7 +140,7 @@ fun Register(nativeLanguage: String, onClickNativeLanguage: () -> Unit) {
                 .aspectRatio(5f)
         )
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { onRegister(email, username, password, passwordVerify, nativeLanguage) },
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.buttonColors(ReallyRed),
             modifier = Modifier

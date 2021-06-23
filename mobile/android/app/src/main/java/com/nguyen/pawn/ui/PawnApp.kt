@@ -75,7 +75,7 @@ fun PawnApp(wordViewModel: WordViewModel, authViewModel: AuthViewModel) {
         ) {
 
             NavHost(navController, startDestination = PawnScreens.Home.route) {
-                composable(PawnScreens.Home.route) { HomeScreen(viewModel = wordViewModel, navController = navController) }
+                composable(PawnScreens.Home.route) { HomeScreen(wordViewModel = wordViewModel, authViewModel = authViewModel,navController = navController) }
                 composable(PawnScreens.Feeds.route) { FeedScreen() }
                 composable(PawnScreens.Chat.route) { ChatScreen() }
                 composable(PawnScreens.Word.route) { WordScreen(navController = navController) }

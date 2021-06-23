@@ -194,7 +194,7 @@ fun AuthScreen(viewModel: AuthViewModel, navController: NavController) {
                     }
                 }
 
-                if (currentTab == AuthTab.LOGIN) Login(navController)
+                if (currentTab == AuthTab.LOGIN) Login(navController, viewModel)
                 else Register(
                     nativeLanguage,
                     onClickNativeLanguage = {

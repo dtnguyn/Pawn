@@ -17,10 +17,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nguyen.pawn.R
+import com.nguyen.pawn.model.User
 import com.nguyen.pawn.ui.theme.*
 
 @Composable
-fun HomeAppBar(navController: NavController){
+fun HomeAppBar(navController: NavController, user: User?){
     Row(
         Modifier
             .fillMaxWidth()
@@ -29,7 +30,7 @@ fun HomeAppBar(navController: NavController){
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if(true) {
+        if(user == null) {
             Column( modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .padding(10.dp)) {
@@ -52,7 +53,7 @@ fun HomeAppBar(navController: NavController){
                 Column( modifier = Modifier
                     .align(Alignment.CenterVertically)
                     .padding(10.dp)) {
-                    Text(text = "Adron", color = Color.White, style = Typography.h6)
+                    Text(text = user.username, color = Color.White, style = Typography.h6)
                     Text(text = "Welcome back!", color = Color.White, style = Typography.body1)
                 }
         }

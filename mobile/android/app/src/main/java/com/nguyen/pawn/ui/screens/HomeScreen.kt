@@ -1,6 +1,5 @@
 package com.nguyen.pawn.ui.screens
 
-import android.util.DisplayMetrics
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -28,8 +27,16 @@ import com.nguyen.pawn.ui.theme.Blue
 import com.nguyen.pawn.ui.theme.Grey
 import com.nguyen.pawn.ui.theme.Typography
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
+import com.nguyen.pawn.model.User
+import com.nguyen.pawn.ui.viewmodels.AuthViewModel
 import com.nguyen.pawn.ui.viewmodels.WordViewModel
+import com.nguyen.pawn.util.DataStoreUtils.getAccessTokenFromDataStore
+import com.nguyen.pawn.util.DataStoreUtils.getRefreshTokenFromDataStore
 import com.nguyen.pawn.util.UtilFunction.convertHeightToDp
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 
 @ExperimentalAnimationApi
@@ -37,18 +44,30 @@ import com.nguyen.pawn.util.UtilFunction.convertHeightToDp
 @ExperimentalFoundationApi
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun HomeScreen(viewModel: WordViewModel, navController: NavController) {
+fun HomeScreen(wordViewModel: WordViewModel, authViewModel: AuthViewModel, navController: NavController) {
 
-    val words: ArrayList<Word> by viewModel.dailyWords
+    val words: ArrayList<Word> by wordViewModel.dailyWords
 
-    val savedWords: ArrayList<Word> by viewModel.savedWords
+    val savedWords: ArrayList<Word> by wordViewModel.savedWords
 
     val pagerState = rememberPagerState(pageCount = words.size)
 
+    val user: User? by authViewModel.user.observeAsState()
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    if(user == null) {
+        getAccessTokenFromDataStore(context) { accessToken ->
+            getRefreshTokenFromDataStore(context) { refreshToken ->
+                authViewModel.checkAuthStatus(accessToken, refreshToken)
+            }
+        }
+    }
 
     Surface(
         color = AlmostBlack,
     ) {
+
         Scaffold(
             Modifier
                 .fillMaxHeight()
@@ -79,7 +98,7 @@ fun HomeScreen(viewModel: WordViewModel, navController: NavController) {
 
                             item {
                                 DailyWordSection(
-                                    viewModel = viewModel,
+                                    viewModel = wordViewModel,
                                     pagerState = pagerState,
                                     navController = navController,
                                     words = words,
@@ -132,7 +151,7 @@ fun HomeScreen(viewModel: WordViewModel, navController: NavController) {
                 },
                 scaffoldState = bottomSheetScaffoldState,
                 topBar = {
-                    HomeAppBar(navController)
+                    HomeAppBar(navController, user)
                 },
 
                 sheetPeekHeight = (convertHeightToDp(

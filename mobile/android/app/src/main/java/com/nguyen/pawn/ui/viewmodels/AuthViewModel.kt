@@ -1,12 +1,16 @@
 package com.nguyen.pawn.ui.viewmodels
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nguyen.pawn.model.User
 import com.nguyen.pawn.repo.AuthRepository
+import com.nguyen.pawn.util.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -15,7 +19,19 @@ class AuthViewModel
         private val repo: AuthRepository
     ) : ViewModel() {
 
-    private val _errorMsg = MutableLiveData<String?>(null)
+    private val _uiState = MutableLiveData<UIState>(UIState.Success)
+
+    private val _user = MutableLiveData<User?>(null)
+
+    private val _accessToken = MutableLiveData<String?>(null)
+
+    private val _refreshToken = MutableLiveData<String?>(null)
+
+    val uiState: LiveData<UIState> = _uiState
+    val user: LiveData<User?> = _user
+    val accessToken: LiveData<String?> = _accessToken
+    val refreshToken: LiveData<String?> = _refreshToken
+
 
 
     fun registerAccount(
@@ -25,19 +41,89 @@ class AuthViewModel
         passwordVerify: String,
         nativeLanguage: String
     ) {
-//        if (email.isBlank() || username.isBlank() || password.isBlank() || passwordVerify.isBlank() || nativeLanguage.isBlank()) {
-//            _errorMsg.value = "Please enter all the required information!"
-//            return
-//        }
-//        if (password != passwordVerify) {
-//            _errorMsg.value = "Enter password again not match registered password!"
-//            return
-//        }
 
-        viewModelScope.launch(IO) {
-            repo.register(email, username, password, nativeLanguage)
+        viewModelScope.launch {
+            if (email.isBlank() || username.isBlank() || password.isBlank() || passwordVerify.isBlank() || nativeLanguage.isBlank()) {
+                emitError("Please enter all the required information!")
+                return@launch
+            }
+            if (password != passwordVerify) {
+                emitError("Enter password again not match registered password!")
+                return@launch
+            }
+            turnOnLoading()
+            val registerResponse = repo.register(email, username, password, nativeLanguage)
+
+            if(registerResponse) {
+                login(email, password)
+            } else {
+                emitError("Register unsuccessful! Please try again!")
+            }
         }
+    }
 
+    fun login(emailOrUsername: String, password: String){
+        viewModelScope.launch {
+            if (emailOrUsername.isBlank() || password.isBlank()) {
+                emitError("Please enter all the required information!")
+                return@launch
+            }
+            turnOnLoading()
+            val loginResponse = repo.login(emailOrUsername, password)
+            if(loginResponse != null){
+                checkAuthStatus(loginResponse.accessToken, loginResponse.refreshToken)
+            } else {
+                emitError("Login unsuccessful! Please try again!")
+            }
+        }
+    }
+
+
+    fun checkAuthStatus(accessToken: String?, refreshToken: String?) {
+        viewModelScope.launch {
+            if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) {
+                emitError("Your session has timed out! Please login again.")
+                return@launch
+            }
+            turnOnLoading()
+            val user = repo.checkAuthStatus(accessToken)
+            if(user != null){
+                turnOffLoading()
+                println(user)
+                withContext(Main) {
+                    _user.value = user
+                    _accessToken.value = accessToken
+                    _refreshToken.value = refreshToken
+                }
+            } else {
+                val newAccessToken = repo.refreshAccessToken(refreshToken)
+                val newUser = repo.checkAuthStatus(newAccessToken)
+                turnOffLoading()
+                withContext(Main) {
+                    _user.value = newUser
+                }
+            }
+        }
+    }
+
+
+    private suspend fun turnOnLoading() {
+        withContext(Main){
+            if(_uiState.value != UIState.Loading) _uiState.value = UIState.Loading
+        }
+    }
+
+    private suspend fun turnOffLoading() {
+        withContext(Main){
+            _uiState.value = UIState.Success
+
+        }
+    }
+
+    private suspend fun emitError(errMsg: String){
+        withContext(Main){
+            _uiState.value = UIState.Error(errMsg)
+        }
     }
 
 

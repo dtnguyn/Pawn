@@ -83,7 +83,6 @@ class AuthViewModel
     fun checkAuthStatus(accessToken: String?, refreshToken: String?) {
         viewModelScope.launch {
             if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) {
-                emitError("Your session has timed out! Please login again.")
                 return@launch
             }
             turnOnLoading()
@@ -121,6 +120,10 @@ class AuthViewModel
                 _refreshToken.value = null
             }
         }
+    }
+
+    fun clearError() {
+        _uiState.value = UIState.Success
     }
 
 

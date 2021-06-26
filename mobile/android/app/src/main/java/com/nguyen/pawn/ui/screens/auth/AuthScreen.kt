@@ -1,13 +1,10 @@
 package com.nguyen.pawn.ui.screens
 
 import android.util.Log
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -22,20 +19,23 @@ import androidx.navigation.NavController
 import com.nguyen.pawn.R
 import com.nguyen.pawn.ui.components.RoundButton
 import com.nguyen.pawn.ui.components.auth.Login
-import com.nguyen.pawn.ui.theme.DarkBlue
-import com.nguyen.pawn.ui.theme.Grey
-import com.nguyen.pawn.ui.theme.ReallyRed
-import com.nguyen.pawn.ui.theme.Typography
 import com.nguyen.pawn.util.AuthTab
 import com.nguyen.pawn.util.UtilFunction.convertHeightToDp
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.window.Dialog
 import com.nguyen.pawn.model.User
+import com.nguyen.pawn.ui.components.CustomDialog
 import com.nguyen.pawn.ui.components.auth.LanguageBottomSheetContent
 import com.nguyen.pawn.ui.components.auth.Register
+import com.nguyen.pawn.ui.theme.*
 import com.nguyen.pawn.ui.viewmodels.AuthViewModel
 import com.nguyen.pawn.util.DataStoreUtils
+import com.nguyen.pawn.util.UIState
 import kotlinx.coroutines.launch
 
 @ExperimentalMaterialApi
@@ -60,11 +60,20 @@ fun AuthScreen(viewModel: AuthViewModel, navController: NavController) {
     val languages = listOf("vie", "eng")
     val user: User? by viewModel.user.observeAsState()
     val context = LocalContext.current
+    val uiState: UIState? by viewModel.uiState.observeAsState()
+    var errorMsg by remember { mutableStateOf("") }
+
+
+    errorMsg = if (uiState != UIState.Loading && uiState != UIState.Success) {
+        (uiState as UIState.Error).msg
+    } else {
+        ""
+    }
 
 
 
     LaunchedEffect(user) {
-        if(user != null){
+        if (user != null) {
             Log.d("Auth", "access: ${viewModel.accessToken.value}")
             Log.d("Auth", "refresh: ${viewModel.refreshToken.value}")
             DataStoreUtils.saveAccessTokenToAuthDataStore(context, viewModel.accessToken.value)
@@ -214,19 +223,35 @@ fun AuthScreen(viewModel: AuthViewModel, navController: NavController) {
                     }
                 }
 
-                if (currentTab == AuthTab.LOGIN) Login(navController, onLogin = { emailOrUsername, password ->
-                    viewModel.login(emailOrUsername, password)
-                })
+                if (currentTab == AuthTab.LOGIN) Login(
+                    navController,
+                    onLogin = { emailOrUsername, password ->
+                        viewModel.login(emailOrUsername, password)
+                    })
                 else Register(
                     nativeLanguage,
                     onClickNativeLanguage = {
                         toggleBottomSheet()
                     },
-                    onRegister = {email, username, password, passwordVerify, nativeLanguage ->
-                        viewModel.registerAccount(email, username, password, passwordVerify, nativeLanguage)
+                    onRegister = { email, username, password, passwordVerify, nativeLanguage ->
+                        viewModel.registerAccount(
+                            email,
+                            username,
+                            password,
+                            passwordVerify,
+                            nativeLanguage
+                        )
                     }
                 )
             }
+        }
+        if (errorMsg.isNotEmpty()) {
+            CustomDialog(
+                title = "Whoops!",
+                content = errorMsg,
+                icon = R.drawable.error,
+                onDismiss = { viewModel.clearError() }
+            )
         }
     }
 

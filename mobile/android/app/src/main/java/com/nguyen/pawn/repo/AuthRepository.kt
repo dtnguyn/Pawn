@@ -1,8 +1,10 @@
 package com.nguyen.pawn.repo
 
+import android.util.Log
 import com.nguyen.pawn.api.model.*
 import com.nguyen.pawn.model.User
 import io.ktor.client.*
+import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import javax.inject.Inject
@@ -29,11 +31,17 @@ class AuthRepository
 
     suspend fun login(emailOrUsername: String, password: String): LoginResponse? {
 
-
-        return apiClient.post("http://192.168.0.235:4000/auth/login") {
-            contentType(ContentType.Application.Json)
-            body = LoginRequestBody(emailOrUsername, password)
+        return try {
+            apiClient.post("http://192.168.0.235:4000/auth/login") {
+                contentType(ContentType.Application.Json)
+                body = LoginRequestBody(emailOrUsername, password)
+            }
+        } catch (error: ClientRequestException) {
+            Log.d("Auth", "error: ${error.message}")
+            null
         }
+
+
     }
 
     suspend fun logout(refreshToken: String): Boolean {

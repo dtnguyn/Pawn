@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 object DataStoreUtils{
@@ -25,13 +26,10 @@ object DataStoreUtils{
         }
     }
 
-    fun getAccessTokenFromDataStore(context: Context, result: (accessToken: String?) -> Unit){
-        val accessTokenFlow = context.authDataStore.data.map {preferences ->
+    suspend fun getAccessTokenFromDataStore(context: Context): String?{
+        return context.authDataStore.data.map {preferences ->
             preferences[ACCESS_TOKEN_KEY]
-        }
-        accessTokenFlow.map{ accessToken ->
-            result(accessToken)
-        }
+        }.first()
     }
 
     suspend fun saveRefreshTokenToAuthDataStore(context: Context, refreshToken: String?){
@@ -40,13 +38,10 @@ object DataStoreUtils{
         }
     }
 
-    fun getRefreshTokenFromDataStore(context: Context, result: (refreshToken: String?) -> Unit){
-        val refreshTokenFlow = context.authDataStore.data.map {preferences ->
-            preferences[ACCESS_TOKEN_KEY]
-        }
-        refreshTokenFlow.map{ refreshToken ->
-            result(refreshToken)
-        }
+    suspend fun getRefreshTokenFromDataStore(context: Context): String?{
+        return context.authDataStore.data.map {preferences ->
+            preferences[REFRESH_TOKEN_KEY]
+        }.first()
     }
 
 }

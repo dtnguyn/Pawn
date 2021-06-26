@@ -1,5 +1,6 @@
 package com.nguyen.pawn.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -63,6 +64,7 @@ class AuthViewModel
     }
 
     fun login(emailOrUsername: String, password: String){
+
         viewModelScope.launch {
             if (emailOrUsername.isBlank() || password.isBlank()) {
                 emitError("Please enter all the required information!")
@@ -87,7 +89,9 @@ class AuthViewModel
             }
             turnOnLoading()
             val user = repo.checkAuthStatus(accessToken)
+            Log.d("Auth", "Here ${user}")
             if(user != null){
+
                 turnOffLoading()
                 println(user)
                 withContext(Main) {
@@ -101,6 +105,7 @@ class AuthViewModel
                 turnOffLoading()
                 withContext(Main) {
                     _user.value = newUser
+                    _accessToken.value = newAccessToken
                 }
             }
         }

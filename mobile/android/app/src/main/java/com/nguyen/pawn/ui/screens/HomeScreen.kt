@@ -1,13 +1,16 @@
 package com.nguyen.pawn.ui.screens
 
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -35,6 +38,7 @@ import com.nguyen.pawn.ui.viewmodels.WordViewModel
 import com.nguyen.pawn.util.DataStoreUtils.getAccessTokenFromDataStore
 import com.nguyen.pawn.util.DataStoreUtils.getRefreshTokenFromDataStore
 import com.nguyen.pawn.util.UtilFunction.convertHeightToDp
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -51,16 +55,20 @@ fun HomeScreen(wordViewModel: WordViewModel, authViewModel: AuthViewModel, navCo
     val savedWords: ArrayList<Word> by wordViewModel.savedWords
 
     val pagerState = rememberPagerState(pageCount = words.size)
-
-    val user: User? by authViewModel.user.observeAsState()
     val coroutineScope = rememberCoroutineScope()
+    val user: User? by authViewModel.user.observeAsState()
     val context = LocalContext.current
+    val homeScaffoldState: ScaffoldState = rememberScaffoldState()
 
-    if(user == null) {
-        getAccessTokenFromDataStore(context) { accessToken ->
-            getRefreshTokenFromDataStore(context) { refreshToken ->
-                authViewModel.checkAuthStatus(accessToken, refreshToken)
-            }
+
+
+    LaunchedEffect(homeScaffoldState) {
+        if(user == null) {
+            val accessToken = getAccessTokenFromDataStore(context)
+            val refreshToken = getRefreshTokenFromDataStore(context)
+            Log.d("Auth", "Check access token: ${accessToken}")
+            Log.d("Auth", "Check refresh token: = ${refreshToken}")
+            authViewModel.checkAuthStatus(accessToken, refreshToken)
         }
     }
 
@@ -71,7 +79,8 @@ fun HomeScreen(wordViewModel: WordViewModel, authViewModel: AuthViewModel, navCo
         Scaffold(
             Modifier
                 .fillMaxHeight()
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            scaffoldState = homeScaffoldState
 
         ) {
 
@@ -90,6 +99,14 @@ fun HomeScreen(wordViewModel: WordViewModel, authViewModel: AuthViewModel, navCo
                         modifier = Modifier
                             .fillMaxWidth()
                             .fillMaxHeight(),
+//                            .clickable {
+//                                coroutineScope.launch {
+//                                    val accessToken = getAccessTokenFromDataStore(context)
+//                                    val refreshToken = getRefreshTokenFromDataStore(context)
+//                                    Log.d("Auth", "Check access token: ${accessToken}")
+//                                    Log.d("Auth", "Check refresh token: = ${refreshToken}")
+//                                }
+//                            },
                         elevation = 10.dp,
 
                         ) {

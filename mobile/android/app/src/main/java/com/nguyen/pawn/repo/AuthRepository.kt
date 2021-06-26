@@ -7,7 +7,6 @@ import com.nguyen.pawn.api.model.RegisterRequestBody
 import com.nguyen.pawn.model.User
 import io.ktor.client.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
 import javax.inject.Inject
 
@@ -42,14 +41,13 @@ class AuthRepository
         return response
     }
 
-    suspend fun checkAuthStatus(accessToken: String?): User?{
-        val user: User? = apiClient.get("http://192.168.0.235:4000/auth/") {
+    suspend fun checkAuthStatus(accessToken: String?): User? {
+
+        return apiClient.get("http://192.168.0.235:4000/auth/") {
             headers {
                 append(HttpHeaders.Authorization, "Bearer $accessToken")
             }
         }
-
-        return user
     }
 
     suspend fun  refreshAccessToken(refreshToken: String?): String? {

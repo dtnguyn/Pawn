@@ -5,53 +5,28 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.NavController
 import com.nguyen.pawn.R
-import com.nguyen.pawn.model.User
 import com.nguyen.pawn.ui.theme.LightGrey
 import com.nguyen.pawn.ui.theme.ReallyRed
 import com.nguyen.pawn.ui.theme.Typography
-import com.nguyen.pawn.ui.viewmodels.AuthViewModel
-import com.nguyen.pawn.util.DataStoreUtils.saveAccessTokenToAuthDataStore
-import com.nguyen.pawn.util.DataStoreUtils.saveRefreshTokenToAuthDataStore
-import kotlinx.coroutines.launch
-import java.util.prefs.Preferences
 
 @Composable
-fun Login(navController: NavController, viewModel: AuthViewModel) {
+fun Login(navController: NavController, onLogin: (emailOrUsername: String, password: String) -> Unit) {
 
     var emailOrUsername by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val user: User? by viewModel.user.observeAsState()
-    val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
 
 
     Column {
-        if(user != null){
-            coroutineScope.launch {
-                saveAccessTokenToAuthDataStore(context, viewModel.accessToken.value)
-                saveRefreshTokenToAuthDataStore(context, viewModel.refreshToken.value)
-            }
-            navController.navigate("home") {
-                popUpTo("home") { inclusive = true }
-            }
-        }
         TextField(
             value = emailOrUsername,
             onValueChange = { newValue -> emailOrUsername = newValue },
@@ -104,7 +79,7 @@ fun Login(navController: NavController, viewModel: AuthViewModel) {
         )
         Button(
             onClick = {
-                viewModel.login(emailOrUsername, password)
+                onLogin(emailOrUsername, password)
             },
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.buttonColors(ReallyRed),
@@ -112,6 +87,7 @@ fun Login(navController: NavController, viewModel: AuthViewModel) {
                 .fillMaxWidth()
                 .padding(horizontal = 30.dp, vertical = 10.dp)
                 .aspectRatio(5f)
+                .clickable{}
         ) {
             Text(text = "Log in", style = Typography.h6, color = Color.White)
         }

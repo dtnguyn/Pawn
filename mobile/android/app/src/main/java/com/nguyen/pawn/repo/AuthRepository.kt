@@ -16,15 +16,16 @@ class AuthRepository
 {
 
     suspend fun register(email: String, username: String, password: String, nativeLanguage: String): Boolean {
-        val response: Boolean = apiClient.post("http://192.168.0.235:4000/auth/register") {
-            contentType(ContentType.Application.Json)
-//            body = RegisterRequestBody("test@test.com", "123123", "adron2", "vie")
-            body = RegisterRequestBody(email, password, username, nativeLanguage)
+        return try {
+            apiClient.post("http://192.168.0.235:4000/auth/register") {
+                contentType(ContentType.Application.Json)
+                body = RegisterRequestBody(email, password, username, nativeLanguage)
+            }
+        } catch (error: ClientRequestException) {
+            Log.d("Auth", "error: ${error.message}")
+            false
         }
 
-        println("register response: $response")
-
-        return response
 
     }
 
@@ -45,28 +46,41 @@ class AuthRepository
     }
 
     suspend fun logout(refreshToken: String): Boolean {
-        return apiClient.delete("http://192.168.0.235:4000/auth/logout") {
-            contentType(ContentType.Application.Json)
-            body = LogoutRequestBody(refreshToken)
+        return try {
+            apiClient.delete("http://192.168.0.235:4000/auth/logout") {
+                contentType(ContentType.Application.Json)
+                body = LogoutRequestBody(refreshToken)
+            }
+        } catch (error: ClientRequestException) {
+            Log.d("Auth", "error: ${error.message}")
+            false
         }
     }
 
     suspend fun checkAuthStatus(accessToken: String?): User? {
-
-        return apiClient.get("http://192.168.0.235:4000/auth/") {
-            headers {
-                append(HttpHeaders.Authorization, "Bearer $accessToken")
+        return try {
+            apiClient.get("http://192.168.0.235:4000/auth/") {
+                headers {
+                    append(HttpHeaders.Authorization, "Bearer $accessToken")
+                }
             }
+        } catch (error: ClientRequestException) {
+
+            null
         }
     }
 
     suspend fun  refreshAccessToken(refreshToken: String?): String? {
-        val response: LoginResponse? = apiClient.post("http://192.168.0.235:4000/auth/token") {
-            contentType(ContentType.Application.Json)
-            body = RefreshTokenRequestBody(token = refreshToken)
+        return try {
+            val response: LoginResponse? = apiClient.post("http://192.168.0.235:4000/auth/token") {
+                contentType(ContentType.Application.Json)
+                body = RefreshTokenRequestBody(token = refreshToken)
+            }
+            response?.accessToken
+        } catch (error: ClientRequestException) {
+            Log.d("Auth", "error: ${error.message}")
+            null
         }
-
-        return response?.accessToken
     }
 
 

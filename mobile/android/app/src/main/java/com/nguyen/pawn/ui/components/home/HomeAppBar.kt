@@ -8,20 +8,29 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nguyen.pawn.R
 import com.nguyen.pawn.model.User
 import com.nguyen.pawn.ui.theme.*
+import com.nguyen.pawn.util.DataStoreUtils.getRefreshTokenFromDataStore
+import com.nguyen.pawn.util.DataStoreUtils.saveAccessTokenToAuthDataStore
+import kotlinx.coroutines.launch
 
 @Composable
-fun HomeAppBar(navController: NavController, user: User?){
+fun HomeAppBar(navController: NavController, user: User?, onLogout: (refreshToken: String?) -> Unit){
+
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
     Row(
         Modifier
             .fillMaxWidth()
@@ -59,7 +68,13 @@ fun HomeAppBar(navController: NavController, user: User?){
         }
 
         }
-        RoundButton(backgroundColor = Color.White, size = 55.dp, icon = R.drawable.settings, padding = 12.dp, onClick = {})
+        RoundButton(backgroundColor = Color.White, size = 55.dp, icon = R.drawable.settings, padding = 12.dp, onClick = {
+            coroutineScope.launch {
+                val refreshToken = getRefreshTokenFromDataStore(context)
+                saveAccessTokenToAuthDataStore(context, null)
+                onLogout(refreshToken)
+            }
+        })
 
     }
 

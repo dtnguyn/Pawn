@@ -1,9 +1,6 @@
 package com.nguyen.pawn.repo
 
-import com.nguyen.pawn.api.model.LoginRequestBody
-import com.nguyen.pawn.api.model.LoginResponse
-import com.nguyen.pawn.api.model.RefreshTokenRequestBody
-import com.nguyen.pawn.api.model.RegisterRequestBody
+import com.nguyen.pawn.api.model.*
 import com.nguyen.pawn.model.User
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -30,15 +27,20 @@ class AuthRepository
     }
 
 
-    suspend fun login(emailOrUsername: String, password: String): LoginResponse?{
-        val response: LoginResponse? = apiClient.post("http://192.168.0.235:4000/auth/login") {
+    suspend fun login(emailOrUsername: String, password: String): LoginResponse? {
+
+
+        return apiClient.post("http://192.168.0.235:4000/auth/login") {
             contentType(ContentType.Application.Json)
             body = LoginRequestBody(emailOrUsername, password)
         }
+    }
 
-        println("login response: $response")
-
-        return response
+    suspend fun logout(refreshToken: String): Boolean {
+        return apiClient.delete("http://192.168.0.235:4000/auth/logout") {
+            contentType(ContentType.Application.Json)
+            body = LogoutRequestBody(refreshToken)
+        }
     }
 
     suspend fun checkAuthStatus(accessToken: String?): User? {

@@ -32,6 +32,7 @@ import com.nguyen.pawn.ui.theme.Typography
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nguyen.pawn.model.User
 import com.nguyen.pawn.ui.viewmodels.AuthViewModel
 import com.nguyen.pawn.ui.viewmodels.WordViewModel
@@ -168,7 +169,9 @@ fun HomeScreen(wordViewModel: WordViewModel, authViewModel: AuthViewModel, navCo
                 },
                 scaffoldState = bottomSheetScaffoldState,
                 topBar = {
-                    HomeAppBar(navController, user)
+                    HomeAppBar(navController, user, onLogout = {
+                        authViewModel.logout(it)
+                    })
                 },
 
                 sheetPeekHeight = (convertHeightToDp(

@@ -16,9 +16,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel
-    @Inject constructor(
-        private val repo: AuthRepository
-    ) : ViewModel() {
+@Inject constructor(
+    private val repo: AuthRepository
+) : ViewModel() {
 
     private val _uiState = MutableLiveData<UIState>(UIState.Success)
 
@@ -32,7 +32,6 @@ class AuthViewModel
     val user: LiveData<User?> = _user
     val accessToken: LiveData<String?> = _accessToken
     val refreshToken: LiveData<String?> = _refreshToken
-
 
 
     fun registerAccount(
@@ -55,7 +54,7 @@ class AuthViewModel
             turnOnLoading()
             val registerResponse = repo.register(email, username, password, nativeLanguage)
 
-            if(registerResponse) {
+            if (registerResponse) {
                 login(email, password)
             } else {
                 emitError("Register unsuccessful! Please try again!")
@@ -63,7 +62,7 @@ class AuthViewModel
         }
     }
 
-    fun login(emailOrUsername: String, password: String){
+    fun login(emailOrUsername: String, password: String) {
 
         viewModelScope.launch {
             if (emailOrUsername.isBlank() || password.isBlank()) {
@@ -72,7 +71,7 @@ class AuthViewModel
             }
             turnOnLoading()
             val loginResponse = repo.login(emailOrUsername, password)
-            if(loginResponse != null){
+            if (loginResponse != null) {
                 checkAuthStatus(loginResponse.accessToken, loginResponse.refreshToken)
             } else {
                 emitError("Login unsuccessful! Please try again!")
@@ -90,7 +89,7 @@ class AuthViewModel
             turnOnLoading()
             val user = repo.checkAuthStatus(accessToken)
             Log.d("Auth", "Here ${user}")
-            if(user != null){
+            if (user != null) {
 
                 turnOffLoading()
                 println(user)
@@ -111,22 +110,35 @@ class AuthViewModel
         }
     }
 
+    fun logout(refreshToken: String?) {
+        viewModelScope.launch {
+            if (refreshToken != null) {
+                repo.logout(refreshToken)
+            }
+            withContext(Main) {
+                _user.value = null
+                _accessToken.value = null
+                _refreshToken.value = null
+            }
+        }
+    }
+
 
     private suspend fun turnOnLoading() {
-        withContext(Main){
-            if(_uiState.value != UIState.Loading) _uiState.value = UIState.Loading
+        withContext(Main) {
+            if (_uiState.value != UIState.Loading) _uiState.value = UIState.Loading
         }
     }
 
     private suspend fun turnOffLoading() {
-        withContext(Main){
+        withContext(Main) {
             _uiState.value = UIState.Success
 
         }
     }
 
-    private suspend fun emitError(errMsg: String){
-        withContext(Main){
+    private suspend fun emitError(errMsg: String) {
+        withContext(Main) {
             _uiState.value = UIState.Error(errMsg)
         }
     }

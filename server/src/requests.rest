@@ -14,15 +14,15 @@ POST http://localhost:4000/auth/login
 Content-Type: application/json
 
 {
-    "usernameOrEmail": "adron0914@gmail.com",
-    "password": "123"
+    "usernameOrEmail": "adron2",
+    "password": "123123"
 }
 
 ###
 
 
 GET http://localhost:4000/auth/
-Authorization: Bearer .eyJ1c2VyIjp7ImlkIjoiNDJmMjBjYWQtNDkyNS00MjY4LWJhMDctM2VjNTEzZTExNWFjIiwib2F1dGhJZCI6bnVsbCwidXNlcm5hbWUiOiJhZHJvbiIsInBhc3N3b3JkIjoiJDJiJDEwJERTRTg5V1c5cFZVamUvb3U1VWR2Ny5PdTdtd1RrQXhBY3p2MS9ERlFJZkZ0QVdpM1VmekRLIiwiZW1haWwiOiJhZHJvbjA5MTRAZ21haWwuY29tIiwiYXZhdGFyIjpudWxsLCJkYWlseVdvcmRDb3VudCI6Mywibm90aWZpY2F0aW9uRW5hYmxlZCI6dHJ1ZSwibmF0aXZlTGFuZ3VhZ2VJZCI6InZpZSIsImNyZWF0ZWRBdCI6IjIwMjEtMDUtMTdUMDI6NDQ6MTYuMTI1WiIsInVwZGF0ZWRBdCI6IjIwMjEtMDUtMTdUMDI6NDQ6MTYuMTI1WiJ9LCJpYXQiOjE2MjEyMjgwNjAsImV4cCI6MTYyMTIyODA5MH0.l0x-doG23Obxh1UqPdlySVmOMWibCSBGPC-aU0M6DRI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNTk0ZWQxMDQtMWUzMi00YTM4LTllNDgtZDMxNzYwMjdkNTY1Iiwib2F1dGhJZCI6bnVsbCwidXNlcm5hbWUiOiJhZHJvbjIiLCJwYXNzd29yZCI6IiQyYiQxMCR6WWV1Y1dJeVNtN3Q3b3VlN1BtRFBleHdoM0JGZFJjZEtGazdWLlRRblNoU3RsTmkuUFEyMiIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSIsImF2YXRhciI6bnVsbCwiZGFpbHlXb3JkQ291bnQiOjMsIm5vdGlmaWNhdGlvbkVuYWJsZWQiOnRydWUsIm5hdGl2ZUxhbmd1YWdlSWQiOiJ2aWUiLCJjcmVhdGVkQXQiOiIyMDIxLTA2LTI1VDIzOjI3OjEzLjA1NVoiLCJ1cGRhdGVkQXQiOiIyMDIxLTA2LTI1VDIzOjI3OjEzLjA1NVoifSwiaWF0IjoxNjI1MTcxMDg1LCJleHAiOjE2MjU3NzU4ODV9.NdBGCKptSqvfC8RSgI3B4ITwXDHhX3iKt336CfEyCQc
 
 
 ###
@@ -39,7 +39,7 @@ Content-Type: application/json
 
 {
     "email": "adron0914@gmail.com",
-    "code": "548106"
+    "code": "605191"
 }
 
 ###
@@ -112,5 +112,12 @@ Content-Type: application/json
     ]
 }
 
+###
 
+POST http://localhost:4000/word/save/language
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNTk0ZWQxMDQtMWUzMi00YTM4LTllNDgtZDMxNzYwMjdkNTY1Iiwib2F1dGhJZCI6bnVsbCwidXNlcm5hbWUiOiJhZHJvbjIiLCJwYXNzd29yZCI6IiQyYiQxMCR6WWV1Y1dJeVNtN3Q3b3VlN1BtRFBleHdoM0JGZFJjZEtGazdWLlRRblNoU3RsTmkuUFEyMiIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSIsImF2YXRhciI6bnVsbCwiZGFpbHlXb3JkQ291bnQiOjMsIm5vdGlmaWNhdGlvbkVuYWJsZWQiOnRydWUsIm5hdGl2ZUxhbmd1YWdlSWQiOiJ2aWUiLCJjcmVhdGVkQXQiOiIyMDIxLTA2LTI1VDIzOjI3OjEzLjA1NVoiLCJ1cGRhdGVkQXQiOiIyMDIxLTA2LTI1VDIzOjI3OjEzLjA1NVoifSwiaWF0IjoxNjI1MTcxMDg1LCJleHAiOjE2MjU3NzU4ODV9.NdBGCKptSqvfC8RSgI3B4ITwXDHhX3iKt336CfEyCQc
+Content-Type: application/json
 
+{
+    "languages": ["en_US"]
+}

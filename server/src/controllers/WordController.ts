@@ -11,6 +11,32 @@ import { SavedWord } from "../entity/SavedWord";
 import { Pronunciation } from "../entity/Pronunciation";
 import { Definition } from "../entity/Definition";
 import { rejects } from "assert";
+import { User } from "../entity/User";
+import { Language } from "../entity/Language";
+
+export const chooseLanguages = async (
+  languageSymbols: string[],
+  userId: string
+) => {
+  const userRepo = getRepository(User);
+  const languageRepo = getRepository(Language);
+  const user = await userRepo
+    .createQueryBuilder("user")
+    .leftJoinAndSelect("user.learningLanguages", "language")
+    .where("user.id = :userId", { userId })
+    .getOne();
+
+  if (!user) throw new Error("User not found!");
+  console.log(user);
+  user.learningLanguages = [];
+  for (const languageSymbol of languageSymbols) {
+    const language = await languageRepo.findOne({ id: languageSymbol });
+    if (language) {
+      user.learningLanguages.push(language);
+      await userRepo.save(user);
+    }
+  }
+};
 
 export const getDailyRandomWords = async (
   wordCount: number,
@@ -285,6 +311,31 @@ export const rearrangeDefinition = async (definitionIds: string[]) => {
   });
 };
 
+export const importAllLanguages = async () => {
+  const languageRepo = getRepository(Language);
+
+  if (!(await languageRepo.findOne({ id: "en_US" })))
+    await languageRepo.insert({
+      id: "en_US",
+      value: "English",
+    });
+  if (!(await languageRepo.findOne({ id: "fr" })))
+    await languageRepo.insert({
+      id: "fr",
+      value: "French",
+    });
+  if (!(await languageRepo.findOne({ id: "es" })))
+    await languageRepo.insert({
+      id: "es",
+      value: "Spanish",
+    });
+  if (!(await languageRepo.findOne({ id: "de" })))
+    await languageRepo.insert({
+      id: "de",
+      value: "German",
+    });
+};
+
 export const importAllWords = async () => {
   const wordRepo = getRepository(Word);
 
@@ -337,7 +388,7 @@ const importFrWords = async () => {
 
 const importEsWords = async () => {
   const wordRepo = getRepository(Word);
-  for (constword of esWords as string[]) {
+  for (const word of esWords as string[]) {
     await wordRepo.insert({
       value: word,
       language: "es",

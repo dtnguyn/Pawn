@@ -40,9 +40,9 @@ export async function createOauthUser(
 
 export async function getOneUser(usernameOrEmail: string) {
   const userRepo = getRepository(User);
-
   return await userRepo
     .createQueryBuilder("user")
+    .leftJoinAndSelect("user.learningLanguages", "learningLanguages")
     .where("user.username = :username", { username: usernameOrEmail })
     .orWhere("user.email = :email", { email: usernameOrEmail })
     .getOne();
@@ -121,6 +121,14 @@ export const sendVerificationCode = async (email: string) => {
     return code;
   } else {
     throw new Error("Please provide a valid email!");
+  }
+};
+
+export const deleteRefreshToken = async (refreshToken: string) => {
+  try {
+    await getRepository(UserRefreshToken).delete({ token: refreshToken });
+  } catch (error) {
+    throw new Error("Unable to logout!");
   }
 };
 

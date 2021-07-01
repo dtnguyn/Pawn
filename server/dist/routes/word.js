@@ -81,7 +81,19 @@ router.post("/save", auth_1.checkAuthentication, (req, res) => __awaiter(this, v
         res.json({ status: true });
     }
     catch (error) {
-        console.log(error);
+        res.status(400).send({
+            message: error.message,
+        });
+    }
+}));
+router.post("/save/language", auth_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const languages = req.body.languages;
+        const userId = req.user.id;
+        yield WordController_1.chooseLanguages(languages, userId);
+        res.json({ status: true });
+    }
+    catch (error) {
         res.status(400).send({
             message: error.message,
         });

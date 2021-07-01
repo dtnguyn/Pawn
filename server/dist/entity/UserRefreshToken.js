@@ -22,7 +22,10 @@ __decorate([
     __metadata("design:type", String)
 ], UserRefreshToken.prototype, "userId", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => User_1.User, (user) => user.refreshTokens),
+    typeorm_1.ManyToOne(() => User_1.User, (user) => user.refreshTokens, {
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+    }),
     __metadata("design:type", User_1.User)
 ], UserRefreshToken.prototype, "user", void 0);
 __decorate([

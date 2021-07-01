@@ -141,6 +141,18 @@ router.post("/login", (req, res) => __awaiter(this, void 0, void 0, function* ()
         });
     }
 }));
+router.delete("/logout", (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const refreshToken = req.body.refreshToken;
+        yield UserController_1.deleteRefreshToken(refreshToken);
+        res.json(true);
+    }
+    catch (error) {
+        return res.status(400).send({
+            message: error.message,
+        });
+    }
+}));
 router.patch("/password", (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         const email = req.body.email;

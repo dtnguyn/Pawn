@@ -46,6 +46,7 @@ function getOneUser(usernameOrEmail) {
         const userRepo = typeorm_1.getRepository(User_1.User);
         return yield userRepo
             .createQueryBuilder("user")
+            .leftJoinAndSelect("user.learningLanguages", "learningLanguages")
             .where("user.username = :username", { username: usernameOrEmail })
             .orWhere("user.email = :email", { email: usernameOrEmail })
             .getOne();
@@ -116,6 +117,14 @@ exports.sendVerificationCode = (email) => __awaiter(this, void 0, void 0, functi
     }
     else {
         throw new Error("Please provide a valid email!");
+    }
+});
+exports.deleteRefreshToken = (refreshToken) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        yield typeorm_1.getRepository(UserRefreshToken_1.UserRefreshToken).delete({ token: refreshToken });
+    }
+    catch (error) {
+        throw new Error("Unable to logout!");
     }
 });
 exports.changePassword = (email, code, hashPW) => __awaiter(this, void 0, void 0, function* () {

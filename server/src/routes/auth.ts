@@ -5,6 +5,7 @@ import {
   changePassword,
   createOauthUser,
   createUser,
+  deleteRefreshToken,
   findOneRefreshToken,
   getOneOauthUser,
   getOneUser,
@@ -185,6 +186,20 @@ router.post("/login", async (req, res) => {
 
     //Send response
     return res.json({ accessToken, refreshToken });
+  } catch (error) {
+    return res.status(400).send({
+      message: error.message,
+    });
+  }
+});
+
+router.delete("/logout", async (req, res) => {
+  try {
+    const refreshToken = req.body.refreshToken;
+
+    await deleteRefreshToken(refreshToken);
+
+    res.json(true);
   } catch (error) {
     return res.status(400).send({
       message: error.message,

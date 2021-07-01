@@ -58,6 +58,10 @@ typeorm_1.createConnection({
     app.use(express_1.default.json());
     app.use("/auth", auth_1.default);
     app.use("/word", word_1.default);
+    console.log(yield typeorm_1.getRepository(User_1.User)
+        .createQueryBuilder("user")
+        .leftJoinAndSelect("user.learningLanguages", "language")
+        .getMany());
     app.listen(4000, () => {
         console.log("Server is running on port 4000");
     });

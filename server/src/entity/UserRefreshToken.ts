@@ -15,7 +15,10 @@ export class UserRefreshToken {
 
   @Column()
   userId: string;
-  @ManyToOne(() => User, (user) => user.refreshTokens)
+  @ManyToOne(() => User, (user) => user.refreshTokens, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
   user: User;
 
   @CreateDateColumn()

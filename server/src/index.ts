@@ -16,7 +16,10 @@ import word from "./routes/word";
 
 import { UserRefreshToken } from "./entity/UserRefreshToken";
 import { SavedWord } from "./entity/SavedWord";
-import { importAllWords } from "./controllers/WordController";
+import {
+  importAllLanguages,
+  importAllWords,
+} from "./controllers/WordController";
 import { VerificationCode } from "./entity/VerificationCode";
 
 createConnection({
@@ -51,7 +54,21 @@ createConnection({
     app.use("/word", word);
 
     // await importAllWords();
-    // console.log(await getRepository(Definition).find());
+    // console.log(await getRepository(User).delete({ email: "test@test.com" }));
+    // await importAllLanguages();
+    console.log(
+      await getRepository(User)
+        .createQueryBuilder("user")
+        .leftJoinAndSelect("user.learningLanguages", "language")
+        .getMany()
+    );
+    // console.log(
+    //   await getRepository(Language)
+    //     .createQueryBuilder("language")
+    //     .leftJoinAndSelect("language.learners", "learner")
+    //     .getMany()
+    // );
+    // console.log(await getRepository(Language).find());
 
     app.listen(4000, () => {
       console.log("Server is running on port 4000");

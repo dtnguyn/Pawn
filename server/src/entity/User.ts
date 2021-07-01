@@ -33,7 +33,7 @@ export class User {
   @Column({ nullable: true })
   password: string;
 
-  @Column({ nullable: true })
+  @Column({ unique: true })
   email: string;
 
   @Column({ nullable: true })
@@ -58,31 +58,31 @@ export class User {
   @OneToMany(() => Notification, (notification) => notification.sender)
   sentNotifications: Notification;
 
-  @Column({ nullable: true })
+  @Column()
   nativeLanguageId: string;
-  @ManyToOne(() => Language, (language) => language.natives)
-  nativeLanguage: Language;
+
+  @ManyToMany(() => Language, (language) => language.learners, {
+    cascade: ["insert"],
+  })
+  @JoinTable()
+  learningLanguages: Language[];
 
   @ManyToMany(() => Topic, (topic) => topic.users)
   @JoinTable()
   feedTopics: Topic[];
 
-  @ManyToMany(() => Language, (language) => language.natives)
-  @JoinTable()
-  learningLanguages: Language[];
+  // @ManyToMany(() => GroupChat, (groupChat) => groupChat.members)
+  // @JoinTable()
+  // followedGroupChats: GroupChat[];
 
-  @ManyToMany(() => GroupChat, (groupChat) => groupChat.members)
-  @JoinTable()
-  followedGroupChats: GroupChat[];
+  // @OneToMany(() => GroupChat, (groupChat) => groupChat.admin)
+  // ownedGroupChat: ChatImage[];
 
-  @OneToMany(() => GroupChat, (groupChat) => groupChat.admin)
-  ownedGroupChat: ChatImage[];
+  // @OneToMany(() => ChatImage, (image) => image.user)
+  // chatImages: ChatImage[];
 
-  @OneToMany(() => ChatImage, (image) => image.user)
-  chatImages: ChatImage[];
-
-  @OneToMany(() => ChatImage, (image) => image.user)
-  chatMessages: ChatMessage[];
+  // @OneToMany(() => ChatImage, (image) => image.user)
+  // chatMessages: ChatMessage[];
 
   @CreateDateColumn()
   createdAt: Date;

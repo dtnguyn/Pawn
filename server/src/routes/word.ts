@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import { SavedWord } from "src/entity/SavedWord";
 import {
+  chooseLanguages,
   getDailyRandomWords,
   getDefinition,
   getSavedWords,
@@ -90,7 +91,20 @@ router.post("/save", checkAuthentication, async (req, res) => {
     await toggleSaveWord(word, language, userId);
     res.json({ status: true });
   } catch (error) {
-    console.log(error);
+    res.status(400).send({
+      message: error.message,
+    });
+  }
+});
+
+router.post("/save/language", checkAuthentication, async (req, res) => {
+  try {
+    const languages = req.body.languages;
+    const userId = (req as any).user.id;
+
+    await chooseLanguages(languages, userId);
+    res.json({ status: true });
+  } catch (error) {
     res.status(400).send({
       message: error.message,
     });

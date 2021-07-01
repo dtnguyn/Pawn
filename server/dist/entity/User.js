@@ -10,8 +10,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const ChatImage_1 = require("./ChatImage");
-const GroupChat_1 = require("./GroupChat");
 const Language_1 = require("./Language");
 const Notification_1 = require("./Notification");
 const SavedWord_1 = require("./SavedWord");
@@ -36,7 +34,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 __decorate([
-    typeorm_1.Column({ nullable: true }),
+    typeorm_1.Column({ unique: true }),
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
@@ -69,40 +67,21 @@ __decorate([
     __metadata("design:type", Notification_1.Notification)
 ], User.prototype, "sentNotifications", void 0);
 __decorate([
-    typeorm_1.Column({ nullable: true }),
+    typeorm_1.Column(),
     __metadata("design:type", String)
 ], User.prototype, "nativeLanguageId", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => Language_1.Language, (language) => language.natives),
-    __metadata("design:type", Language_1.Language)
-], User.prototype, "nativeLanguage", void 0);
+    typeorm_1.ManyToMany(() => Language_1.Language, (language) => language.learners, {
+        cascade: ["insert"],
+    }),
+    typeorm_1.JoinTable(),
+    __metadata("design:type", Array)
+], User.prototype, "learningLanguages", void 0);
 __decorate([
     typeorm_1.ManyToMany(() => Topic_1.Topic, (topic) => topic.users),
     typeorm_1.JoinTable(),
     __metadata("design:type", Array)
 ], User.prototype, "feedTopics", void 0);
-__decorate([
-    typeorm_1.ManyToMany(() => Language_1.Language, (language) => language.natives),
-    typeorm_1.JoinTable(),
-    __metadata("design:type", Array)
-], User.prototype, "learningLanguages", void 0);
-__decorate([
-    typeorm_1.ManyToMany(() => GroupChat_1.GroupChat, (groupChat) => groupChat.members),
-    typeorm_1.JoinTable(),
-    __metadata("design:type", Array)
-], User.prototype, "followedGroupChats", void 0);
-__decorate([
-    typeorm_1.OneToMany(() => GroupChat_1.GroupChat, (groupChat) => groupChat.admin),
-    __metadata("design:type", Array)
-], User.prototype, "ownedGroupChat", void 0);
-__decorate([
-    typeorm_1.OneToMany(() => ChatImage_1.ChatImage, (image) => image.user),
-    __metadata("design:type", Array)
-], User.prototype, "chatImages", void 0);
-__decorate([
-    typeorm_1.OneToMany(() => ChatImage_1.ChatImage, (image) => image.user),
-    __metadata("design:type", Array)
-], User.prototype, "chatMessages", void 0);
 __decorate([
     typeorm_1.CreateDateColumn(),
     __metadata("design:type", Date)

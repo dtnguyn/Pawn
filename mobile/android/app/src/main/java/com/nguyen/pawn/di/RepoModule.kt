@@ -1,6 +1,7 @@
 package com.nguyen.pawn.di
 
 import com.nguyen.pawn.repo.AuthRepository
+import com.nguyen.pawn.repo.WordRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,5 +16,11 @@ object RepoModule {
     @Provides
     fun provideAuthRepository(client: HttpClient): AuthRepository {
         return AuthRepository(client)
+    }
+
+    @Singleton
+    @Provides
+    fun provideWordRepository(client: HttpClient): WordRepository {
+        return WordRepository(client)
     }
 }

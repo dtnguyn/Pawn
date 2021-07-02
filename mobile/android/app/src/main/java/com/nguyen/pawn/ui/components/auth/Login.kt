@@ -87,7 +87,6 @@ fun Login(navController: NavController, onLogin: (emailOrUsername: String, passw
                 .fillMaxWidth()
                 .padding(horizontal = 30.dp, vertical = 10.dp)
                 .aspectRatio(5f)
-                .clickable{}
         ) {
             Text(text = "Log in", style = Typography.h6, color = Color.White)
         }

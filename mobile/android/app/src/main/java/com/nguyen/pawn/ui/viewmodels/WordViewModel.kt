@@ -4,19 +4,35 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.nguyen.pawn.model.Definition
+import com.nguyen.pawn.model.Language
 import com.nguyen.pawn.model.Word
+import com.nguyen.pawn.repo.WordRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class WordViewModel : ViewModel() {
+@HiltViewModel
+class WordViewModel
+@Inject constructor(
+    private val repo: WordRepository
+) : ViewModel() {
 
     private val _dailyWords: MutableState<ArrayList<Word>> = mutableStateOf(arrayListOf())
     private val _savedWords: MutableState<ArrayList<Word>> = mutableStateOf(arrayListOf())
+    private val _pickedLanguages: MutableState<ArrayList<Language>> = mutableStateOf(arrayListOf())
     private val _wordDefinition: MutableState<Definition?> = mutableStateOf(null)
 
+
+
     private val savedWordMap = HashMap<String, Boolean>()
+    private val pickedLanguageMap = HashMap<String, Boolean>()
 
     val dailyWords: State<ArrayList<Word>> = _dailyWords
     val savedWords: State<ArrayList<Word>> = _savedWords
+    val pickedLanguages: State<ArrayList<Language>> = _pickedLanguages
+
 
     init {
         _dailyWords.value = arrayListOf(
@@ -132,9 +148,45 @@ class WordViewModel : ViewModel() {
         }
     }
 
+    fun savePickedLanguages(languages: List<Language>, accessToken: String?) {
+        val languageString = languages.map { language -> language.id }
+        if(accessToken == null) {
+
+        } else {
+            viewModelScope.launch {
+                val response = repo.pickLearningLanguages(languageString, accessToken)
+                if(response) {
+                    _pickedLanguages.value = languages as ArrayList<Language>
+                } else {
+
+                }
+            }
+        }
+    }
+
+    fun togglePickedLanguage(language: Language) {
+        if(pickedLanguageMap[language.id] == true) {
+            pickedLanguageMap[language.id] = false
+            _pickedLanguages.value = _pickedLanguages.value.filter { pickedLanguage ->
+                pickedLanguage.id != language.id
+            } as ArrayList<Language>
+        } else {
+            pickedLanguageMap[language.id] = true
+            _pickedLanguages.value = (pickedLanguages.value + arrayListOf(language)) as ArrayList<Language>
+        }
+    }
+
+    fun initializePickedLanguages(languages: List<Language>){
+        for(language in languages) {
+            pickedLanguageMap[language.id] = true
+        }
+        _pickedLanguages.value =  languages as ArrayList<Language>
+    }
+
     fun checkIsSaved(wordId: String): Boolean{
         return savedWordMap[wordId] == true
     }
+
 
 
 }

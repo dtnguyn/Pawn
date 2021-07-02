@@ -15,40 +15,44 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.nguyen.pawn.R
+import com.nguyen.pawn.model.Language
 import com.nguyen.pawn.ui.theme.*
 import com.nguyen.pawn.util.SupportedLanguage
 
 @Composable
 fun LanguageItem(
-    language: SupportedLanguage,
+    language: Language,
     isPicked: Boolean,
-    onToggleLanguage: (language: SupportedLanguage) -> Unit
+    onToggleLanguage: (language: Language) -> Unit
 ) {
 
-    fun generateBackgroundColorForLanguage(language: SupportedLanguage): Color {
+    fun generateBackgroundColorForLanguage(language: String): Color {
         return when (language) {
-            SupportedLanguage.ENGLISH -> Blue
-            SupportedLanguage.GERMANY -> LightOrange
-            SupportedLanguage.FRENCH -> DarkBlue
-            SupportedLanguage.SPANISH -> LightRed
+            SupportedLanguage.ENGLISH.value -> SupportedLanguage.ENGLISH.backgroundColor
+            SupportedLanguage.GERMANY.value -> SupportedLanguage.GERMANY.backgroundColor
+            SupportedLanguage.FRENCH.value -> SupportedLanguage.FRENCH.backgroundColor
+            SupportedLanguage.SPANISH.value -> SupportedLanguage.SPANISH.backgroundColor
+            else -> SupportedLanguage.ENGLISH.backgroundColor
         }
     }
 
-    fun generateFlagForLanguage(language: SupportedLanguage): Int {
+    fun generateFlagForLanguage(language: String): Int {
         return when (language) {
-            SupportedLanguage.ENGLISH -> R.drawable.england
-            SupportedLanguage.GERMANY -> R.drawable.germany
-            SupportedLanguage.FRENCH -> R.drawable.france
-            SupportedLanguage.SPANISH -> R.drawable.spain
+            SupportedLanguage.ENGLISH.value -> SupportedLanguage.ENGLISH.flag
+            SupportedLanguage.GERMANY.value -> SupportedLanguage.GERMANY.flag
+            SupportedLanguage.FRENCH.value -> SupportedLanguage.FRENCH.flag
+            SupportedLanguage.SPANISH.value -> SupportedLanguage.SPANISH.flag
+            else -> SupportedLanguage.ENGLISH.flag
         }
     }
 
-    fun generateIconForLanguage(language: SupportedLanguage): Int {
+    fun generateIconForLanguage(language: String): Int {
         return when (language) {
-            SupportedLanguage.ENGLISH -> R.drawable.big_ben
-            SupportedLanguage.GERMANY -> R.drawable.beer
-            SupportedLanguage.FRENCH -> R.drawable.eiffel_tower
-            SupportedLanguage.SPANISH -> R.drawable.bull
+            SupportedLanguage.ENGLISH.value -> SupportedLanguage.ENGLISH.icon
+            SupportedLanguage.GERMANY.value -> SupportedLanguage.GERMANY.icon
+            SupportedLanguage.FRENCH.value -> SupportedLanguage.FRENCH.icon
+            SupportedLanguage.SPANISH.value -> SupportedLanguage.SPANISH.icon
+            else -> SupportedLanguage.ENGLISH.icon
         }
     }
 
@@ -64,7 +68,7 @@ fun LanguageItem(
             },
         shape = RoundedCornerShape(20.dp),
         backgroundColor = generateBackgroundColorForLanguage(
-            language
+            language.id
         )
     ) {
         Column(
@@ -103,7 +107,7 @@ fun LanguageItem(
             ) {
                 Image(
                     painter = painterResource(
-                        id = generateFlagForLanguage(language)
+                        id = generateFlagForLanguage(language.id)
                     ),
                     contentDescription = "language flag",
                     modifier = Modifier
@@ -117,7 +121,7 @@ fun LanguageItem(
                         .align(Alignment.Bottom)
                 ) {
                     Image(
-                        painter = painterResource(id = generateIconForLanguage(language)),
+                        painter = painterResource(id = generateIconForLanguage(language.id)),
                         contentDescription = "language icon",
                         modifier = Modifier
                             .size(120.dp)

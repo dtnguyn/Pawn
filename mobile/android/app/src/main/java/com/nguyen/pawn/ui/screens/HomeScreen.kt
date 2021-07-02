@@ -35,12 +35,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.nguyen.pawn.model.Language
 import com.nguyen.pawn.model.User
 import com.nguyen.pawn.ui.components.home.ChooseLanguagesHeader
 import com.nguyen.pawn.ui.components.home.LanguageItem
 import com.nguyen.pawn.ui.theme.*
 import com.nguyen.pawn.ui.viewmodels.AuthViewModel
 import com.nguyen.pawn.ui.viewmodels.WordViewModel
+import com.nguyen.pawn.util.Constants.supportedLanguages
 import com.nguyen.pawn.util.DataStoreUtils.getAccessTokenFromDataStore
 import com.nguyen.pawn.util.DataStoreUtils.getRefreshTokenFromDataStore
 import com.nguyen.pawn.util.SupportedLanguage
@@ -64,54 +66,27 @@ fun HomeScreen(
     val words: ArrayList<Word> by wordViewModel.dailyWords
 
     val savedWords: ArrayList<Word> by wordViewModel.savedWords
+    val pickedLanguages: ArrayList<Language> by wordViewModel.pickedLanguages
 
     val pagerState = rememberPagerState(pageCount = words.size)
     val user: User? by authViewModel.user.observeAsState()
     val context = LocalContext.current
     val homeScaffoldState: ScaffoldState = rememberScaffoldState()
     var showAddLanguageMenu by remember { mutableStateOf(true) }
-    val languages = listOf(
-        SupportedLanguage.ENGLISH,
-        SupportedLanguage.SPANISH,
-        SupportedLanguage.FRENCH,
-        SupportedLanguage.GERMANY
-    )
-
-    var englishPicked by remember { mutableStateOf(false) }
-    var germanPicked by remember { mutableStateOf(false) }
-    var spanishPicked by remember { mutableStateOf(false) }
-    var frenchPicked by remember { mutableStateOf(false) }
 
 
-    LaunchedEffect(homeScaffoldState) {
+    LaunchedEffect(user) {
         if (user == null) {
             val accessToken = getAccessTokenFromDataStore(context)
             val refreshToken = getRefreshTokenFromDataStore(context)
             Log.d("Auth", "Check access token: ${accessToken}")
             Log.d("Auth", "Check refresh token: = ${refreshToken}")
             authViewModel.checkAuthStatus(accessToken, refreshToken)
+        } else {
+            wordViewModel.initializePickedLanguages(user!!.learningLanguages)
         }
     }
 
-
-
-    fun isPicked(language: SupportedLanguage): Boolean {
-        return when (language) {
-            SupportedLanguage.ENGLISH -> englishPicked
-            SupportedLanguage.GERMANY -> germanPicked
-            SupportedLanguage.FRENCH -> frenchPicked
-            SupportedLanguage.SPANISH -> spanishPicked
-        }
-    }
-
-    fun togglePickLanguage(language: SupportedLanguage) {
-        when (language) {
-            SupportedLanguage.ENGLISH -> englishPicked = !englishPicked
-            SupportedLanguage.GERMANY -> germanPicked = !germanPicked
-            SupportedLanguage.FRENCH -> frenchPicked = !frenchPicked
-            SupportedLanguage.SPANISH -> spanishPicked = !spanishPicked
-        }
-    }
 
     Surface(
         color = AlmostBlack,
@@ -146,14 +121,17 @@ fun HomeScreen(
 
                             if (showAddLanguageMenu) {
                                 item {
-                                    ChooseLanguagesHeader {
+                                    ChooseLanguagesHeader(pickedLanguages = pickedLanguages) {
                                         showAddLanguageMenu = false
                                     }
                                 }
 
-                                items(languages.size) { index ->
-                                    LanguageItem(language = languages[index], isPicked = isPicked(languages[index])) { language ->
-                                        togglePickLanguage(language)
+                                items(supportedLanguages.size) { index ->
+                                    LanguageItem(
+                                        language = supportedLanguages[index],
+                                        isPicked = pickedLanguages.filter { it.id == supportedLanguages[index].id }.size == 1
+                                    ) { language ->
+                                        wordViewModel.togglePickedLanguage(language)
                                     }
                                 }
 
@@ -165,7 +143,6 @@ fun HomeScreen(
                                         pagerState = pagerState,
                                         navController = navController,
                                         words = words,
-                                        savedWords = savedWords
                                     )
                                 }
                                 stickyHeader {

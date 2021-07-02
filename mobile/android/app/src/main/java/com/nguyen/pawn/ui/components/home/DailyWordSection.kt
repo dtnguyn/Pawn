@@ -29,8 +29,7 @@ fun DailyWordSection(
     viewModel: WordViewModel,
     pagerState: PagerState,
     navController: NavController,
-    words: ArrayList<Word>,
-    savedWords: ArrayList<Word>
+    words: ArrayList<Word>
 ) {
 
     val coroutineScope = rememberCoroutineScope()

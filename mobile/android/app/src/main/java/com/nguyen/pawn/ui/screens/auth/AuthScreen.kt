@@ -20,14 +20,10 @@ import com.nguyen.pawn.R
 import com.nguyen.pawn.ui.components.RoundButton
 import com.nguyen.pawn.ui.components.auth.Login
 import com.nguyen.pawn.util.AuthTab
-import com.nguyen.pawn.util.UtilFunction.convertHeightToDp
+import com.nguyen.pawn.util.UtilFunctions.convertHeightToDp
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.window.Dialog
 import com.nguyen.pawn.model.User
 import com.nguyen.pawn.ui.components.CustomDialog
 import com.nguyen.pawn.ui.components.auth.LanguageBottomSheetContent

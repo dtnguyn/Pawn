@@ -1,5 +1,6 @@
 package com.nguyen.pawn.ui.viewmodels
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +24,7 @@ class WordViewModel
     private val _savedWords: MutableState<ArrayList<Word>> = mutableStateOf(arrayListOf())
     private val _pickedLanguages: MutableState<ArrayList<Language>> = mutableStateOf(arrayListOf())
     private val _wordDefinition: MutableState<Definition?> = mutableStateOf(null)
+    private val _currentPickedLanguage: MutableState<Language?> = mutableStateOf(null)
 
 
 
@@ -32,6 +34,7 @@ class WordViewModel
     val dailyWords: State<ArrayList<Word>> = _dailyWords
     val savedWords: State<ArrayList<Word>> = _savedWords
     val pickedLanguages: State<ArrayList<Language>> = _pickedLanguages
+    val currentPickedLanguage: State<Language?> = _currentPickedLanguage
 
 
     init {
@@ -153,12 +156,13 @@ class WordViewModel
         if(accessToken == null) {
 
         } else {
+            Log.d("Word", "picked count ${languages.size}")
             viewModelScope.launch {
                 val response = repo.pickLearningLanguages(languageString, accessToken)
                 if(response) {
-                    _pickedLanguages.value = languages as ArrayList<Language>
+                    Log.d("Word", "Save language success")
                 } else {
-
+                    Log.d("Word", "Save language error")
                 }
             }
         }
@@ -181,6 +185,13 @@ class WordViewModel
             pickedLanguageMap[language.id] = true
         }
         _pickedLanguages.value =  languages as ArrayList<Language>
+        if(languages.isNotEmpty()){
+            _currentPickedLanguage.value = languages.first()
+        }
+    }
+
+    fun changeCurrentPickedLanguage(language: Language) {
+        _currentPickedLanguage.value = language
     }
 
     fun checkIsSaved(wordId: String): Boolean{

@@ -1,7 +1,6 @@
 package com.nguyen.pawn.ui.components.word
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -13,9 +12,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nguyen.pawn.model.Definition
-import com.nguyen.pawn.ui.theme.LightGreen
 import com.nguyen.pawn.ui.theme.Typography
-import com.nguyen.pawn.util.UtilFunction.generateColor
+import com.nguyen.pawn.util.UtilFunctions.generateColor
 
 @Composable
 fun DefinitionItem(index: Int, definition: Definition) {

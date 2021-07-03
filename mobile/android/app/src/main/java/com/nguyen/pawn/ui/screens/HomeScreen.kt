@@ -1,11 +1,7 @@
 package com.nguyen.pawn.ui.screens
 
-import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -28,13 +24,8 @@ import com.nguyen.pawn.ui.components.RoundButton
 import com.nguyen.pawn.ui.components.SavedWordItem
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterEnd
-import androidx.compose.ui.Alignment.Companion.CenterVertically
-import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nguyen.pawn.model.Language
 import com.nguyen.pawn.model.User
 import com.nguyen.pawn.ui.components.home.ChooseLanguagesHeader
@@ -45,10 +36,8 @@ import com.nguyen.pawn.ui.viewmodels.WordViewModel
 import com.nguyen.pawn.util.Constants.supportedLanguages
 import com.nguyen.pawn.util.DataStoreUtils.getAccessTokenFromDataStore
 import com.nguyen.pawn.util.DataStoreUtils.getRefreshTokenFromDataStore
-import com.nguyen.pawn.util.SupportedLanguage
-import com.nguyen.pawn.util.UtilFunction.convertHeightToDp
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.map
+import com.nguyen.pawn.util.UtilFunctions.convertHeightToDp
+import com.nguyen.pawn.util.UtilFunctions.generateFlagForLanguage
 import kotlinx.coroutines.launch
 
 
@@ -67,23 +56,27 @@ fun HomeScreen(
 
     val savedWords: ArrayList<Word> by wordViewModel.savedWords
     val pickedLanguages: ArrayList<Language> by wordViewModel.pickedLanguages
-
-    val pagerState = rememberPagerState(pageCount = words.size)
+    val currentPickedLanguage: Language? by wordViewModel.currentPickedLanguage
     val user: User? by authViewModel.user.observeAsState()
+    var showAddLanguageMenu by remember { mutableStateOf(true) }
+
+
+    val coroutineScope = rememberCoroutineScope()
+    val pagerState = rememberPagerState(pageCount = words.size)
     val context = LocalContext.current
     val homeScaffoldState: ScaffoldState = rememberScaffoldState()
-    var showAddLanguageMenu by remember { mutableStateOf(true) }
+
 
 
     LaunchedEffect(user) {
         if (user == null) {
-            val accessToken = getAccessTokenFromDataStore(context)
-            val refreshToken = getRefreshTokenFromDataStore(context)
-            Log.d("Auth", "Check access token: ${accessToken}")
-            Log.d("Auth", "Check refresh token: = ${refreshToken}")
-            authViewModel.checkAuthStatus(accessToken, refreshToken)
+            authViewModel.checkAuthStatus(
+                getAccessTokenFromDataStore(context),
+                getRefreshTokenFromDataStore(context)
+            )
         } else {
             wordViewModel.initializePickedLanguages(user!!.learningLanguages)
+            showAddLanguageMenu = user!!.learningLanguages.isEmpty()
         }
     }
 
@@ -91,7 +84,6 @@ fun HomeScreen(
     Surface(
         color = AlmostBlack,
     ) {
-
         Scaffold(
             Modifier
                 .fillMaxHeight()
@@ -118,18 +110,26 @@ fun HomeScreen(
                         ) {
 
                         LazyColumn(Modifier.padding(bottom = 50.dp)) {
-
                             if (showAddLanguageMenu) {
                                 item {
                                     ChooseLanguagesHeader(pickedLanguages = pickedLanguages) {
-                                        showAddLanguageMenu = false
+                                        coroutineScope.launch {
+                                            showAddLanguageMenu = false
+                                            wordViewModel.savePickedLanguages(
+                                                pickedLanguages,
+                                                getAccessTokenFromDataStore(context)
+                                            )
+                                        }
+
                                     }
                                 }
 
                                 items(supportedLanguages.size) { index ->
                                     LanguageItem(
                                         language = supportedLanguages[index],
-                                        isPicked = pickedLanguages.filter { it.id == supportedLanguages[index].id }.size == 1
+                                        isPicked = pickedLanguages.filter {
+                                            it.id == supportedLanguages[index].id
+                                        }.size == 1
                                     ) { language ->
                                         wordViewModel.togglePickedLanguage(language)
                                     }
@@ -137,6 +137,48 @@ fun HomeScreen(
 
 
                             } else {
+                                if (pickedLanguages.isNotEmpty()) {
+                                    item {
+                                        Row(
+                                            modifier = Modifier.padding(
+                                                start = 30.dp,
+                                                end = 30.dp,
+                                                top = 30.dp
+                                            ),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            pickedLanguages.forEach { language ->
+                                                Image(
+                                                    painter = painterResource(
+                                                        id = generateFlagForLanguage(
+                                                            language.id
+                                                        )
+                                                    ),
+                                                    contentDescription = "language icon",
+                                                    modifier = Modifier
+                                                        .padding(horizontal = 5.dp)
+                                                        .size(if (language.id == currentPickedLanguage?.id) 46.dp else 38.dp)
+                                                        .clip(CircleShape)
+                                                        .border(
+                                                            if (language.id == currentPickedLanguage?.id) 3.dp else 0.dp,
+                                                            DarkBlue,
+                                                            CircleShape
+                                                        )
+                                                        .clickable {
+                                                            wordViewModel.changeCurrentPickedLanguage(
+                                                                language
+                                                            )
+                                                        }
+                                                )
+                                            }
+                                            Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+                                            RoundButton(backgroundColor = Grey, size = 38.dp , icon = R.drawable.add_32_black) {
+                                                showAddLanguageMenu = true
+                                            }
+                                        }
+                                    }
+                                }
+
                                 item {
                                     DailyWordSection(
                                         viewModel = wordViewModel,

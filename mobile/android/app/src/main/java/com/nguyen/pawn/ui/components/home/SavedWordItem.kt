@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.nguyen.pawn.R
 import com.nguyen.pawn.ui.theme.*
-import com.nguyen.pawn.util.UtilFunction.generateColor
+import com.nguyen.pawn.util.UtilFunctions.generateColor
 
 @ExperimentalAnimationApi
 @Composable

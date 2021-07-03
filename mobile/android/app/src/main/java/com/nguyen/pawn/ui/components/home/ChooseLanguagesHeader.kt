@@ -50,7 +50,7 @@ fun ChooseLanguagesHeader(pickedLanguages: List<Language>, onFinish: () -> Unit)
         ) {
             Text(text = "Your picks:", style = Typography.body1)
 
-            Button(onClick = { onFinish() }, colors = ButtonDefaults.buttonColors(Blue), shape = RoundedCornerShape(20.dp)) {
+            Button(onClick = { onFinish() }, colors = ButtonDefaults.buttonColors(Blue), shape = RoundedCornerShape(20.dp), enabled = pickedLanguages.isNotEmpty()) {
                 Text(
                     text = "Done",
                     style = Typography.body1,

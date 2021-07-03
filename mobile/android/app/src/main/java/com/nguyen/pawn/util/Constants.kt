@@ -10,4 +10,6 @@ object Constants {
         Language("de", "German"),
     )
 
+    const val apiURL = "http://192.168.0.235:4000"
+
 }

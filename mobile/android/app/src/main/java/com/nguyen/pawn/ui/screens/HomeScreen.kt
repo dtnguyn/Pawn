@@ -1,5 +1,6 @@
 package com.nguyen.pawn.ui.screens
 
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -32,6 +33,7 @@ import com.nguyen.pawn.ui.components.home.ChooseLanguagesHeader
 import com.nguyen.pawn.ui.components.home.LanguageItem
 import com.nguyen.pawn.ui.theme.*
 import com.nguyen.pawn.ui.viewmodels.AuthViewModel
+import com.nguyen.pawn.ui.viewmodels.LanguageViewModel
 import com.nguyen.pawn.ui.viewmodels.WordViewModel
 import com.nguyen.pawn.util.Constants.supportedLanguages
 import com.nguyen.pawn.util.DataStoreUtils.getAccessTokenFromDataStore
@@ -49,16 +51,20 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     wordViewModel: WordViewModel,
     authViewModel: AuthViewModel,
+    languageViewModel: LanguageViewModel,
     navController: NavController
 ) {
+
+    val TAG = "HomeScreen"
 
     val words: ArrayList<Word> by wordViewModel.dailyWords
 
     val savedWords: ArrayList<Word> by wordViewModel.savedWords
-    val pickedLanguages: ArrayList<Language> by wordViewModel.pickedLanguages
-    val currentPickedLanguage: Language? by wordViewModel.currentPickedLanguage
+    val pickedLanguages: List<Language>? by languageViewModel.pickedLanguages
+    val tempPickedLanguages: ArrayList<Language>? by languageViewModel.tempPickedLanguages
+    val currentPickedLanguage: Language? by languageViewModel.currentPickedLanguage
     val user: User? by authViewModel.user.observeAsState()
-    var showAddLanguageMenu by remember { mutableStateOf(true) }
+    var showAddLanguageMenu by remember { mutableStateOf(pickedLanguages?.isEmpty() ?: true) }
 
 
     val coroutineScope = rememberCoroutineScope()
@@ -68,18 +74,26 @@ fun HomeScreen(
 
 
 
-    LaunchedEffect(user) {
+
+    LaunchedEffect(null) {
+        languageViewModel.getPickedLanguages(getAccessTokenFromDataStore(context))
         if (user == null) {
             authViewModel.checkAuthStatus(
                 getAccessTokenFromDataStore(context),
                 getRefreshTokenFromDataStore(context)
             )
-        } else {
-            wordViewModel.initializePickedLanguages(user!!.learningLanguages)
-            showAddLanguageMenu = user!!.learningLanguages.isEmpty()
         }
     }
 
+    LaunchedEffect(pickedLanguages) {
+        showAddLanguageMenu = pickedLanguages?.isEmpty() ?: false
+    }
+
+//    LaunchedEffect(user) {
+//
+//    }
+
+    if(pickedLanguages == null) return
 
     Surface(
         color = AlmostBlack,
@@ -112,11 +126,11 @@ fun HomeScreen(
                         LazyColumn(Modifier.padding(bottom = 50.dp)) {
                             if (showAddLanguageMenu) {
                                 item {
-                                    ChooseLanguagesHeader(pickedLanguages = pickedLanguages) {
+                                    ChooseLanguagesHeader(pickedLanguages = tempPickedLanguages!!) {
                                         coroutineScope.launch {
                                             showAddLanguageMenu = false
-                                            wordViewModel.savePickedLanguages(
-                                                pickedLanguages,
+                                            languageViewModel.savePickedLanguages(
+                                                tempPickedLanguages!!,
                                                 getAccessTokenFromDataStore(context)
                                             )
                                         }
@@ -127,17 +141,17 @@ fun HomeScreen(
                                 items(supportedLanguages.size) { index ->
                                     LanguageItem(
                                         language = supportedLanguages[index],
-                                        isPicked = pickedLanguages.filter {
+                                        isPicked = tempPickedLanguages!!.filter {
                                             it.id == supportedLanguages[index].id
                                         }.size == 1
                                     ) { language ->
-                                        wordViewModel.togglePickedLanguage(language)
+                                        languageViewModel.togglePickedLanguage(language)
                                     }
                                 }
 
 
                             } else {
-                                if (pickedLanguages.isNotEmpty()) {
+                                if (pickedLanguages!!.isNotEmpty()) {
                                     item {
                                         Row(
                                             modifier = Modifier.padding(
@@ -147,7 +161,7 @@ fun HomeScreen(
                                             ),
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            pickedLanguages.forEach { language ->
+                                            pickedLanguages!!.forEach { language ->
                                                 Image(
                                                     painter = painterResource(
                                                         id = generateFlagForLanguage(
@@ -165,14 +179,18 @@ fun HomeScreen(
                                                             CircleShape
                                                         )
                                                         .clickable {
-                                                            wordViewModel.changeCurrentPickedLanguage(
+                                                            languageViewModel.changeCurrentPickedLanguage(
                                                                 language
                                                             )
                                                         }
                                                 )
                                             }
                                             Spacer(modifier = Modifier.padding(horizontal = 5.dp))
-                                            RoundButton(backgroundColor = Grey, size = 38.dp , icon = R.drawable.add_32_black) {
+                                            RoundButton(
+                                                backgroundColor = Grey,
+                                                size = 38.dp,
+                                                icon = R.drawable.add_32_black
+                                            ) {
                                                 showAddLanguageMenu = true
                                             }
                                         }

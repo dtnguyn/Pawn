@@ -22,19 +22,15 @@ class WordViewModel
 
     private val _dailyWords: MutableState<ArrayList<Word>> = mutableStateOf(arrayListOf())
     private val _savedWords: MutableState<ArrayList<Word>> = mutableStateOf(arrayListOf())
-    private val _pickedLanguages: MutableState<ArrayList<Language>> = mutableStateOf(arrayListOf())
     private val _wordDefinition: MutableState<Definition?> = mutableStateOf(null)
-    private val _currentPickedLanguage: MutableState<Language?> = mutableStateOf(null)
 
 
 
     private val savedWordMap = HashMap<String, Boolean>()
-    private val pickedLanguageMap = HashMap<String, Boolean>()
 
     val dailyWords: State<ArrayList<Word>> = _dailyWords
     val savedWords: State<ArrayList<Word>> = _savedWords
-    val pickedLanguages: State<ArrayList<Language>> = _pickedLanguages
-    val currentPickedLanguage: State<Language?> = _currentPickedLanguage
+
 
 
     init {
@@ -149,49 +145,6 @@ class WordViewModel
             _savedWords.value = (arrayListOf(word) + _savedWords.value) as ArrayList<Word>
             savedWordMap[word.id] = true
         }
-    }
-
-    fun savePickedLanguages(languages: List<Language>, accessToken: String?) {
-        val languageString = languages.map { language -> language.id }
-        if(accessToken == null) {
-
-        } else {
-            Log.d("Word", "picked count ${languages.size}")
-            viewModelScope.launch {
-                val response = repo.pickLearningLanguages(languageString, accessToken)
-                if(response) {
-                    Log.d("Word", "Save language success")
-                } else {
-                    Log.d("Word", "Save language error")
-                }
-            }
-        }
-    }
-
-    fun togglePickedLanguage(language: Language) {
-        if(pickedLanguageMap[language.id] == true) {
-            pickedLanguageMap[language.id] = false
-            _pickedLanguages.value = _pickedLanguages.value.filter { pickedLanguage ->
-                pickedLanguage.id != language.id
-            } as ArrayList<Language>
-        } else {
-            pickedLanguageMap[language.id] = true
-            _pickedLanguages.value = (pickedLanguages.value + arrayListOf(language)) as ArrayList<Language>
-        }
-    }
-
-    fun initializePickedLanguages(languages: List<Language>){
-        for(language in languages) {
-            pickedLanguageMap[language.id] = true
-        }
-        _pickedLanguages.value =  languages as ArrayList<Language>
-        if(languages.isNotEmpty()){
-            _currentPickedLanguage.value = languages.first()
-        }
-    }
-
-    fun changeCurrentPickedLanguage(language: Language) {
-        _currentPickedLanguage.value = language
     }
 
     fun checkIsSaved(wordId: String): Boolean{

@@ -21,6 +21,7 @@ import com.nguyen.pawn.ui.screens.*
 import com.nguyen.pawn.ui.screens.auth.ChangePasswordScreen
 import com.nguyen.pawn.ui.screens.auth.VerifyCodeScreen
 import com.nguyen.pawn.ui.viewmodels.AuthViewModel
+import com.nguyen.pawn.ui.viewmodels.LanguageViewModel
 import com.nguyen.pawn.ui.viewmodels.WordViewModel
 
 
@@ -28,7 +29,7 @@ import com.nguyen.pawn.ui.viewmodels.WordViewModel
 @ExperimentalFoundationApi
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun PawnApp(wordViewModel: WordViewModel, authViewModel: AuthViewModel) {
+fun PawnApp(wordViewModel: WordViewModel, authViewModel: AuthViewModel, languageViewModel: LanguageViewModel) {
 
     val navController = rememberNavController()
     val items = listOf(
@@ -75,7 +76,7 @@ fun PawnApp(wordViewModel: WordViewModel, authViewModel: AuthViewModel) {
         ) {
 
             NavHost(navController, startDestination = PawnScreens.Home.route) {
-                composable(PawnScreens.Home.route) { HomeScreen(wordViewModel = wordViewModel, authViewModel = authViewModel,navController = navController) }
+                composable(PawnScreens.Home.route) { HomeScreen(wordViewModel = wordViewModel, authViewModel = authViewModel, languageViewModel = languageViewModel,navController = navController) }
                 composable(PawnScreens.Feeds.route) { FeedScreen() }
                 composable(PawnScreens.Chat.route) { ChatScreen() }
                 composable(PawnScreens.Word.route) { WordScreen(navController = navController) }

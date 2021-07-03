@@ -1,5 +1,6 @@
+import express from "express";
 import "reflect-metadata";
-import { createConnection, getRepository } from "typeorm";
+import { createConnection } from "typeorm";
 import { ChatImage } from "./entity/ChatImage";
 import { ChatMessage } from "./entity/ChatMessage";
 import { Definition } from "./entity/Definition";
@@ -7,20 +8,15 @@ import { GroupChat } from "./entity/GroupChat";
 import { Language } from "./entity/Language";
 import { Notification } from "./entity/Notification";
 import { Pronunciation } from "./entity/Pronunciation";
+import { SavedWord } from "./entity/SavedWord";
 import { Topic } from "./entity/Topic";
 import { User } from "./entity/User";
+import { UserRefreshToken } from "./entity/UserRefreshToken";
+import { VerificationCode } from "./entity/VerificationCode";
 import { Word } from "./entity/Word";
-import express from "express";
 import auth from "./routes/auth";
 import word from "./routes/word";
-
-import { UserRefreshToken } from "./entity/UserRefreshToken";
-import { SavedWord } from "./entity/SavedWord";
-import {
-  importAllLanguages,
-  importAllWords,
-} from "./controllers/WordController";
-import { VerificationCode } from "./entity/VerificationCode";
+import language from "./routes/language";
 
 createConnection({
   type: "postgres",
@@ -46,22 +42,23 @@ createConnection({
     VerificationCode,
   ],
 })
-  .then(async (connection) => {
+  .then(async (_) => {
     const app = express();
     app.use(express.json());
 
     app.use("/auth", auth);
     app.use("/word", word);
+    app.use("/language", language);
 
     // await importAllWords();
     // console.log(await getRepository(User).delete({ email: "test@test.com" }));
     // await importAllLanguages();
-    console.log(
-      await getRepository(User)
-        .createQueryBuilder("user")
-        .leftJoinAndSelect("user.learningLanguages", "language")
-        .getMany()
-    );
+    // console.log(
+    //   await getRepository(User)
+    //     .createQueryBuilder("user")
+    //     .leftJoinAndSelect("user.learningLanguages", "language")
+    //     .getMany()
+    // );
     // console.log(
     //   await getRepository(Language)
     //     .createQueryBuilder("language")

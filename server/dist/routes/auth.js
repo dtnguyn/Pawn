@@ -52,21 +52,22 @@ exports.checkAuthentication = (req, res, next) => {
     if (!token)
         res.sendStatus(401);
     else {
-        jsonwebtoken_1.default.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        jsonwebtoken_1.default.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => __awaiter(this, void 0, void 0, function* () {
             if (err) {
                 res.sendStatus(403);
             }
             else {
-                req.user = decoded.user;
+                req.user = yield UserController_1.getOneUser(decoded.user.email);
                 next();
             }
-        });
+        }));
     }
 };
 router.get("/", exports.checkAuthentication, (req, res) => {
     const user = req && req.user;
     if (user) {
         res.json(user);
+        console.log(user);
     }
     else {
         res.sendStatus(404);

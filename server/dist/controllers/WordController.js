@@ -22,28 +22,7 @@ const Word_1 = require("../entity/Word");
 const SavedWord_1 = require("../entity/SavedWord");
 const Pronunciation_1 = require("../entity/Pronunciation");
 const Definition_1 = require("../entity/Definition");
-const User_1 = require("../entity/User");
 const Language_1 = require("../entity/Language");
-exports.chooseLanguages = (languageSymbols, userId) => __awaiter(this, void 0, void 0, function* () {
-    const userRepo = typeorm_1.getRepository(User_1.User);
-    const languageRepo = typeorm_1.getRepository(Language_1.Language);
-    const user = yield userRepo
-        .createQueryBuilder("user")
-        .leftJoinAndSelect("user.learningLanguages", "language")
-        .where("user.id = :userId", { userId })
-        .getOne();
-    if (!user)
-        throw new Error("User not found!");
-    console.log(user);
-    user.learningLanguages = [];
-    for (const languageSymbol of languageSymbols) {
-        const language = yield languageRepo.findOne({ id: languageSymbol });
-        if (language) {
-            user.learningLanguages.push(language);
-            yield userRepo.save(user);
-        }
-    }
-});
 exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, void 0, function* () {
     const results = [];
     switch (language) {

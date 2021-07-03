@@ -1,1 +1,1 @@
-{"version":3,"file":"ApiReponse.js","sourceRoot":"","sources":["../../src/utils/ApiReponse.ts"],"names":[],"mappings":""}
+{"version":3,"file":"ApiReponse.js","sourceRoot":"","sources":["../../src/utils/ApiReponse.ts"],"names":[],"mappings":"AAMA,MAAM,WAAW;IAKf,YAAY,MAAe,EAAE,OAAe,EAAE,IAAc;QAC1D,IAAI,CAAC,IAAI,GAAG,IAAI,CAAC;QACjB,IAAI,CAAC,OAAO,GAAG,OAAO,CAAC;QACvB,IAAI,CAAC,MAAM,GAAG,MAAM,CAAC;IACvB,CAAC;CACF"}

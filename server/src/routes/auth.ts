@@ -80,11 +80,12 @@ export const checkAuthentication = (
     jwt.verify(
       token,
       process.env.ACCESS_TOKEN_SECRET!,
-      (err: any, decoded: any) => {
+      async (err: any, decoded: any) => {
         if (err) {
           res.sendStatus(403);
         } else {
-          (req as any).user = decoded.user;
+          (req as any).user = await getOneUser(decoded.user.email);
+
           next();
         }
       }
@@ -97,6 +98,7 @@ router.get("/", checkAuthentication, (req, res) => {
   const user = req && (req as any).user;
   if (user) {
     res.json(user);
+    console.log(user);
   } else {
     res.sendStatus(404);
   }

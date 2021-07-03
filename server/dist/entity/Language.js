@@ -22,10 +22,6 @@ __decorate([
     __metadata("design:type", String)
 ], Language.prototype, "value", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => User_1.User, (user) => user.nativeLanguage),
-    __metadata("design:type", Array)
-], Language.prototype, "natives", void 0);
-__decorate([
     typeorm_1.ManyToMany(() => User_1.User, (user) => user.learningLanguages),
     __metadata("design:type", Array)
 ], Language.prototype, "learners", void 0);

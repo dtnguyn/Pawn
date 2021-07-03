@@ -16,9 +16,6 @@ export class Language {
   @PrimaryColumn()
   value: string;
 
-  @ManyToOne(() => User, (user) => user.nativeLanguage)
-  natives: User[];
-
   @ManyToMany(() => User, (user) => user.learningLanguages)
   learners: User[];
 

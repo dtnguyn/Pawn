@@ -86,19 +86,6 @@ router.post("/save", auth_1.checkAuthentication, (req, res) => __awaiter(this, v
         });
     }
 }));
-router.post("/save/language", auth_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
-    try {
-        const languages = req.body.languages;
-        const userId = req.user.id;
-        yield WordController_1.chooseLanguages(languages, userId);
-        res.json({ status: true });
-    }
-    catch (error) {
-        res.status(400).send({
-            message: error.message,
-        });
-    }
-}));
 router.patch("/rearrange", auth_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         const wordIds = req.body.wordIds;

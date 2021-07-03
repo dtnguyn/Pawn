@@ -11,6 +11,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
 require("reflect-metadata");
 const typeorm_1 = require("typeorm");
 const ChatImage_1 = require("./entity/ChatImage");
@@ -20,15 +21,15 @@ const GroupChat_1 = require("./entity/GroupChat");
 const Language_1 = require("./entity/Language");
 const Notification_1 = require("./entity/Notification");
 const Pronunciation_1 = require("./entity/Pronunciation");
+const SavedWord_1 = require("./entity/SavedWord");
 const Topic_1 = require("./entity/Topic");
 const User_1 = require("./entity/User");
+const UserRefreshToken_1 = require("./entity/UserRefreshToken");
+const VerificationCode_1 = require("./entity/VerificationCode");
 const Word_1 = require("./entity/Word");
-const express_1 = __importDefault(require("express"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const word_1 = __importDefault(require("./routes/word"));
-const UserRefreshToken_1 = require("./entity/UserRefreshToken");
-const SavedWord_1 = require("./entity/SavedWord");
-const VerificationCode_1 = require("./entity/VerificationCode");
+const language_1 = __importDefault(require("./routes/language"));
 typeorm_1.createConnection({
     type: "postgres",
     host: "localhost",
@@ -53,15 +54,12 @@ typeorm_1.createConnection({
         VerificationCode_1.VerificationCode,
     ],
 })
-    .then((connection) => __awaiter(this, void 0, void 0, function* () {
+    .then((_) => __awaiter(this, void 0, void 0, function* () {
     const app = express_1.default();
     app.use(express_1.default.json());
     app.use("/auth", auth_1.default);
     app.use("/word", word_1.default);
-    console.log(yield typeorm_1.getRepository(User_1.User)
-        .createQueryBuilder("user")
-        .leftJoinAndSelect("user.learningLanguages", "language")
-        .getMany());
+    app.use("/language", language_1.default);
     app.listen(4000, () => {
         console.log("Server is running on port 4000");
     });

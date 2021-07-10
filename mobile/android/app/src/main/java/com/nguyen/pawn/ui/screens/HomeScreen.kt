@@ -1,5 +1,6 @@
 package com.nguyen.pawn.ui.screens
 
+import android.nfc.Tag
 import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.*
@@ -86,6 +87,7 @@ fun HomeScreen(
     }
 
     LaunchedEffect(pickedLanguages) {
+        Log.d(TAG, "menu")
         showAddLanguageMenu = pickedLanguages?.isEmpty() ?: false
     }
 
@@ -253,6 +255,7 @@ fun HomeScreen(
                 topBar = {
                     HomeAppBar(navController, user, onLogout = {
                         authViewModel.logout(it)
+                        languageViewModel.getPickedLanguages(null)
                     })
                 },
 

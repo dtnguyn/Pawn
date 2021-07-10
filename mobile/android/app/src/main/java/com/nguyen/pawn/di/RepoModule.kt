@@ -1,5 +1,7 @@
 package com.nguyen.pawn.di
 
+//import com.nguyen.pawn.db.PawnDatabase
+import com.nguyen.pawn.db.PawnDatabase
 import com.nguyen.pawn.repo.AuthRepository
 import com.nguyen.pawn.repo.LanguageRepository
 import com.nguyen.pawn.repo.WordRepository
@@ -27,7 +29,7 @@ object RepoModule {
 
     @Singleton
     @Provides
-    fun provideLanguageRepository(client: HttpClient): LanguageRepository {
-        return LanguageRepository(client)
+    fun provideLanguageRepository(client: HttpClient, database: PawnDatabase): LanguageRepository {
+        return LanguageRepository(client, database)
     }
 }

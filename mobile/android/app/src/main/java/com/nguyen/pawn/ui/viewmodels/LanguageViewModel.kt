@@ -19,6 +19,9 @@ class LanguageViewModel
     private val repo: LanguageRepository
 ) : ViewModel() {
 
+    companion object{
+        private const val TAG = "LanguageViewModel"
+    }
 
     private val _currentPickedLanguage: MutableState<Language?> = mutableStateOf(null)
     private val _pickedLanguages: MutableState<List<Language>?> = mutableStateOf(null)
@@ -49,44 +52,36 @@ class LanguageViewModel
 
     fun getPickedLanguages(accessToken: String?) {
         viewModelScope.launch {
-            if (accessToken == null) {
-                // Get from DataStore
-            } else {
-                val languages = repo.getLearningLanguages(accessToken)
-                _pickedLanguages.value = languages
-                _tempPickedLanguages.value = languages as ArrayList<Language>
-                for (language in languages) {
-                    pickedLanguageMap[language.id] = true
-                }
-                if (languages.isNotEmpty()) {
-                    _currentPickedLanguage.value = languages.first()
-                }
+            val languages = repo.getLearningLanguages(accessToken)
+            Log.d(TAG, "languages: $languages")
+            _pickedLanguages.value = languages
+            _tempPickedLanguages.value = languages as ArrayList<Language>
+            for (language in languages) {
+                pickedLanguageMap[language.id] = true
+            }
+            if (languages.isNotEmpty()) {
+                _currentPickedLanguage.value = languages.first()
             }
         }
     }
 
     fun savePickedLanguages(languages: ArrayList<Language>, accessToken: String?) {
-        val languageString = languages.map { language -> language.id }
-        if (accessToken == null) {
-            //Save to datastore
-        } else {
-            viewModelScope.launch {
-                val response = repo.pickLearningLanguages(languageString, accessToken)
-                if (response) {
-                    _pickedLanguages.value = languages
-                    _tempPickedLanguages.value = languages
-                    if (_currentPickedLanguage.value == null) {
-                        if (languages.isNotEmpty()) {
-                            _currentPickedLanguage.value = languages.first()
-                        }
-                    } else {
-                        if (languages.isNotEmpty() && languages.filter { it.id == _currentPickedLanguage.value!!.id }.isEmpty()) {
-                            _currentPickedLanguage.value = languages.first()
-                        }
+        viewModelScope.launch {
+            val response = repo.pickLearningLanguages(languages, accessToken)
+            if (response) {
+                _pickedLanguages.value = languages
+                _tempPickedLanguages.value = languages
+                if (_currentPickedLanguage.value == null) {
+                    if (languages.isNotEmpty()) {
+                        _currentPickedLanguage.value = languages.first()
                     }
                 } else {
-                    //Handle error
+                    if (languages.isNotEmpty() && languages.filter { it.id == _currentPickedLanguage.value!!.id }.isEmpty()) {
+                        _currentPickedLanguage.value = languages.first()
+                    }
                 }
+            } else {
+                //Handle error
             }
         }
     }

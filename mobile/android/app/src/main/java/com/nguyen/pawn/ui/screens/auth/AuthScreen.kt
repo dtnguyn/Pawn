@@ -24,20 +24,24 @@ import com.nguyen.pawn.util.UtilFunctions.convertHeightToDp
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.draw.clip
-import com.nguyen.pawn.model.User
+import com.nguyen.pawn.model.Token
+import com.nguyen.pawn.ui.SharedViewModel
 import com.nguyen.pawn.ui.components.CustomDialog
 import com.nguyen.pawn.ui.components.auth.LanguageBottomSheetContent
 import com.nguyen.pawn.ui.components.auth.Register
 import com.nguyen.pawn.ui.theme.*
-import com.nguyen.pawn.ui.viewmodels.AuthViewModel
+import com.nguyen.pawn.ui.screens.auth.AuthViewModel
 import com.nguyen.pawn.util.DataStoreUtils
+import com.nguyen.pawn.util.DataStoreUtils.getAccessTokenFromDataStore
+import com.nguyen.pawn.util.DataStoreUtils.getRefreshTokenFromDataStore
 import com.nguyen.pawn.util.UIState
 import kotlinx.coroutines.launch
 
 @ExperimentalMaterialApi
 @Composable
-fun AuthScreen(viewModel: AuthViewModel, navController: NavController) {
+fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, navController: NavController) {
 
+    val TAG = "AuthScreen"
 
     val deviceWidthDp = (convertHeightToDp(
         LocalContext.current.resources.displayMetrics.widthPixels,
@@ -54,28 +58,38 @@ fun AuthScreen(viewModel: AuthViewModel, navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     var nativeLanguage by remember { mutableStateOf("") }
     val languages = listOf("vie", "eng")
-    val user: User? by viewModel.user.observeAsState()
     val context = LocalContext.current
-    val uiState: UIState? by viewModel.uiState.observeAsState()
+    val token: Token by authViewModel.token
+    val uiState: UIState? by authViewModel.uiState.observeAsState()
     var errorMsg by remember { mutableStateOf("") }
 
 
-    errorMsg = if (uiState != UIState.Loading && uiState != UIState.Success) {
-        (uiState as UIState.Error).msg
-    } else {
-        ""
+    LaunchedEffect(null) {
+        authViewModel.initializeToken(getAccessTokenFromDataStore(context), getRefreshTokenFromDataStore(context))
     }
 
-
-
-    LaunchedEffect(user) {
-        if (user != null) {
-            Log.d("Auth", "access: ${viewModel.accessToken.value}")
-            Log.d("Auth", "refresh: ${viewModel.refreshToken.value}")
-            DataStoreUtils.saveAccessTokenToAuthDataStore(context, viewModel.accessToken.value)
-            DataStoreUtils.saveRefreshTokenToAuthDataStore(context, viewModel.refreshToken.value)
+    LaunchedEffect(token) {
+        DataStoreUtils.saveAccessTokenToAuthDataStore(context, authViewModel.token.value.accessToken)
+        DataStoreUtils.saveRefreshTokenToAuthDataStore(context, authViewModel.token.value.refreshToken)
+        if (token.accessToken != null && token.refreshToken != null) {
             navController.navigate("home") {
                 popUpTo("home") { inclusive = true }
+            }
+        }
+    }
+
+    LaunchedEffect(uiState) {
+        when(uiState){
+            is UIState.Idle -> {
+                // Hide loading animation and error dialog
+                errorMsg = ""
+            }
+            is UIState.Loading -> {
+                // Display loading animation
+            }
+            is UIState.Error -> {
+                // Display error message to user
+                errorMsg = (uiState as UIState.Error).msg
             }
         }
     }
@@ -222,7 +236,7 @@ fun AuthScreen(viewModel: AuthViewModel, navController: NavController) {
                 if (currentTab == AuthTab.LOGIN) Login(
                     navController,
                     onLogin = { emailOrUsername, password ->
-                        viewModel.login(emailOrUsername, password)
+                        authViewModel.login(emailOrUsername, password)
                     })
                 else Register(
                     nativeLanguage,
@@ -230,7 +244,7 @@ fun AuthScreen(viewModel: AuthViewModel, navController: NavController) {
                         toggleBottomSheet()
                     },
                     onRegister = { email, username, password, passwordVerify, nativeLanguage ->
-                        viewModel.registerAccount(
+                        authViewModel.registerAccount(
                             email,
                             username,
                             password,
@@ -246,7 +260,7 @@ fun AuthScreen(viewModel: AuthViewModel, navController: NavController) {
                 title = "Whoops!",
                 content = errorMsg,
                 icon = R.drawable.error,
-                onDismiss = { viewModel.clearError() }
+                onDismiss = { authViewModel.clearError() }
             )
         }
     }

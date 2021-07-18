@@ -18,6 +18,8 @@ import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.PagerState
 import com.nguyen.pawn.R
 import com.nguyen.pawn.model.Word
+import com.nguyen.pawn.ui.SharedViewModel
+import com.nguyen.pawn.ui.screens.home.HomeViewModel
 import com.nguyen.pawn.ui.theme.*
 import com.nguyen.pawn.ui.viewmodels.WordViewModel
 import kotlinx.coroutines.launch
@@ -26,7 +28,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun DailyWordSection(
-    viewModel: WordViewModel,
+    viewModel: SharedViewModel,
     pagerState: PagerState,
     navController: NavController,
     words: ArrayList<Word>
@@ -86,7 +88,7 @@ fun DailyWordSection(
                     }
                 })
                 RoundedSquareButton(Grey, R.drawable.trash) {
-                    viewModel.removeDailyWords(words[pagerState.currentPage].id)
+//                    viewModel.removeDailyWords(words[pagerState.currentPage].id)
 
                 }
                 if(viewModel.checkIsSaved(words[pagerState.currentPage].id)){

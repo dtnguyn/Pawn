@@ -1,0 +1,185 @@
+package com.nguyen.pawn.ui
+
+import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.nguyen.pawn.model.Language
+import com.nguyen.pawn.model.User
+import com.nguyen.pawn.model.Word
+import com.nguyen.pawn.repo.AuthRepository
+import com.nguyen.pawn.repo.LanguageRepository
+import com.nguyen.pawn.repo.WordRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
+
+/** This viewModel contains states that
+ * shared between different screens */
+
+@HiltViewModel
+class SharedViewModel
+@Inject constructor(
+    private val authRepo: AuthRepository,
+    private val wordRepo: WordRepository,
+    private val languageRepo: LanguageRepository
+) : ViewModel() {
+
+    /** STATES */
+
+    /** These states are for authentication data */
+
+    private val _user = mutableStateOf<User?>(null)
+    val user: State<User?> = _user
+
+    /** These states are for picked learning languages */
+
+    // The current language that the app is on
+    private val _currentPickedLanguage: MutableState<Language?> = mutableStateOf(null)
+    val currentPickedLanguage: State<Language?> = _currentPickedLanguage
+
+    // The list of languages that user wants to learn
+    private val _pickedLanguages: MutableState<List<Language>> = mutableStateOf(listOf())
+    val pickedLanguages: State<List<Language>> = _pickedLanguages
+
+    // The list of languages that user wants to learn (this list is used when user is choosing languages)
+    private val _displayPickedLanguages: MutableState<ArrayList<Language>> = mutableStateOf(arrayListOf())
+    val displayPickedLanguages: State<ArrayList<Language>> = _displayPickedLanguages
+
+    // A hash map that helps update picked languages quicker
+    private val pickedLanguageMap = HashMap<String, Boolean>()
+
+
+    /** These states are for saved words and daily random words */
+
+    // This is a list of words that user saved
+    private val _savedWords: MutableState<ArrayList<Word>> = mutableStateOf(arrayListOf())
+    val savedWords: State<ArrayList<Word>> = _savedWords
+
+    // A hash map that helps update saved words quicker
+    private val savedWordMap = HashMap<String, Boolean>()
+
+
+    /** INTENTS */
+
+    /** Auth intents*/
+
+    fun getUser(accessToken: String?, refreshToken: String?) {
+        if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) {
+            _user.value = null
+            return
+        }
+        viewModelScope.launch {
+            val user = authRepo.checkAuthStatus(accessToken)
+            withContext(Dispatchers.Main) {
+                _user.value = user
+            }
+        }
+    }
+
+    fun logout(refreshToken: String?) {
+        viewModelScope.launch {
+            if (refreshToken != null) {
+                authRepo.logout(refreshToken)
+            }
+            withContext(Dispatchers.Main) {
+                _user.value = null
+            }
+        }
+    }
+
+
+    /** Language intents */
+
+    /** Check in pickedLanguageMap if the chosen language is picked or not,
+     * if yes then remove it from map and display list,
+     * if no then add to the map and display list */
+    fun togglePickedLanguage(language: Language) {
+        if (pickedLanguageMap[language.id] == true) {
+            pickedLanguageMap[language.id] = false
+            _displayPickedLanguages.value =
+                _displayPickedLanguages.value!!.filter { pickedLanguage ->
+                    pickedLanguage.id != language.id
+                } as ArrayList<Language>
+        } else {
+            pickedLanguageMap[language.id] = true
+            _displayPickedLanguages.value =
+                (displayPickedLanguages.value!! + arrayListOf(language)) as ArrayList<Language>
+        }
+    }
+
+    /** Get the current picked languages either
+     *  from network or room database */
+    fun getPickedLanguages(accessToken: String?) {
+        viewModelScope.launch {
+            val languages = languageRepo.getLearningLanguages(accessToken)
+            _pickedLanguages.value = languages
+            _displayPickedLanguages.value = languages as ArrayList<Language>
+            for (language in languages) {
+                pickedLanguageMap[language.id] = true
+            }
+            if (languages.isNotEmpty()) {
+                _currentPickedLanguage.value = languages.first()
+            }
+        }
+    }
+
+    /** Save the picked languages to network and/or room database
+     *  Update the picked list and current pick language*/
+    fun savePickedLanguages(languages: ArrayList<Language>, accessToken: String?) {
+        viewModelScope.launch {
+            val response = languageRepo.pickLearningLanguages(languages, accessToken)
+            if (response) {
+                _pickedLanguages.value = languages
+                _displayPickedLanguages.value = languages
+                if (_currentPickedLanguage.value == null) {
+                    if (languages.isNotEmpty()) {
+                        _currentPickedLanguage.value = languages.first()
+                    }
+                } else {
+                    if (languages.isNotEmpty() && languages.filter { it.id == _currentPickedLanguage.value!!.id }
+                            .isEmpty()) {
+                        _currentPickedLanguage.value = languages.first()
+                    }
+                }
+            } else {
+                //Handle error
+            }
+        }
+    }
+
+    /** This will update the current language picked
+     * by the user */
+    fun changeCurrentPickedLanguage(language: Language) {
+        _currentPickedLanguage.value = language
+    }
+
+
+    /**  Word intents */
+
+    /** If the word is saved, then remove it from map and list
+     * else add it to the map and list */
+    fun toggleSavedWord(word: Word) {
+        if (savedWordMap[word.id] == true) {
+            _savedWords.value = _savedWords.value.filter { savedWord ->
+                savedWord.id != word.id
+            } as ArrayList<Word>
+            savedWordMap[word.id] = false
+        } else {
+            _savedWords.value = (arrayListOf(word) + _savedWords.value) as ArrayList<Word>
+            savedWordMap[word.id] = true
+        }
+    }
+
+    /** A helper function to check if the word is in the map */
+    fun checkIsSaved(wordId: String): Boolean {
+        return savedWordMap[wordId] == true
+    }
+
+}

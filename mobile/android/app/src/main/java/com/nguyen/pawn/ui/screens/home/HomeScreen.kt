@@ -29,10 +29,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import com.nguyen.pawn.model.Language
 import com.nguyen.pawn.model.User
+import com.nguyen.pawn.ui.SharedViewModel
 import com.nguyen.pawn.ui.components.home.ChooseLanguagesHeader
 import com.nguyen.pawn.ui.components.home.LanguageItem
 import com.nguyen.pawn.ui.theme.*
 import com.nguyen.pawn.ui.screens.auth.AuthViewModel
+import com.nguyen.pawn.ui.screens.home.HomeViewModel
 import com.nguyen.pawn.ui.viewmodels.LanguageViewModel
 import com.nguyen.pawn.ui.viewmodels.WordViewModel
 import com.nguyen.pawn.util.Constants.supportedLanguages
@@ -43,27 +45,26 @@ import com.nguyen.pawn.util.UtilFunctions.generateFlagForLanguage
 import kotlinx.coroutines.launch
 
 
+@ExperimentalPagerApi
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @ExperimentalFoundationApi
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun HomeScreen(
-    wordViewModel: WordViewModel,
-    authViewModel: AuthViewModel,
-    languageViewModel: LanguageViewModel,
+    homeViewModel: HomeViewModel,
+    sharedViewModel: SharedViewModel,
     navController: NavController
 ) {
 
     val TAG = "HomeScreen"
 
-    val words: ArrayList<Word> by wordViewModel.dailyWords
+    val words: ArrayList<Word> by homeViewModel.dailyWords
 
-    val savedWords: ArrayList<Word> by wordViewModel.savedWords
-    val pickedLanguages: List<Language> by languageViewModel.pickedLanguages
-    val tempPickedLanguages: ArrayList<Language> by languageViewModel.displayPickedLanguages
-    val currentPickedLanguage: Language? by languageViewModel.currentPickedLanguage
-    val user: User? by authViewModel.user.observeAsState()
+    val savedWords: ArrayList<Word> by sharedViewModel.savedWords
+    val pickedLanguages: List<Language> by sharedViewModel.pickedLanguages
+    val tempPickedLanguages: ArrayList<Language> by sharedViewModel.displayPickedLanguages
+    val currentPickedLanguage: Language? by sharedViewModel.currentPickedLanguage
+    val user: User? by sharedViewModel.user
     var showAddLanguageMenu by remember { mutableStateOf(pickedLanguages.isEmpty()) }
 
 
@@ -74,13 +75,8 @@ fun HomeScreen(
 
 
     LaunchedEffect(null) {
-        languageViewModel.getPickedLanguages(getAccessTokenFromDataStore(context))
-        if (user == null) {
-            authViewModel.checkAuthStatus(
-                getAccessTokenFromDataStore(context),
-                getRefreshTokenFromDataStore(context)
-            )
-        }
+        sharedViewModel.getUser(getAccessTokenFromDataStore(context), getRefreshTokenFromDataStore(context))
+        sharedViewModel.getPickedLanguages(getAccessTokenFromDataStore(context))
     }
 
     LaunchedEffect(pickedLanguages) {
@@ -124,7 +120,7 @@ fun HomeScreen(
                                     ChooseLanguagesHeader(pickedLanguages = tempPickedLanguages) {
                                         coroutineScope.launch {
                                             showAddLanguageMenu = false
-                                            languageViewModel.savePickedLanguages(
+                                            sharedViewModel.savePickedLanguages(
                                                 tempPickedLanguages,
                                                 getAccessTokenFromDataStore(context)
                                             )
@@ -140,7 +136,7 @@ fun HomeScreen(
                                             it.id == supportedLanguages[index].id
                                         }.size == 1
                                     ) { language ->
-                                        languageViewModel.togglePickedLanguage(language)
+                                        sharedViewModel.togglePickedLanguage(language)
                                     }
                                 }
 
@@ -174,7 +170,7 @@ fun HomeScreen(
                                                             CircleShape
                                                         )
                                                         .clickable {
-                                                            languageViewModel.changeCurrentPickedLanguage(
+                                                            sharedViewModel.changeCurrentPickedLanguage(
                                                                 language
                                                             )
                                                         }
@@ -194,7 +190,7 @@ fun HomeScreen(
 
                                 item {
                                     DailyWordSection(
-                                        viewModel = wordViewModel,
+                                        viewModel = sharedViewModel,
                                         pagerState = pagerState,
                                         navController = navController,
                                         words = words,
@@ -247,8 +243,8 @@ fun HomeScreen(
                 scaffoldState = bottomSheetScaffoldState,
                 topBar = {
                     HomeAppBar(navController, user, onLogout = {
-                        authViewModel.logout(it)
-                        languageViewModel.getPickedLanguages(null)
+                        sharedViewModel.logout(it)
+                        sharedViewModel.getPickedLanguages(null)
                     })
                 },
 

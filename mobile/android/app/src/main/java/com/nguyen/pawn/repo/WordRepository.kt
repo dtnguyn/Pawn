@@ -2,9 +2,11 @@ package com.nguyen.pawn.repo
 
 import android.util.Log
 import com.nguyen.pawn.api.model.ApiResponse
+import com.nguyen.pawn.api.model.GetDailyWordsRequestBody
 import com.nguyen.pawn.api.model.PickLearningLanguagesRequestBody
 import com.nguyen.pawn.api.model.RegisterRequestBody
 import com.nguyen.pawn.model.Language
+import com.nguyen.pawn.model.Word
 import com.nguyen.pawn.util.Constants.apiURL
 import io.ktor.client.*
 import io.ktor.client.features.*
@@ -17,35 +19,19 @@ class WordRepository
     private val apiClient: HttpClient
 ){
 
-    suspend fun pickLearningLanguages(languages: List<String>, accessToken: String): Boolean {
+    suspend fun getRandomDailyWord(wordCount: Int, language: String): List<Word>? {
          return try {
-            val response: ApiResponse<Void> = apiClient.post("${apiURL}/language/save") {
+            val response: ApiResponse<List<Word>?> = apiClient.post("${apiURL}/word/daily") {
                 contentType(ContentType.Application.Json)
-                body = PickLearningLanguagesRequestBody(languages)
-                headers {
-                    append(HttpHeaders.Authorization, "Bearer $accessToken")
-                }
+                body = GetDailyWordsRequestBody(wordCount, language)
             }
-             response.status
+             response.data
         } catch (error: ClientRequestException) {
-            Log.d("Auth", "error: ${error.message}")
-            false
+            null
         }
     }
 
-    suspend fun getLearningLanguages(accessToken: String): List<Language>{
-        return try {
-            val response: ApiResponse<List<Language>> = apiClient.get("${apiURL}/language/") {
-                contentType(ContentType.Application.Json)
-                headers {
-                    append(HttpHeaders.Authorization, "Bearer $accessToken")
-                }
-            }
-            response.data
-        } catch (error: ClientRequestException) {
-            listOf()
-        }
-    }
+
 
 
 

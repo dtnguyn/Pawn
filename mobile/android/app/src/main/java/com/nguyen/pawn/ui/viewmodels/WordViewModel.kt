@@ -27,7 +27,6 @@ class WordViewModel
 
 
     private val savedWordMap = HashMap<String, Boolean>()
-
     val dailyWords: State<ArrayList<Word>> = _dailyWords
     val savedWords: State<ArrayList<Word>> = _savedWords
 
@@ -127,6 +126,10 @@ class WordViewModel
         for (word in _savedWords.value) {
             savedWordMap[word.id] = true
         }
+    }
+
+    fun getDailyWords(dailyWordCount: Int){
+
     }
 
     fun removeDailyWords(wordId: String) {

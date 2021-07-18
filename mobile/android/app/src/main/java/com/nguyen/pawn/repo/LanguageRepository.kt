@@ -42,14 +42,15 @@ class LanguageRepository
             }
 
             Log.d(TAG, "save cache ${response.status} $accessToken")
-            if(response.status || accessToken == null){
 
+            if(response.status || accessToken == null){
                 database.languageDao().clearAll()
                 database.languageDao().insertMany(cacheLanguages)
+                true
+            } else {
+                response.status
             }
 
-
-            response.status
         } catch (error: ClientRequestException) {
             Log.d(TAG, "error: ${error.message}")
             false
@@ -76,7 +77,7 @@ class LanguageRepository
                 languages
             }
 
-        } catch (error: ClientRequestException) {
+        } catch (error: Exception) {
             Log.d(TAG, "error: ${error.message}")
             arrayListOf()
         }

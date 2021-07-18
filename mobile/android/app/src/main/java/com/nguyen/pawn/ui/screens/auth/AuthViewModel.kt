@@ -1,11 +1,12 @@
-package com.nguyen.pawn.ui.viewmodels
+package com.nguyen.pawn.ui.screens.auth
 
-import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nguyen.pawn.model.User
+import com.nguyen.pawn.model.Token
 import com.nguyen.pawn.repo.AuthRepository
 import com.nguyen.pawn.util.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,18 +21,17 @@ class AuthViewModel
     private val authRepo: AuthRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableLiveData<UIState>(UIState.Success)
-
-    private val _user = MutableLiveData<User?>(null)
-
-    private val _accessToken = MutableLiveData<String?>(null)
-
-    private val _refreshToken = MutableLiveData<String?>(null)
-
+    private val _uiState = MutableLiveData<UIState>(UIState.Idle)
     val uiState: LiveData<UIState> = _uiState
-    val user: LiveData<User?> = _user
-    val accessToken: LiveData<String?> = _accessToken
-    val refreshToken: LiveData<String?> = _refreshToken
+
+//    private val _accessToken = MutableLiveData<String?>(null)
+//    val accessToken: LiveData<String?> = _accessToken
+//
+//    private val _refreshToken = MutableLiveData<String?>(null)
+//    val refreshToken: LiveData<String?> = _refreshToken
+
+    private val _token = mutableStateOf<Token>(Token(null, null))
+    val token: State<Token> = _token
 
 
     fun registerAccount(
@@ -41,7 +41,6 @@ class AuthViewModel
         passwordVerify: String,
         nativeLanguage: String
     ) {
-
         viewModelScope.launch {
             if (email.isBlank() || username.isBlank() || password.isBlank() || passwordVerify.isBlank() || nativeLanguage.isBlank()) {
                 emitError("Please enter all the required information!")
@@ -52,10 +51,12 @@ class AuthViewModel
                 return@launch
             }
             turnOnLoading()
-            val registerResponse = authRepo.register(email, username, password, nativeLanguage)
+            val response = authRepo.register(email, username, password, nativeLanguage)
 
-            if (registerResponse) {
-                login(email, password)
+            if (response != null) {
+                withContext(Main) {
+                    _token.value = response
+                }
             } else {
                 emitError("Register unsuccessful! Please try again!")
             }
@@ -63,69 +64,66 @@ class AuthViewModel
     }
 
     fun login(emailOrUsername: String, password: String) {
-
         viewModelScope.launch {
             if (emailOrUsername.isBlank() || password.isBlank()) {
                 emitError("Please enter all the required information!")
                 return@launch
             }
             turnOnLoading()
-            val loginResponse = authRepo.login(emailOrUsername, password)
-            if (loginResponse != null) {
-                checkAuthStatus(loginResponse.accessToken, loginResponse.refreshToken)
+            val response = authRepo.login(emailOrUsername, password)
+            if (response != null) {
+                withContext(Main) {
+                    _token.value = response
+                }
             } else {
                 emitError("Login unsuccessful! Please try again!")
             }
         }
     }
 
-
-    fun checkAuthStatus(accessToken: String?, refreshToken: String?) {
-        viewModelScope.launch {
-            if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) {
-                return@launch
-            }
-            turnOnLoading()
-            val user = authRepo.checkAuthStatus(accessToken)
-            Log.d("Auth", "Here ${user}")
-            if (user != null) {
-
-                turnOffLoading()
-                println(user)
-                withContext(Main) {
-                    _user.value = user
-                    _accessToken.value = accessToken
-                    _refreshToken.value = refreshToken
-                }
-            } else {
-                val newAccessToken = authRepo.refreshAccessToken(refreshToken)
-                val newUser = authRepo.checkAuthStatus(newAccessToken)
-                turnOffLoading()
-                withContext(Main) {
-                    _user.value = newUser
-                    _accessToken.value = newAccessToken
-                }
-            }
-        }
+    fun initializeToken(accessToken: String?, refreshToken: String?){
+        _token.value = Token(accessToken, refreshToken)
     }
 
-    fun logout(refreshToken: String?) {
-        viewModelScope.launch {
-            if (refreshToken != null) {
-                authRepo.logout(refreshToken)
-            }
-            withContext(Main) {
-                _user.value = null
-                _accessToken.value = null
-                _refreshToken.value = null
-            }
-        }
-    }
+
+//    fun checkAuthStatus(accessToken: String?, refreshToken: String?) {
+//        viewModelScope.launch {
+//            if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) {
+//                return@launch
+//            }
+//            turnOnLoading()
+//            val user = authRepo.checkAuthStatus(accessToken)
+//            if (user != null) {
+//                turnOffLoading()
+//                withContext(Main) {
+//                    _token.value = Token(accessToken, refreshToken)
+//                }
+//            } else {
+//                val newAccessToken = authRepo.refreshAccessToken(refreshToken)
+//                turnOffLoading()
+//                withContext(Main) {
+//                    _token.value = Token(newAccessToken, refreshToken)
+//                }
+//            }
+//        }
+//    }
+//
+//    fun logout(refreshToken: String?) {
+//        viewModelScope.launch {
+//            if (refreshToken != null) {
+//                authRepo.logout(refreshToken)
+//            }
+//            withContext(Main) {
+//                _user.value = null
+//                _accessToken.value = null
+//                _refreshToken.value = null
+//            }
+//        }
+//    }
 
     fun clearError() {
-        _uiState.value = UIState.Success
+        _uiState.value = UIState.Idle
     }
-
 
 
     private suspend fun turnOnLoading() {
@@ -136,8 +134,7 @@ class AuthViewModel
 
     private suspend fun turnOffLoading() {
         withContext(Main) {
-            _uiState.value = UIState.Success
-
+            _uiState.value = UIState.Idle
         }
     }
 

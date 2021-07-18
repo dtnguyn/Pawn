@@ -5,10 +5,6 @@ data class LoginRequestBody(
     val password: String,
 )
 
-data class LoginResponse(
-    val accessToken: String,
-    val refreshToken: String,
-)
 
 data class LogoutRequestBody(
     val refreshToken: String

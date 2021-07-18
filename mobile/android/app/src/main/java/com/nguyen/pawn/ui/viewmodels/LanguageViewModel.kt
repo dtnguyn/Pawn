@@ -24,12 +24,12 @@ class LanguageViewModel
     }
 
     private val _currentPickedLanguage: MutableState<Language?> = mutableStateOf(null)
-    private val _pickedLanguages: MutableState<List<Language>?> = mutableStateOf(null)
-    private val _tempPickedLanguages: MutableState<ArrayList<Language>?> = mutableStateOf(null)
+    private val _pickedLanguages: MutableState<List<Language>> = mutableStateOf(listOf())
+    private val _displayPickedLanguages: MutableState<ArrayList<Language>> = mutableStateOf(arrayListOf())
 
 
-    val pickedLanguages: State<List<Language>?> = _pickedLanguages
-    val tempPickedLanguages: State<ArrayList<Language>?> = _tempPickedLanguages
+    val pickedLanguages: State<List<Language>> = _pickedLanguages
+    val displayPickedLanguages: State<ArrayList<Language>> = _displayPickedLanguages
     val currentPickedLanguage: State<Language?> = _currentPickedLanguage
 
 
@@ -37,16 +37,16 @@ class LanguageViewModel
 
 
     fun togglePickedLanguage(language: Language) {
-        if (pickedLanguages.value == null || _tempPickedLanguages.value == null) return
+        if (pickedLanguages.value == null || _displayPickedLanguages.value == null) return
         if (pickedLanguageMap[language.id] == true) {
             pickedLanguageMap[language.id] = false
-            _tempPickedLanguages.value = _tempPickedLanguages.value!!.filter { pickedLanguage ->
+            _displayPickedLanguages.value = _displayPickedLanguages.value!!.filter { pickedLanguage ->
                 pickedLanguage.id != language.id
             } as ArrayList<Language>
         } else {
             pickedLanguageMap[language.id] = true
-            _tempPickedLanguages.value =
-                (tempPickedLanguages.value!! + arrayListOf(language)) as ArrayList<Language>
+            _displayPickedLanguages.value =
+                (displayPickedLanguages.value!! + arrayListOf(language)) as ArrayList<Language>
         }
     }
 
@@ -55,7 +55,7 @@ class LanguageViewModel
             val languages = repo.getLearningLanguages(accessToken)
             Log.d(TAG, "languages: $languages")
             _pickedLanguages.value = languages
-            _tempPickedLanguages.value = languages as ArrayList<Language>
+            _displayPickedLanguages.value = languages as ArrayList<Language>
             for (language in languages) {
                 pickedLanguageMap[language.id] = true
             }
@@ -69,8 +69,9 @@ class LanguageViewModel
         viewModelScope.launch {
             val response = repo.pickLearningLanguages(languages, accessToken)
             if (response) {
+                Log.d(TAG, "response $response")
                 _pickedLanguages.value = languages
-                _tempPickedLanguages.value = languages
+                _displayPickedLanguages.value = languages
                 if (_currentPickedLanguage.value == null) {
                     if (languages.isNotEmpty()) {
                         _currentPickedLanguage.value = languages.first()

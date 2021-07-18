@@ -14,28 +14,33 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.pager.ExperimentalPagerApi
 import com.nguyen.pawn.R
-import com.nguyen.pawn.ui.theme.PawnTheme
 import com.nguyen.pawn.ui.navigation.PawnScreens
 import com.nguyen.pawn.ui.screens.*
+import com.nguyen.pawn.ui.screens.auth.AuthViewModel
 import com.nguyen.pawn.ui.screens.auth.ChangePasswordScreen
 import com.nguyen.pawn.ui.screens.auth.VerifyCodeScreen
-import com.nguyen.pawn.ui.viewmodels.AuthViewModel
-import com.nguyen.pawn.ui.viewmodels.LanguageViewModel
-import com.nguyen.pawn.ui.viewmodels.WordViewModel
+import com.nguyen.pawn.ui.screens.home.HomeViewModel
+import com.nguyen.pawn.ui.theme.PawnTheme
 
 
+@ExperimentalPagerApi
+@ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @ExperimentalFoundationApi
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun PawnApp(wordViewModel: WordViewModel, authViewModel: AuthViewModel, languageViewModel: LanguageViewModel) {
+fun PawnApp(
+    authViewModel: AuthViewModel,
+    homeViewModel: HomeViewModel,
+    sharedViewModel: SharedViewModel
+) {
 
     val navController = rememberNavController()
     val items = listOf(
         PawnScreens.Home,
+        PawnScreens.Search,
         PawnScreens.Feeds,
-        PawnScreens.Chat
     )
 
     PawnTheme {
@@ -43,13 +48,13 @@ fun PawnApp(wordViewModel: WordViewModel, authViewModel: AuthViewModel, language
             bottomBar = {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
-                if(currentRoute in setOf("home", "feeds", "chat")){
+                if (currentRoute in setOf("home", "feeds", "search")) {
                     BottomNavigation {
                         items.forEach { screen ->
                             BottomNavigationItem(
                                 icon = {
                                     Icon(
-                                        painterResource(id = screen.icon?: R.drawable.home), null,
+                                        painterResource(id = screen.icon ?: R.drawable.home), null,
                                         Modifier
                                             .width(28.dp)
                                             .height(28.dp)
@@ -76,14 +81,25 @@ fun PawnApp(wordViewModel: WordViewModel, authViewModel: AuthViewModel, language
         ) {
 
             NavHost(navController, startDestination = PawnScreens.Home.route) {
-                composable(PawnScreens.Home.route) { HomeScreen(wordViewModel = wordViewModel, authViewModel = authViewModel, languageViewModel = languageViewModel,navController = navController) }
+                composable(PawnScreens.Home.route) {
+                    HomeScreen(
+                        homeViewModel = homeViewModel,
+                        sharedViewModel = sharedViewModel,
+                        navController = navController
+                    )
+                }
                 composable(PawnScreens.Feeds.route) { FeedScreen() }
-                composable(PawnScreens.Chat.route) { ChatScreen() }
+                composable(PawnScreens.Search.route) { SearchScreen() }
                 composable(PawnScreens.Word.route) { WordScreen(navController = navController) }
-                composable(PawnScreens.Auth.route) { AuthScreen(viewModel = authViewModel, navController = navController) }
+                composable(PawnScreens.Auth.route) {
+                    AuthScreen(
+                        authViewModel = authViewModel,
+                        sharedViewModel = sharedViewModel,
+                        navController = navController
+                    )
+                }
                 composable(PawnScreens.ChangePassword.route) { ChangePasswordScreen(navController = navController) }
                 composable(PawnScreens.VerifyCode.route) { VerifyCodeScreen(navController = navController) }
-
             }
         }
     }

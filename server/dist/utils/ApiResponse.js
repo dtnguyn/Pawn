@@ -8,4 +8,4 @@ class ApiResponse {
     }
 }
 exports.default = ApiResponse;
-//# sourceMappingURL=ApiReponse.js.map
+//# sourceMappingURL=ApiResponse.js.map

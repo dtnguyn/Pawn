@@ -1,6 +1,13 @@
+import bcrypt from "bcrypt";
 import dotenv from "dotenv";
-dotenv.config();
-import { Request, Response, Router } from "express";
+import express, { Request, Response, Router } from "express";
+import jwt from "jsonwebtoken";
+import passport from "passport";
+import {
+  Strategy as GoogleStrategy,
+  VerifyCallback,
+} from "passport-google-oauth20";
+import { checkAuthentication } from "../utils/middlewares";
 import {
   changePassword,
   createOauthUser,
@@ -13,16 +20,8 @@ import {
   sendVerificationCode,
   verifyCode,
 } from "../controllers/UserController";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
-import express from "express";
-import passport from "passport";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { VerifyCallback } from "passport-google-oauth20";
-import nodemailer from "nodemailer";
-import { getRepository } from "typeorm";
-import { User } from "../entity/User";
-import { VerificationCode } from "../entity/VerificationCode";
+import ApiResponse from "../utils/ApiResponse";
+dotenv.config();
 
 const router = Router();
 router.use(express.json());
@@ -67,40 +66,14 @@ passport.use(
 );
 
 //Middlewares
-export const checkAuthentication = (
-  req: Request,
-  res: Response,
-  next: Function
-) => {
-  const authHeader = req.headers["authorization"];
-  let token = authHeader && authHeader.split(" ")[1];
-
-  if (!token) res.sendStatus(401);
-  else {
-    jwt.verify(
-      token,
-      process.env.ACCESS_TOKEN_SECRET!,
-      async (err: any, decoded: any) => {
-        if (err) {
-          res.sendStatus(403);
-        } else {
-          (req as any).user = await getOneUser(decoded.user.email);
-
-          next();
-        }
-      }
-    );
-  }
-};
 
 //Routes
 router.get("/", checkAuthentication, (req, res) => {
   const user = req && (req as any).user;
   if (user) {
-    res.json(user);
-    console.log(user);
+    res.send(new ApiResponse(true, "", user));
   } else {
-    res.sendStatus(404);
+    res.send(new ApiResponse(false, "Not logged in!", null));
   }
 });
 
@@ -110,11 +83,9 @@ router.get("/verify/code", async (req, res) => {
 
     const code = await sendVerificationCode(email);
 
-    res.json(code);
+    res.send(new ApiResponse(true, "", code));
   } catch (error) {
-    res.status(400).send({
-      message: error.message,
-    });
+    res.send(new ApiResponse(false, error.message, null));
   }
 });
 
@@ -125,11 +96,9 @@ router.post("/verify/code", async (req, res) => {
 
     const result = await verifyCode(email, code);
 
-    res.json(result);
+    res.send(new ApiResponse(true, "", code));
   } catch (error) {
-    res.status(400).send({
-      message: error.message,
-    });
+    res.send(new ApiResponse(false, error.message, null));
   }
 });
 
@@ -154,11 +123,9 @@ router.post("/register", async (req, res) => {
     //Create new user
     await createUser(username, native, email, hashPW, avatar);
 
-    return res.json(true);
+    return res.send(new ApiResponse(true, "", null));
   } catch (error) {
-    return res.status(400).send({
-      message: error.message,
-    });
+    return res.send(new ApiResponse(false, error.message, null));
   }
 });
 
@@ -187,11 +154,9 @@ router.post("/login", async (req, res) => {
     await saveRefreshToken(user.id, refreshToken);
 
     //Send response
-    return res.json({ accessToken, refreshToken });
+    return res.send(new ApiResponse(true, "", { accessToken, refreshToken }));
   } catch (error) {
-    return res.status(400).send({
-      message: error.message,
-    });
+    return res.send(new ApiResponse(false, error.message, null));
   }
 });
 
@@ -201,11 +166,9 @@ router.delete("/logout", async (req, res) => {
 
     await deleteRefreshToken(refreshToken);
 
-    res.json(true);
+    return res.send(new ApiResponse(true, "", null));
   } catch (error) {
-    return res.status(400).send({
-      message: error.message,
-    });
+    return res.send(new ApiResponse(false, error.message, null));
   }
 });
 
@@ -220,11 +183,9 @@ router.patch("/password", async (req, res) => {
     );
     await changePassword(email, code, hashPW);
 
-    res.json(true);
+    return res.send(new ApiResponse(true, "", null));
   } catch (error) {
-    res.status(400).send({
-      message: error.message,
-    });
+    return res.send(new ApiResponse(false, error.message, null));
   }
 });
 
@@ -243,7 +204,7 @@ router.post("/token", (req, res) => {
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET!,
       (err: any, decoded: any) => {
-        if (err) res.sendStatus(403);
+        if (err) throw err;
         else {
           const accessToken = jwt.sign(
             { user: decoded.user },
@@ -252,18 +213,14 @@ router.post("/token", (req, res) => {
               expiresIn: process.env.TOKEN_EXPIRATION,
             }
           );
-          res.json({ accessToken: accessToken });
+          return res.send(
+            new ApiResponse(true, "", { accessToken: accessToken })
+          );
         }
       }
     );
   } catch (error) {
-    if (error.message === "Unauthorized") {
-      res.sendStatus(401);
-    } else if (error.message === "Forbidden") {
-      res.sendStatus(403);
-    } else {
-      res.sendStatus(400);
-    }
+    return res.send(new ApiResponse(false, error.message, null));
   }
 });
 

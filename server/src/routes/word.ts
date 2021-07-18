@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
+import ApiResponse from "../utils/ApiResponse";
 import {
-  chooseLanguages,
   getDailyRandomWords,
   getDefinition,
   getSavedWords,
@@ -9,27 +9,28 @@ import {
   rearrangeSavedWords,
   toggleSaveWord,
 } from "../controllers/WordController";
-import { User } from "../entity/User";
-import { checkAuthentication } from "./auth";
+import { checkAuthentication } from "../utils/middlewares";
 
 const router = Router();
 
 router.get("/daily", async (req, res) => {
   try {
     let dailyWordCount = 3;
-    if (req.user) {
-      dailyWordCount = (req.user as User).dailyWordCount;
+    if (req.body.dailyWordCount) {
+      dailyWordCount = req.body.dailyWordCount;
     }
 
-    const language = req.query.language as string;
+    const language = req.body.language;
+    if (language)
+      return res.send(
+        new ApiResponse(false, "Please provide the target language!", null)
+      );
 
     const words = await getDailyRandomWords(dailyWordCount, language);
 
-    res.json(words);
+    return res.send(new ApiResponse(true, "", words));
   } catch (error) {
-    res.status(400).send({
-      message: error.message,
-    });
+    return res.send(new ApiResponse(false, error.message, null));
   }
 });
 
@@ -44,11 +45,9 @@ router.get("/definition", async (req, res) => {
     const definition = await getDefinition(word, language);
     if (!definition)
       throw new Error("Couldn't find definition for the word provided!");
-    res.json(definition);
+    return res.send(new ApiResponse(true, "", definition));
   } catch (error) {
-    res.status(400).send({
-      message: error.message,
-    });
+    return res.send(new ApiResponse(false, error.message, null));
   }
 });
 
@@ -60,12 +59,9 @@ router.get("/autocomplete", async (req, res) => {
     if (!text || !language)
       throw new Error("Please provide text and language!");
     const results = await getWordAutoCompletes(language, text);
-    // console.log(results);
-    res.send(results);
+    return res.send(new ApiResponse(true, "", results));
   } catch (error) {
-    res.status(400).send({
-      message: error.message,
-    });
+    return res.send(new ApiResponse(false, error.message, null));
   }
 });
 
@@ -73,11 +69,9 @@ router.get("/save", checkAuthentication, async (req, res) => {
   try {
     const userId = (req as any).user.id;
     const savedWords = await getSavedWords(userId);
-    res.json(savedWords);
+    return res.send(new ApiResponse(true, "", savedWords));
   } catch (error) {
-    res.status(400).send({
-      message: error.message,
-    });
+    return res.send(new ApiResponse(false, error.message, null));
   }
 });
 
@@ -88,11 +82,9 @@ router.post("/save", checkAuthentication, async (req, res) => {
     const language = req.body.language;
     const userId = (req as any).user.id;
     await toggleSaveWord(word, language, userId);
-    res.json({ status: true });
+    return res.send(new ApiResponse(true, "", null));
   } catch (error) {
-    res.status(400).send({
-      message: error.message,
-    });
+    return res.send(new ApiResponse(false, error.message, null));
   }
 });
 
@@ -106,12 +98,10 @@ router.patch("/rearrange", checkAuthentication, async (req, res) => {
 
     await rearrangeSavedWords(wordIds);
 
-    res.json({ status: true });
+    return res.send(new ApiResponse(true, "", null));
   } catch (error) {
     console.log(error);
-    res.status(400).send({
-      message: error.message,
-    });
+    return res.send(new ApiResponse(false, error.message, null));
   }
 });
 
@@ -124,12 +114,9 @@ router.patch("/definition/rearrange", checkAuthentication, async (req, res) => {
 
     await rearrangeDefinition(definitionIds);
 
-    res.json({ status: true });
+    return res.send(new ApiResponse(true, "", null));
   } catch (error) {
-    console.log(error);
-    res.status(400).send({
-      message: error.message,
-    });
+    return res.send(new ApiResponse(false, error.message, null));
   }
 });
 

@@ -10,18 +10,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config();
-const express_1 = require("express");
-const UserController_1 = require("../controllers/UserController");
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const express_2 = __importDefault(require("express"));
+const dotenv_1 = __importDefault(require("dotenv"));
+const express_1 = __importStar(require("express"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const passport_1 = __importDefault(require("passport"));
 const passport_google_oauth20_1 = require("passport-google-oauth20");
+const middlewares_1 = require("../utils/middlewares");
+const UserController_1 = require("../controllers/UserController");
+const ApiResponse_1 = __importDefault(require("../utils/ApiResponse"));
+dotenv_1.default.config();
 const router = express_1.Router();
-router.use(express_2.default.json());
+router.use(express_1.default.json());
 const handleAuth = (_accessToken, _refreshToken, profile, cb) => __awaiter(this, void 0, void 0, function* () {
     try {
         const { id, emails, displayName, photos } = profile;
@@ -46,43 +54,23 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: process.env.GOOGLE_CLIENT_SECRET,
 }, handleAuth));
-exports.checkAuthentication = (req, res, next) => {
-    const authHeader = req.headers["authorization"];
-    let token = authHeader && authHeader.split(" ")[1];
-    if (!token)
-        res.sendStatus(401);
-    else {
-        jsonwebtoken_1.default.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => __awaiter(this, void 0, void 0, function* () {
-            if (err) {
-                res.sendStatus(403);
-            }
-            else {
-                req.user = yield UserController_1.getOneUser(decoded.user.email);
-                next();
-            }
-        }));
-    }
-};
-router.get("/", exports.checkAuthentication, (req, res) => {
+router.get("/", middlewares_1.checkAuthentication, (req, res) => {
     const user = req && req.user;
     if (user) {
-        res.json(user);
-        console.log(user);
+        res.send(new ApiResponse_1.default(true, "", user));
     }
     else {
-        res.sendStatus(404);
+        res.send(new ApiResponse_1.default(false, "Not logged in!", null));
     }
 });
 router.get("/verify/code", (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         const email = req.body.email;
         const code = yield UserController_1.sendVerificationCode(email);
-        res.json(code);
+        res.send(new ApiResponse_1.default(true, "", code));
     }
     catch (error) {
-        res.status(400).send({
-            message: error.message,
-        });
+        res.send(new ApiResponse_1.default(false, error.message, null));
     }
 }));
 router.post("/verify/code", (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -90,12 +78,10 @@ router.post("/verify/code", (req, res) => __awaiter(this, void 0, void 0, functi
         const email = req.body.email;
         const code = req.body.code;
         const result = yield UserController_1.verifyCode(email, code);
-        res.json(result);
+        res.send(new ApiResponse_1.default(true, "", code));
     }
     catch (error) {
-        res.status(400).send({
-            message: error.message,
-        });
+        res.send(new ApiResponse_1.default(false, error.message, null));
     }
 }));
 router.post("/register", (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -109,12 +95,10 @@ router.post("/register", (req, res) => __awaiter(this, void 0, void 0, function*
             throw new Error("Please provide the required information");
         const hashPW = bcrypt_1.default.hashSync(password, parseInt(process.env.SALT_ROUNDS));
         yield UserController_1.createUser(username, native, email, hashPW, avatar);
-        return res.json(true);
+        return res.send(new ApiResponse_1.default(true, "", null));
     }
     catch (error) {
-        return res.status(400).send({
-            message: error.message,
-        });
+        return res.send(new ApiResponse_1.default(false, error.message, null));
     }
 }));
 router.post("/login", (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -134,24 +118,20 @@ router.post("/login", (req, res) => __awaiter(this, void 0, void 0, function* ()
         });
         const refreshToken = jsonwebtoken_1.default.sign({ user }, process.env.REFRESH_TOKEN_SECRET);
         yield UserController_1.saveRefreshToken(user.id, refreshToken);
-        return res.json({ accessToken, refreshToken });
+        return res.send(new ApiResponse_1.default(true, "", { accessToken, refreshToken }));
     }
     catch (error) {
-        return res.status(400).send({
-            message: error.message,
-        });
+        return res.send(new ApiResponse_1.default(false, error.message, null));
     }
 }));
 router.delete("/logout", (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         const refreshToken = req.body.refreshToken;
         yield UserController_1.deleteRefreshToken(refreshToken);
-        res.json(true);
+        return res.send(new ApiResponse_1.default(true, "", null));
     }
     catch (error) {
-        return res.status(400).send({
-            message: error.message,
-        });
+        return res.send(new ApiResponse_1.default(false, error.message, null));
     }
 }));
 router.patch("/password", (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -161,12 +141,10 @@ router.patch("/password", (req, res) => __awaiter(this, void 0, void 0, function
         const code = req.body.code;
         const hashPW = bcrypt_1.default.hashSync(newPassword, parseInt(process.env.SALT_ROUNDS));
         yield UserController_1.changePassword(email, code, hashPW);
-        res.json(true);
+        return res.send(new ApiResponse_1.default(true, "", null));
     }
     catch (error) {
-        res.status(400).send({
-            message: error.message,
-        });
+        return res.send(new ApiResponse_1.default(false, error.message, null));
     }
 }));
 router.post("/token", (req, res) => {
@@ -178,25 +156,17 @@ router.post("/token", (req, res) => {
             throw new Error("Forbidden");
         jsonwebtoken_1.default.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
             if (err)
-                res.sendStatus(403);
+                throw err;
             else {
                 const accessToken = jsonwebtoken_1.default.sign({ user: decoded.user }, process.env.ACCESS_TOKEN_SECRET, {
                     expiresIn: process.env.TOKEN_EXPIRATION,
                 });
-                res.json({ accessToken: accessToken });
+                return res.send(new ApiResponse_1.default(true, "", { accessToken: accessToken }));
             }
         });
     }
     catch (error) {
-        if (error.message === "Unauthorized") {
-            res.sendStatus(401);
-        }
-        else if (error.message === "Forbidden") {
-            res.sendStatus(403);
-        }
-        else {
-            res.sendStatus(400);
-        }
+        return res.send(new ApiResponse_1.default(false, error.message, null));
     }
 });
 router.get("/google", passport_1.default.authenticate("google", { scope: ["profile", "email"] }));

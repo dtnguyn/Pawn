@@ -4,7 +4,7 @@
 //   data: T;
 // };
 
-class ApiResponse<T> {
+export default class ApiResponse<T> {
   status: boolean;
   message: string;
   data: T | null;

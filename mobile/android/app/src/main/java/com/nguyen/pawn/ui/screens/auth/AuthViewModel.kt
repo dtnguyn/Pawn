@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel
 @Inject constructor(
-    private val repo: AuthRepository
+    private val authRepo: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableLiveData<UIState>(UIState.Success)
@@ -52,7 +52,7 @@ class AuthViewModel
                 return@launch
             }
             turnOnLoading()
-            val registerResponse = repo.register(email, username, password, nativeLanguage)
+            val registerResponse = authRepo.register(email, username, password, nativeLanguage)
 
             if (registerResponse) {
                 login(email, password)
@@ -70,7 +70,7 @@ class AuthViewModel
                 return@launch
             }
             turnOnLoading()
-            val loginResponse = repo.login(emailOrUsername, password)
+            val loginResponse = authRepo.login(emailOrUsername, password)
             if (loginResponse != null) {
                 checkAuthStatus(loginResponse.accessToken, loginResponse.refreshToken)
             } else {
@@ -86,7 +86,7 @@ class AuthViewModel
                 return@launch
             }
             turnOnLoading()
-            val user = repo.checkAuthStatus(accessToken)
+            val user = authRepo.checkAuthStatus(accessToken)
             Log.d("Auth", "Here ${user}")
             if (user != null) {
 
@@ -98,8 +98,8 @@ class AuthViewModel
                     _refreshToken.value = refreshToken
                 }
             } else {
-                val newAccessToken = repo.refreshAccessToken(refreshToken)
-                val newUser = repo.checkAuthStatus(newAccessToken)
+                val newAccessToken = authRepo.refreshAccessToken(refreshToken)
+                val newUser = authRepo.checkAuthStatus(newAccessToken)
                 turnOffLoading()
                 withContext(Main) {
                     _user.value = newUser
@@ -112,7 +112,7 @@ class AuthViewModel
     fun logout(refreshToken: String?) {
         viewModelScope.launch {
             if (refreshToken != null) {
-                repo.logout(refreshToken)
+                authRepo.logout(refreshToken)
             }
             withContext(Main) {
                 _user.value = null

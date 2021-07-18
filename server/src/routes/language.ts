@@ -4,7 +4,9 @@ import {
   chooseLanguages,
   getLearningLanguages,
 } from "../controllers/LanguageController";
-import { checkAuthentication } from "./auth";
+
+import ApiResponse from "../utils/ApiResponse";
+import { checkAuthentication } from "../utils/middlewares";
 
 const router = Router();
 
@@ -14,9 +16,9 @@ router.get("/", checkAuthentication, async (req, res) => {
     const userId = (req as any).user.id;
 
     const languages = await getLearningLanguages(userId);
-    res.json(new ApiResponse<Language[]>(true, "", languages));
+    res.send(new ApiResponse<Language[]>(true, "", languages));
   } catch (error) {
-    res.status(400).json(new ApiResponse(false, error.message, null));
+    res.send(new ApiResponse(false, error.message, null));
   }
 });
 
@@ -27,9 +29,9 @@ router.post("/save", checkAuthentication, async (req, res) => {
     const userId = (req as any).user.id;
 
     await chooseLanguages(languages, userId);
-    res.json(new ApiResponse(true, "", null));
+    res.send(new ApiResponse(true, "", null));
   } catch (error) {
-    res.status(400).json(new ApiResponse(false, error.message, null));
+    res.send(new ApiResponse(false, error.message, null));
   }
 });
 

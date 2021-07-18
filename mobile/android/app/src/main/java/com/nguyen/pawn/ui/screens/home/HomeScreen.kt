@@ -1,6 +1,5 @@
 package com.nguyen.pawn.ui.screens
 
-import android.nfc.Tag
 import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.*
@@ -33,7 +32,7 @@ import com.nguyen.pawn.model.User
 import com.nguyen.pawn.ui.components.home.ChooseLanguagesHeader
 import com.nguyen.pawn.ui.components.home.LanguageItem
 import com.nguyen.pawn.ui.theme.*
-import com.nguyen.pawn.ui.viewmodels.AuthViewModel
+import com.nguyen.pawn.ui.screens.auth.AuthViewModel
 import com.nguyen.pawn.ui.viewmodels.LanguageViewModel
 import com.nguyen.pawn.ui.viewmodels.WordViewModel
 import com.nguyen.pawn.util.Constants.supportedLanguages
@@ -61,19 +60,17 @@ fun HomeScreen(
     val words: ArrayList<Word> by wordViewModel.dailyWords
 
     val savedWords: ArrayList<Word> by wordViewModel.savedWords
-    val pickedLanguages: List<Language>? by languageViewModel.pickedLanguages
-    val tempPickedLanguages: ArrayList<Language>? by languageViewModel.tempPickedLanguages
+    val pickedLanguages: List<Language> by languageViewModel.pickedLanguages
+    val tempPickedLanguages: ArrayList<Language> by languageViewModel.displayPickedLanguages
     val currentPickedLanguage: Language? by languageViewModel.currentPickedLanguage
     val user: User? by authViewModel.user.observeAsState()
-    var showAddLanguageMenu by remember { mutableStateOf(pickedLanguages?.isEmpty() ?: true) }
+    var showAddLanguageMenu by remember { mutableStateOf(pickedLanguages.isEmpty()) }
 
 
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = words.size)
     val context = LocalContext.current
     val homeScaffoldState: ScaffoldState = rememberScaffoldState()
-
-
 
 
     LaunchedEffect(null) {
@@ -88,14 +85,10 @@ fun HomeScreen(
 
     LaunchedEffect(pickedLanguages) {
         Log.d(TAG, "menu")
-        showAddLanguageMenu = pickedLanguages?.isEmpty() ?: false
+        showAddLanguageMenu = pickedLanguages.isEmpty() ?: false
+        Log.d(TAG, "menu $showAddLanguageMenu")
     }
 
-//    LaunchedEffect(user) {
-//
-//    }
-
-    if(pickedLanguages == null) return
 
     Surface(
         color = AlmostBlack,
@@ -128,11 +121,11 @@ fun HomeScreen(
                         LazyColumn(Modifier.padding(bottom = 50.dp)) {
                             if (showAddLanguageMenu) {
                                 item {
-                                    ChooseLanguagesHeader(pickedLanguages = tempPickedLanguages!!) {
+                                    ChooseLanguagesHeader(pickedLanguages = tempPickedLanguages) {
                                         coroutineScope.launch {
                                             showAddLanguageMenu = false
                                             languageViewModel.savePickedLanguages(
-                                                tempPickedLanguages!!,
+                                                tempPickedLanguages,
                                                 getAccessTokenFromDataStore(context)
                                             )
                                         }

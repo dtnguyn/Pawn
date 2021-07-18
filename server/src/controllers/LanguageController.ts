@@ -41,5 +41,7 @@ export const getLearningLanguages = async (userId: string) => {
     .where("user.id = :userId", { userId })
     .getOne();
 
-  return user?.learningLanguages ?? [];
+  if (!user) return [];
+
+  return user.learningLanguages;
 };

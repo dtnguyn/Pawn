@@ -33,43 +33,40 @@ class SharedViewModel
 
     /** STATES */
 
-    /** These states are for authentication data */
-
+    /** This is the current user (null when no user is logged in) */
     private val _user = mutableStateOf<User?>(null)
     val user: State<User?> = _user
 
-    /** These states are for picked learning languages */
-
-    // The current language that the app is on
+    /** The current language that the app is on */
     private val _currentPickedLanguage: MutableState<Language?> = mutableStateOf(null)
     val currentPickedLanguage: State<Language?> = _currentPickedLanguage
 
-    // The list of languages that user wants to learn
+    /** The list of languages that user wants to learn */
     private val _pickedLanguages: MutableState<List<Language>?> = mutableStateOf(null)
     val pickedLanguages: State<List<Language>?> = _pickedLanguages
 
-    // The list of languages that user wants to learn (this list is used when user is choosing languages)
+    /** The list of languages that user wants to learn (this list is used when user is choosing languages) */
     private val _displayPickedLanguages: MutableState<ArrayList<Language>> = mutableStateOf(arrayListOf())
     val displayPickedLanguages: State<ArrayList<Language>> = _displayPickedLanguages
 
-    // A hash map that helps update picked languages quicker
-    private val pickedLanguageMap = HashMap<String, Boolean>()
-
-
-    /** These states are for saved words and daily random words */
-
-    // This is a list of words that user saved
+    /** This is a list of words that user saved */
     private val _savedWords: MutableState<ArrayList<Word>> = mutableStateOf(arrayListOf())
     val savedWords: State<ArrayList<Word>> = _savedWords
 
-    // A hash map that helps update saved words quicker
+    /** A hash map that helps update saved words quicker */
     private val savedWordMap = HashMap<String, Boolean>()
+
+    /** A hash map that helps update picked languages quicker */
+    private val pickedLanguageMap = HashMap<String, Boolean>()
+
 
 
     /** INTENTS */
 
     /** Auth intents*/
 
+    /** Get the current user using token, set
+     *  the current user null if not logged in */
     fun getUser(accessToken: String?, refreshToken: String?) {
         if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) {
             _user.value = null
@@ -83,6 +80,8 @@ class SharedViewModel
         }
     }
 
+    /** Call api to get rid of the refresh token,
+     * then set the current user to null */
     fun logout(refreshToken: String?) {
         viewModelScope.launch {
             if (refreshToken != null) {

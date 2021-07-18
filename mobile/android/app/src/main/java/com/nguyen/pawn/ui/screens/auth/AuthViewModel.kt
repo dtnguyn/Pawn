@@ -37,7 +37,7 @@ class AuthViewModel
 
     /** INTENTS */
 
-    
+
     fun registerAccount(
         email: String,
         username: String,

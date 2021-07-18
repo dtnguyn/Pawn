@@ -23,7 +23,6 @@ import com.nguyen.pawn.ui.components.DailyWordSection
 import com.nguyen.pawn.ui.components.HomeAppBar
 import com.nguyen.pawn.ui.components.RoundButton
 import com.nguyen.pawn.ui.components.SavedWordItem
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -33,13 +32,12 @@ import com.nguyen.pawn.ui.SharedViewModel
 import com.nguyen.pawn.ui.components.home.ChooseLanguagesHeader
 import com.nguyen.pawn.ui.components.home.LanguageItem
 import com.nguyen.pawn.ui.theme.*
-import com.nguyen.pawn.ui.screens.auth.AuthViewModel
 import com.nguyen.pawn.ui.screens.home.HomeViewModel
-import com.nguyen.pawn.ui.viewmodels.LanguageViewModel
-import com.nguyen.pawn.ui.viewmodels.WordViewModel
+
 import com.nguyen.pawn.util.Constants.supportedLanguages
 import com.nguyen.pawn.util.DataStoreUtils.getAccessTokenFromDataStore
 import com.nguyen.pawn.util.DataStoreUtils.getRefreshTokenFromDataStore
+import com.nguyen.pawn.util.UIState
 import com.nguyen.pawn.util.UtilFunctions.convertHeightToDp
 import com.nguyen.pawn.util.UtilFunctions.generateFlagForLanguage
 import kotlinx.coroutines.launch
@@ -61,17 +59,19 @@ fun HomeScreen(
     val words: ArrayList<Word> by homeViewModel.dailyWords
 
     val savedWords: ArrayList<Word> by sharedViewModel.savedWords
-    val pickedLanguages: List<Language> by sharedViewModel.pickedLanguages
-    val tempPickedLanguages: ArrayList<Language> by sharedViewModel.displayPickedLanguages
+    val pickedLanguages: List<Language>? by sharedViewModel.pickedLanguages
+    val displayPickedLanguages: ArrayList<Language> by sharedViewModel.displayPickedLanguages
     val currentPickedLanguage: Language? by sharedViewModel.currentPickedLanguage
     val user: User? by sharedViewModel.user
-    var showAddLanguageMenu by remember { mutableStateOf(pickedLanguages.isEmpty()) }
+    var showAddLanguageMenu by remember { mutableStateOf(pickedLanguages?.isEmpty() ?: true) }
+    val uiState: UIState by homeViewModel.uiState
 
 
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = words.size)
     val context = LocalContext.current
     val homeScaffoldState: ScaffoldState = rememberScaffoldState()
+    var isLoading by remember { mutableStateOf(true) }
 
 
     LaunchedEffect(null) {
@@ -80,11 +80,30 @@ fun HomeScreen(
     }
 
     LaunchedEffect(pickedLanguages) {
-        Log.d(TAG, "menu")
-        showAddLanguageMenu = pickedLanguages.isEmpty() ?: false
-        Log.d(TAG, "menu $showAddLanguageMenu")
+        if(pickedLanguages == null)
+            homeViewModel.turnOnLoading()
+        else {
+            showAddLanguageMenu = pickedLanguages!!.isEmpty()
+            homeViewModel.turnOffLoading()
+        }
     }
 
+    LaunchedEffect(uiState) {
+        when(uiState){
+            is UIState.Idle -> {
+                isLoading = false
+            }
+            is UIState.Loading -> {
+                isLoading = true
+            }
+            is UIState.Error -> {
+                // Display error message to user
+
+            }
+        }
+    }
+
+    if(isLoading) return
 
     Surface(
         color = AlmostBlack,
@@ -117,11 +136,11 @@ fun HomeScreen(
                         LazyColumn(Modifier.padding(bottom = 50.dp)) {
                             if (showAddLanguageMenu) {
                                 item {
-                                    ChooseLanguagesHeader(pickedLanguages = tempPickedLanguages) {
+                                    ChooseLanguagesHeader(pickedLanguages = displayPickedLanguages) {
                                         coroutineScope.launch {
                                             showAddLanguageMenu = false
                                             sharedViewModel.savePickedLanguages(
-                                                tempPickedLanguages,
+                                                displayPickedLanguages,
                                                 getAccessTokenFromDataStore(context)
                                             )
                                         }
@@ -132,7 +151,7 @@ fun HomeScreen(
                                 items(supportedLanguages.size) { index ->
                                     LanguageItem(
                                         language = supportedLanguages[index],
-                                        isPicked = tempPickedLanguages!!.filter {
+                                        isPicked = displayPickedLanguages!!.filter {
                                             it.id == supportedLanguages[index].id
                                         }.size == 1
                                     ) { language ->
@@ -152,7 +171,7 @@ fun HomeScreen(
                                             ),
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            pickedLanguages!!.forEach { language ->
+                                            displayPickedLanguages.forEach { language ->
                                                 Image(
                                                     painter = painterResource(
                                                         id = generateFlagForLanguage(

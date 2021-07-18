@@ -66,7 +66,14 @@ class LanguageRepository
                 }
             }
             if(response.status) {
-                response.data
+                val languages = response.data
+                val cacheLanguages = languages.map {language ->
+                    LanguageCacheEntity(id = language.id, value = language.value)
+                }
+                database.languageDao().clearAll()
+                database.languageDao().insertMany(cacheLanguages)
+
+                languages
             } else {
                 val cacheLanguages = database.languageDao().getMany()
 

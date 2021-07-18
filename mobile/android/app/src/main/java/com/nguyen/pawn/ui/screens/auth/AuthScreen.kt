@@ -60,7 +60,7 @@ fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, n
     val languages = listOf("vie", "eng")
     val context = LocalContext.current
     val token: Token by authViewModel.token
-    val uiState: UIState? by authViewModel.uiState.observeAsState()
+    val uiState: UIState? by authViewModel.uiState
     var errorMsg by remember { mutableStateOf("") }
 
 
@@ -72,6 +72,7 @@ fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, n
         DataStoreUtils.saveAccessTokenToAuthDataStore(context, authViewModel.token.value.accessToken)
         DataStoreUtils.saveRefreshTokenToAuthDataStore(context, authViewModel.token.value.refreshToken)
         if (token.accessToken != null && token.refreshToken != null) {
+            sharedViewModel.getUser(token.accessToken, token.refreshToken)
             navController.navigate("home") {
                 popUpTo("home") { inclusive = true }
             }

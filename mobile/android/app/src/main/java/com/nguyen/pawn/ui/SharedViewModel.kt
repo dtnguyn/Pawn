@@ -45,8 +45,8 @@ class SharedViewModel
     val currentPickedLanguage: State<Language?> = _currentPickedLanguage
 
     // The list of languages that user wants to learn
-    private val _pickedLanguages: MutableState<List<Language>> = mutableStateOf(listOf())
-    val pickedLanguages: State<List<Language>> = _pickedLanguages
+    private val _pickedLanguages: MutableState<List<Language>?> = mutableStateOf(null)
+    val pickedLanguages: State<List<Language>?> = _pickedLanguages
 
     // The list of languages that user wants to learn (this list is used when user is choosing languages)
     private val _displayPickedLanguages: MutableState<ArrayList<Language>> = mutableStateOf(arrayListOf())

@@ -19,9 +19,7 @@ import com.google.accompanist.pager.PagerState
 import com.nguyen.pawn.R
 import com.nguyen.pawn.model.Word
 import com.nguyen.pawn.ui.SharedViewModel
-import com.nguyen.pawn.ui.screens.home.HomeViewModel
 import com.nguyen.pawn.ui.theme.*
-import com.nguyen.pawn.ui.viewmodels.WordViewModel
 import kotlinx.coroutines.launch
 
 @ExperimentalAnimationApi

@@ -15,25 +15,29 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+/** This viewModel contains states
+ *  for Auth screen */
+
 @HiltViewModel
 class AuthViewModel
 @Inject constructor(
     private val authRepo: AuthRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableLiveData<UIState>(UIState.Idle)
-    val uiState: LiveData<UIState> = _uiState
+    /** STATES */
 
-//    private val _accessToken = MutableLiveData<String?>(null)
-//    val accessToken: LiveData<String?> = _accessToken
-//
-//    private val _refreshToken = MutableLiveData<String?>(null)
-//    val refreshToken: LiveData<String?> = _refreshToken
+    // This state is used for displaying loading animation or error dialog
+    private val _uiState = mutableStateOf<UIState>(UIState.Idle)
+    val uiState: State<UIState> = _uiState
 
-    private val _token = mutableStateOf<Token>(Token(null, null))
+    // This state is used for pushing the user to home screen after login
+    private val _token = mutableStateOf(Token(null, null))
     val token: State<Token> = _token
 
 
+    /** INTENTS */
+
+    
     fun registerAccount(
         email: String,
         username: String,
@@ -86,45 +90,12 @@ class AuthViewModel
     }
 
 
-//    fun checkAuthStatus(accessToken: String?, refreshToken: String?) {
-//        viewModelScope.launch {
-//            if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) {
-//                return@launch
-//            }
-//            turnOnLoading()
-//            val user = authRepo.checkAuthStatus(accessToken)
-//            if (user != null) {
-//                turnOffLoading()
-//                withContext(Main) {
-//                    _token.value = Token(accessToken, refreshToken)
-//                }
-//            } else {
-//                val newAccessToken = authRepo.refreshAccessToken(refreshToken)
-//                turnOffLoading()
-//                withContext(Main) {
-//                    _token.value = Token(newAccessToken, refreshToken)
-//                }
-//            }
-//        }
-//    }
-//
-//    fun logout(refreshToken: String?) {
-//        viewModelScope.launch {
-//            if (refreshToken != null) {
-//                authRepo.logout(refreshToken)
-//            }
-//            withContext(Main) {
-//                _user.value = null
-//                _accessToken.value = null
-//                _refreshToken.value = null
-//            }
-//        }
-//    }
-
     fun clearError() {
         _uiState.value = UIState.Idle
     }
 
+
+    /** HELPER FUNCTIONS */
 
     private suspend fun turnOnLoading() {
         withContext(Main) {

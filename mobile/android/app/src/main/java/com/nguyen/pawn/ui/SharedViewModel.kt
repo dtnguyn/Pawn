@@ -31,7 +31,7 @@ class SharedViewModel
     private val languageRepo: LanguageRepository
 ) : ViewModel() {
 
-    /** STATES */
+    /** ---STATES--- */
 
     /** This is the current user (null when no user is logged in) */
     private val _user = mutableStateOf<User?>(null)
@@ -61,7 +61,7 @@ class SharedViewModel
 
 
 
-    /** INTENTS */
+    /** ---INTENTS--- */
 
     /** Auth intents*/
 
@@ -175,6 +175,7 @@ class SharedViewModel
             savedWordMap[word.id] = true
         }
     }
+
 
     /** A helper function to check if the word is in the map */
     fun checkIsSaved(wordId: String): Boolean {

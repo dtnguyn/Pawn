@@ -1,6 +1,5 @@
 package com.nguyen.pawn.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -22,7 +21,6 @@ import com.nguyen.pawn.ui.components.auth.Login
 import com.nguyen.pawn.util.AuthTab
 import com.nguyen.pawn.util.UtilFunctions.convertHeightToDp
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.draw.clip
 import com.nguyen.pawn.model.Token
 import com.nguyen.pawn.ui.SharedViewModel
@@ -31,43 +29,64 @@ import com.nguyen.pawn.ui.components.auth.LanguageBottomSheetContent
 import com.nguyen.pawn.ui.components.auth.Register
 import com.nguyen.pawn.ui.theme.*
 import com.nguyen.pawn.ui.screens.auth.AuthViewModel
+import com.nguyen.pawn.util.Constants.allLanguages
 import com.nguyen.pawn.util.DataStoreUtils
 import com.nguyen.pawn.util.DataStoreUtils.getAccessTokenFromDataStore
 import com.nguyen.pawn.util.DataStoreUtils.getRefreshTokenFromDataStore
 import com.nguyen.pawn.util.UIState
 import kotlinx.coroutines.launch
 
+const val TAG = "AuthScreen"
+
 @ExperimentalMaterialApi
 @Composable
 fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, navController: NavController) {
 
-    val TAG = "AuthScreen"
 
-    val deviceWidthDp = (convertHeightToDp(
-        LocalContext.current.resources.displayMetrics.widthPixels,
-        LocalContext.current.resources.displayMetrics
-    ))
+    /**   ---STATES---   */
 
+    /** States from AuthViewModel */
+    val token: Token by authViewModel.token
+
+
+    /** States for the app UI */
+    val uiState: UIState? by authViewModel.uiState
+    var errorMsg by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+
+    var nativeLanguage by remember { mutableStateOf("") }
     var currentTab by remember { mutableStateOf(AuthTab.LOGIN) }
 
+
+    /** Compose state */
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(
             initialValue = BottomSheetValue.Collapsed,
         )
     )
     val coroutineScope = rememberCoroutineScope()
-    var nativeLanguage by remember { mutableStateOf("") }
-    val languages = listOf("vie", "eng")
+
+
+    /** Helper variables */
+    val deviceWidthDp = (convertHeightToDp(
+        LocalContext.current.resources.displayMetrics.widthPixels,
+        LocalContext.current.resources.displayMetrics
+    ))
     val context = LocalContext.current
-    val token: Token by authViewModel.token
-    val uiState: UIState? by authViewModel.uiState
-    var errorMsg by remember { mutableStateOf("") }
 
 
+
+    /**   ---OBSERVERS---   */
+
+    /** Initialize the token with the token
+     * value stored in DataStore */
     LaunchedEffect(null) {
         authViewModel.initializeToken(getAccessTokenFromDataStore(context), getRefreshTokenFromDataStore(context))
     }
 
+    /** Whenever the token changes, store it in DataStore,
+     * then if the token is not null then get the current
+     * logged user and move to home screen*/
     LaunchedEffect(token) {
         DataStoreUtils.saveAccessTokenToAuthDataStore(context, authViewModel.token.value.accessToken)
         DataStoreUtils.saveRefreshTokenToAuthDataStore(context, authViewModel.token.value.refreshToken)
@@ -79,14 +98,18 @@ fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, n
         }
     }
 
+    /** Whenever the uiState changes, Update the UI so that
+     * the user can tell the app is loading, error or idle */
     LaunchedEffect(uiState) {
         when(uiState){
             is UIState.Idle -> {
                 // Hide loading animation and error dialog
                 errorMsg = ""
+                isLoading = false
             }
             is UIState.Loading -> {
                 // Display loading animation
+                isLoading = true
             }
             is UIState.Error -> {
                 // Display error message to user
@@ -95,6 +118,11 @@ fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, n
         }
     }
 
+
+
+    /**   ---HELPER FUNCTIONS---   */
+
+    /** Expand or collapse the bottom sheet view */
     fun toggleBottomSheet() {
         coroutineScope.launch {
             if (bottomSheetScaffoldState.bottomSheetState.isCollapsed) {
@@ -105,12 +133,16 @@ fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, n
         }
     }
 
+
+
+    /**   ---COMPOSE UI---   */
+
     BottomSheetScaffold(
         backgroundColor = Color.White,
         sheetPeekHeight = 0.dp,
         sheetContent = {
             LanguageBottomSheetContent(
-                languages = languages,
+                languages = allLanguages,
                 onLanguageClick = { language ->
                     nativeLanguage = language
                     toggleBottomSheet()
@@ -261,7 +293,7 @@ fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, n
                 title = "Whoops!",
                 content = errorMsg,
                 icon = R.drawable.error,
-                onDismiss = { authViewModel.clearError() }
+                onDismiss = { coroutineScope.launch { authViewModel.goToIdle() } }
             )
         }
     }

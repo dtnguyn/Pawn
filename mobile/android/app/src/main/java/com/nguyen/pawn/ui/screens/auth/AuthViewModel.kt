@@ -24,20 +24,22 @@ class AuthViewModel
     private val authRepo: AuthRepository
 ) : ViewModel() {
 
-    /** STATES */
+    /** ---STATES--- */
 
-    // This state is used for displaying loading animation or error dialog
+    /** This state is used for displaying loading animation or error dialog */
     private val _uiState = mutableStateOf<UIState>(UIState.Idle)
     val uiState: State<UIState> = _uiState
 
-    // This state is used for pushing the user to home screen after login
+    /** This state is used for pushing the user to home screen after login */
     private val _token = mutableStateOf(Token(null, null))
     val token: State<Token> = _token
 
 
-    /** INTENTS */
+    /** ---INTENTS--- */
 
-
+    /** Check all the required inputs, emit errors if necessary,
+     * if not then create a new account, then if get null response then
+     * emit errors */
     fun registerAccount(
         email: String,
         username: String,
@@ -67,6 +69,9 @@ class AuthViewModel
         }
     }
 
+    /** Check required inputs, emit error if necessary,
+     * if not then login to account, if the token is null
+     * then emit error */
     fun login(emailOrUsername: String, password: String) {
         viewModelScope.launch {
             if (emailOrUsername.isBlank() || password.isBlank()) {
@@ -85,31 +90,28 @@ class AuthViewModel
         }
     }
 
+    /** Update the current state of auth token */
     fun initializeToken(accessToken: String?, refreshToken: String?){
         _token.value = Token(accessToken, refreshToken)
     }
 
 
-    fun clearError() {
-        _uiState.value = UIState.Idle
-    }
-
-
-    /** HELPER FUNCTIONS */
-
-    private suspend fun turnOnLoading() {
+    /** Set ui state to loading */
+    suspend fun turnOnLoading() {
         withContext(Main) {
             if (_uiState.value != UIState.Loading) _uiState.value = UIState.Loading
         }
     }
 
-    private suspend fun turnOffLoading() {
+    /** Set ui state to Idle  */
+    suspend fun goToIdle() {
         withContext(Main) {
             _uiState.value = UIState.Idle
         }
     }
 
-    private suspend fun emitError(errMsg: String) {
+    /** Set ui state to error  */
+    suspend fun emitError(errMsg: String) {
         withContext(Main) {
             _uiState.value = UIState.Error(errMsg)
         }

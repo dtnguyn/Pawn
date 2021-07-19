@@ -42,6 +42,7 @@ import com.nguyen.pawn.util.UtilFunctions.convertHeightToDp
 import com.nguyen.pawn.util.UtilFunctions.generateFlagForLanguage
 import kotlinx.coroutines.launch
 
+private const val TAG = "HomeScreen"
 
 @ExperimentalPagerApi
 @ExperimentalAnimationApi
@@ -54,31 +55,44 @@ fun HomeScreen(
     navController: NavController
 ) {
 
-    val TAG = "HomeScreen"
+    /**   ---STATES---   */
 
+    /** States from viewModel */
     val words: ArrayList<Word> by homeViewModel.dailyWords
-
     val savedWords: ArrayList<Word> by sharedViewModel.savedWords
     val pickedLanguages: List<Language>? by sharedViewModel.pickedLanguages
     val displayPickedLanguages: ArrayList<Language> by sharedViewModel.displayPickedLanguages
     val currentPickedLanguage: Language? by sharedViewModel.currentPickedLanguage
     val user: User? by sharedViewModel.user
-    var showAddLanguageMenu by remember { mutableStateOf(pickedLanguages?.isEmpty() ?: true) }
     val uiState: UIState by homeViewModel.uiState
 
+    /** Local ui states */
+    var showAddLanguageMenu by remember { mutableStateOf(pickedLanguages?.isEmpty() ?: true) }
+    var isLoading by remember { mutableStateOf(true) }
+    var errorMsg by remember { mutableStateOf("") }
 
+    /** Compose state */
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = words.size)
-    val context = LocalContext.current
     val homeScaffoldState: ScaffoldState = rememberScaffoldState()
-    var isLoading by remember { mutableStateOf(true) }
+
+    /** Helper variables */
+    val context = LocalContext.current
 
 
+
+    /**   ---OBSERVERS---   */
+
+    /** Initialize the user and get the current
+     * picked learning languages */
     LaunchedEffect(null) {
         sharedViewModel.getUser(getAccessTokenFromDataStore(context), getRefreshTokenFromDataStore(context))
         sharedViewModel.getPickedLanguages(getAccessTokenFromDataStore(context))
     }
 
+    /** Whenever picked languages change,
+     * if picked languages is null (initial trigger), display loading animation
+     * else (update trigger), show language menu if it's empty and hide loading animation*/
     LaunchedEffect(pickedLanguages) {
         if(pickedLanguages == null)
             homeViewModel.turnOnLoading()
@@ -88,6 +102,8 @@ fun HomeScreen(
         }
     }
 
+    /** Whenever the uiState changes, Update the UI so that
+     * the user can tell the app is loading, error or idle */
     LaunchedEffect(uiState) {
         when(uiState){
             is UIState.Idle -> {
@@ -98,10 +114,14 @@ fun HomeScreen(
             }
             is UIState.Error -> {
                 // Display error message to user
-
+                errorMsg = (uiState as UIState.Error).msg
             }
         }
     }
+
+
+    
+    /**   ---COMPOSE UI---   */
 
     if(isLoading) return
 

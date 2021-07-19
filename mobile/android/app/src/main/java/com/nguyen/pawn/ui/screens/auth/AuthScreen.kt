@@ -36,7 +36,7 @@ import com.nguyen.pawn.util.DataStoreUtils.getRefreshTokenFromDataStore
 import com.nguyen.pawn.util.UIState
 import kotlinx.coroutines.launch
 
-const val TAG = "AuthScreen"
+private const val TAG = "AuthScreen"
 
 @ExperimentalMaterialApi
 @Composable
@@ -47,10 +47,10 @@ fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, n
 
     /** States from AuthViewModel */
     val token: Token by authViewModel.token
-
-
-    /** States for the app UI */
     val uiState: UIState? by authViewModel.uiState
+
+
+    /** Local ui states */
     var errorMsg by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 

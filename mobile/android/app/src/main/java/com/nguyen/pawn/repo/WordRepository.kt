@@ -12,27 +12,28 @@ import io.ktor.client.*
 import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import java.net.ConnectException
 import javax.inject.Inject
 
 class WordRepository
 @Inject constructor(
     private val apiClient: HttpClient
-){
-
-    suspend fun getRandomDailyWord(wordCount: Int, language: String): List<Word>? {
-         return try {
-            val response: ApiResponse<List<Word>?> = apiClient.post("${apiURL}/word/daily") {
-                contentType(ContentType.Application.Json)
-                body = GetDailyWordsRequestBody(wordCount, language)
-            }
-             response.data
-        } catch (error: ClientRequestException) {
-            null
-        }
+) {
+    companion object {
+        private const val TAG = "WordRepo"
     }
 
-
-
-
-
+    suspend fun getRandomDailyWord(wordCount: Int, language: String): ArrayList<Word> {
+        return try {
+            val response: ApiResponse<ArrayList<Word>?> = apiClient.get("${apiURL}/word/daily?language=${language}&dailyWordCount=${wordCount}")
+            Log.d(TAG, "Response $language: $response")
+            arrayListOf()
+        } catch (error: ClientRequestException) {
+            Log.d(TAG, "getRandomDailyWord error: ${error.message}")
+            arrayListOf()
+        } catch (error: ConnectException) {
+            Log.d(TAG, "getRandomDailyWord error: ${error.message}")
+            arrayListOf()
+        }
+    }
 }

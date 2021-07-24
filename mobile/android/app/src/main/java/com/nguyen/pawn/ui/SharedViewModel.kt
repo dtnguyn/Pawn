@@ -165,14 +165,14 @@ class SharedViewModel
     /** If the word is saved, then remove it from map and list
      * else add it to the map and list */
     fun toggleSavedWord(word: Word) {
-        if (savedWordMap[word.id] == true) {
+        if (savedWordMap[word.value] == true) {
             _savedWords.value = _savedWords.value.filter { savedWord ->
-                savedWord.id != word.id
+                savedWord.value!= word.value
             } as ArrayList<Word>
-            savedWordMap[word.id] = false
+            savedWordMap[word.value] = false
         } else {
             _savedWords.value = (arrayListOf(word) + _savedWords.value) as ArrayList<Word>
-            savedWordMap[word.id] = true
+            savedWordMap[word.value] = true
         }
     }
 

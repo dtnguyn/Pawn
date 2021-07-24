@@ -1,7 +1,7 @@
 package com.nguyen.pawn.util
 
 sealed class UIState{
-    object Idle: UIState()
-    object Loading: UIState()
+    class Idle(val loadingOrError: UIState? = null): UIState()
+    class Loading(val type: LoadingType): UIState()
     class Error(val msg: String): UIState()
 }

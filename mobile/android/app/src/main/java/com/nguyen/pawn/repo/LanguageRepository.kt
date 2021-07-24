@@ -13,6 +13,7 @@ import io.ktor.client.*
 import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import java.net.ConnectException
 import javax.inject.Inject
 
 class LanguageRepository
@@ -52,7 +53,10 @@ class LanguageRepository
             }
 
         } catch (error: ClientRequestException) {
-            Log.d(TAG, "error: ${error.message}")
+            Log.d(TAG, "pickLearningLanguages error: ${error.message}")
+            false
+        } catch (error: ConnectException) {
+            Log.d(TAG, "pickLearningLanguages error: ${error.message}")
             false
         }
     }
@@ -84,8 +88,11 @@ class LanguageRepository
                 languages
             }
 
-        } catch (error: Exception) {
-            Log.d(TAG, "error: ${error.message}")
+        } catch (error: ClientRequestException) {
+            Log.d(TAG, "getLearningLanguages error: ${error.message}")
+            arrayListOf()
+        } catch (error: ConnectException) {
+            Log.d(TAG, "getLearningLanguages error: ${error.message}")
             arrayListOf()
         }
     }

@@ -30,43 +30,43 @@ import com.nguyen.pawn.ui.theme.*
 @Composable
 fun WordScreen(navController: NavController) {
 
-    val definitions = listOf(
-        Definition(
-            "1",
-            "Sprinkle or season (food) with pepper.",
-            "noun",
-            "season to taste with salt and pepper"
-        ),
-        Definition(
-            "2",
-            "Sprinkle or season (food) with pepper.",
-            "noun",
-            "season to taste with salt and pepper"
-        ),
-        Definition(
-            "3",
-            "Sprinkle or season (food) with pepper.",
-            "noun",
-            "season to taste with salt and pepper"
-        ),
-        Definition(
-            "4",
-            "Sprinkle or season (food) with pepper.",
-            "noun",
-            "season to taste with salt and pepper"
-        ),
-        Definition(
-            "5",
-            "Sprinkle or season (food) with pepper.",
-            "noun",
-            "season to taste with salt and pepper"
-        ),
-        Definition(
-            "6",
-            "Sprinkle or season (food) with pepper.",
-            "noun",
-            "season to taste with salt and pepper"
-        ),
+    val definitions = listOf<Definition>(
+//        Definition(
+//            "1",
+//            "Sprinkle or season (food) with pepper.",
+//            "noun",
+//            "season to taste with salt and pepper"
+//        ),
+//        Definition(
+//            "2",
+//            "Sprinkle or season (food) with pepper.",
+//            "noun",
+//            "season to taste with salt and pepper"
+//        ),
+//        Definition(
+//            "3",
+//            "Sprinkle or season (food) with pepper.",
+//            "noun",
+//            "season to taste with salt and pepper"
+//        ),
+//        Definition(
+//            "4",
+//            "Sprinkle or season (food) with pepper.",
+//            "noun",
+//            "season to taste with salt and pepper"
+//        ),
+//        Definition(
+//            "5",
+//            "Sprinkle or season (food) with pepper.",
+//            "noun",
+//            "season to taste with salt and pepper"
+//        ),
+//        Definition(
+//            "6",
+//            "Sprinkle or season (food) with pepper.",
+//            "noun",
+//            "season to taste with salt and pepper"
+//        ),
     )
 
     val lazyListState = rememberLazyListState()

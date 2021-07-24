@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nguyen.pawn.model.Token
 import com.nguyen.pawn.repo.AuthRepository
+import com.nguyen.pawn.util.LoadingType
 import com.nguyen.pawn.util.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.Main
@@ -27,7 +28,7 @@ class AuthViewModel
     /** ---STATES--- */
 
     /** This state is used for displaying loading animation or error dialog */
-    private val _uiState = mutableStateOf<UIState>(UIState.Idle)
+    private val _uiState = mutableStateOf<UIState>(UIState.Idle())
     val uiState: State<UIState> = _uiState
 
     /** This state is used for pushing the user to home screen after login */
@@ -56,7 +57,7 @@ class AuthViewModel
                 emitError("Enter password again not match registered password!")
                 return@launch
             }
-            turnOnLoading()
+            turnOnLoading(LoadingType.AUTH_LOADING)
             val response = authRepo.register(email, username, password, nativeLanguage)
 
             if (response != null) {
@@ -78,7 +79,7 @@ class AuthViewModel
                 emitError("Please enter all the required information!")
                 return@launch
             }
-            turnOnLoading()
+            turnOnLoading(LoadingType.AUTH_LOADING)
             val response = authRepo.login(emailOrUsername, password)
             if (response != null) {
                 withContext(Main) {
@@ -97,16 +98,16 @@ class AuthViewModel
 
 
     /** Set ui state to loading */
-    suspend fun turnOnLoading() {
+    suspend fun turnOnLoading(type: LoadingType) {
         withContext(Main) {
-            if (_uiState.value != UIState.Loading) _uiState.value = UIState.Loading
+            if (_uiState.value !is UIState.Loading) _uiState.value = UIState.Loading(type)
         }
     }
 
     /** Set ui state to Idle  */
-    suspend fun goToIdle() {
+    suspend fun goToIdle(from: UIState) {
         withContext(Main) {
-            _uiState.value = UIState.Idle
+            _uiState.value = UIState.Idle(from)
         }
     }
 

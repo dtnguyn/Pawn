@@ -56,8 +56,8 @@ fun DailyWordSection(
 
                 DailyWordCard(
                     word = words[page].value,
-                    definition = words[page].definition,
-                    pronunciation = words[page].pronunciation,
+                    definition = words[page].definitions[0].meaning,
+                    pronunciation = words[page].pronunciations[0].symbol,
                     onClick = {
                         navController.navigate("Word")
 
@@ -89,7 +89,7 @@ fun DailyWordSection(
 //                    viewModel.removeDailyWords(words[pagerState.currentPage].id)
 
                 }
-                if(viewModel.checkIsSaved(words[pagerState.currentPage].id)){
+                if(viewModel.checkIsSaved(words[pagerState.currentPage].value)){
                     RoundedSquareButton(LightRed, R.drawable.heart_red , onClick = {
                         isSaved.value = !isSaved.value
                         viewModel.toggleSavedWord(words[pagerState.currentPage])

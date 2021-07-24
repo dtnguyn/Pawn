@@ -1,6 +1,5 @@
 package com.nguyen.pawn.ui.screens
 
-import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -37,6 +36,8 @@ import com.nguyen.pawn.ui.screens.home.HomeViewModel
 import com.nguyen.pawn.util.Constants.supportedLanguages
 import com.nguyen.pawn.util.DataStoreUtils.getAccessTokenFromDataStore
 import com.nguyen.pawn.util.DataStoreUtils.getRefreshTokenFromDataStore
+import com.nguyen.pawn.util.LoadingType
+import com.nguyen.pawn.util.SupportedLanguage
 import com.nguyen.pawn.util.UIState
 import com.nguyen.pawn.util.UtilFunctions.convertHeightToDp
 import com.nguyen.pawn.util.UtilFunctions.generateFlagForLanguage
@@ -58,7 +59,10 @@ fun HomeScreen(
     /**   ---STATES---   */
 
     /** States from viewModel */
-    val words: ArrayList<Word> by homeViewModel.dailyWords
+    val dailyEnWords: ArrayList<Word> by homeViewModel.dailyEnWords
+    val dailyEsWords: ArrayList<Word> by homeViewModel.dailyEsWords
+    val dailyFrWords: ArrayList<Word> by homeViewModel.dailyFrWords
+    val dailyDeWords: ArrayList<Word> by homeViewModel.dailyDeWords
     val savedWords: ArrayList<Word> by sharedViewModel.savedWords
     val pickedLanguages: List<Language>? by sharedViewModel.pickedLanguages
     val displayPickedLanguages: ArrayList<Language> by sharedViewModel.displayPickedLanguages
@@ -68,13 +72,15 @@ fun HomeScreen(
 
     /** Local ui states */
     var showAddLanguageMenu by remember { mutableStateOf(pickedLanguages?.isEmpty() ?: true) }
-    var isLoading by remember { mutableStateOf(true) }
+    var isLoadingPickedLanguage by remember { mutableStateOf(true) }
+    var isLoadingUser by remember { mutableStateOf(true) }
+    var isLoadingDailyWords by remember { mutableStateOf(true) }
     var errorMsg by remember { mutableStateOf("") }
 
     /** Compose state */
     val coroutineScope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(pageCount = words.size)
     val homeScaffoldState: ScaffoldState = rememberScaffoldState()
+    val pagerState = rememberPagerState(pageCount = user?.dailyWordCount ?: 3)
 
     /** Helper variables */
     val context = LocalContext.current
@@ -86,8 +92,14 @@ fun HomeScreen(
     /** Initialize the user and get the current
      * picked learning languages */
     LaunchedEffect(null) {
+
         sharedViewModel.getUser(getAccessTokenFromDataStore(context), getRefreshTokenFromDataStore(context))
         sharedViewModel.getPickedLanguages(getAccessTokenFromDataStore(context))
+
+        homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, SupportedLanguage.ENGLISH.id)
+        homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, SupportedLanguage.SPANISH.id)
+        homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, SupportedLanguage.FRENCH.id)
+        homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, SupportedLanguage.GERMANY.id)
     }
 
     /** Whenever picked languages change,
@@ -95,10 +107,10 @@ fun HomeScreen(
      * else (update trigger), show language menu if it's empty and hide loading animation*/
     LaunchedEffect(pickedLanguages) {
         if(pickedLanguages == null)
-            homeViewModel.turnOnLoading()
+            homeViewModel.turnOnLoading(LoadingType.PICKED_LANGUAGE_LOADING)
         else {
             showAddLanguageMenu = pickedLanguages!!.isEmpty()
-            homeViewModel.turnOffLoading()
+            homeViewModel.goToIdle()
         }
     }
 
@@ -107,10 +119,24 @@ fun HomeScreen(
     LaunchedEffect(uiState) {
         when(uiState){
             is UIState.Idle -> {
-                isLoading = false
+                when((uiState as UIState.Idle).loadingOrError){
+                    is UIState.Error -> errorMsg = ""
+                    is UIState.Loading -> {
+                        when((uiState as UIState.Loading).type){
+                            LoadingType.AUTH_LOADING -> isLoadingUser = false
+                            LoadingType.PICKED_LANGUAGE_LOADING -> isLoadingPickedLanguage = false
+                            LoadingType.DAILY_WORDS_LOADING -> isLoadingDailyWords = false
+                        }
+                    }
+                }
+                isLoadingPickedLanguage = false
             }
             is UIState.Loading -> {
-                isLoading = true
+                when((uiState as UIState.Loading).type){
+                    LoadingType.AUTH_LOADING -> isLoadingUser = true
+                    LoadingType.PICKED_LANGUAGE_LOADING -> isLoadingPickedLanguage = true
+                    LoadingType.DAILY_WORDS_LOADING -> isLoadingDailyWords = true
+                }
             }
             is UIState.Error -> {
                 // Display error message to user
@@ -120,10 +146,33 @@ fun HomeScreen(
     }
 
 
-    
+
+    /**   ---HELPER FUNCTIONS---   */
+
+    fun dailyWords(): ArrayList<Word>{
+        if(currentPickedLanguage == null) return arrayListOf()
+        return when(currentPickedLanguage?.id){
+            SupportedLanguage.ENGLISH.id -> {
+                dailyEnWords
+            }
+            SupportedLanguage.SPANISH.id -> {
+                dailyEsWords
+            }
+            SupportedLanguage.FRENCH.id -> {
+                dailyFrWords
+            }
+            SupportedLanguage.GERMANY.id -> {
+                dailyDeWords
+            }
+            else -> arrayListOf()
+        }
+    }
+
+
+
     /**   ---COMPOSE UI---   */
 
-    if(isLoading) return
+    if(isLoadingPickedLanguage) return
 
     Surface(
         color = AlmostBlack,
@@ -232,7 +281,7 @@ fun HomeScreen(
                                         viewModel = sharedViewModel,
                                         pagerState = pagerState,
                                         navController = navController,
-                                        words = words,
+                                        words = dailyWords(),
                                     )
                                 }
                                 stickyHeader {
@@ -267,7 +316,7 @@ fun HomeScreen(
                                 items(savedWords.size) { index ->
                                     SavedWordItem(
                                         word = savedWords[index].value,
-                                        pronunciation = savedWords[index].pronunciation,
+                                        pronunciation = savedWords[index].pronunciations[0].symbol,
                                         index = index,
                                         onClick = {
                                             navController.navigate("word")

@@ -117,6 +117,7 @@ class SharedViewModel
      *  from network or room database */
     fun getPickedLanguages(accessToken: String?) {
         viewModelScope.launch {
+
             val languages = languageRepo.getLearningLanguages(accessToken)
             _pickedLanguages.value = languages
             _displayPickedLanguages.value = languages as ArrayList<Language>
@@ -156,7 +157,7 @@ class SharedViewModel
     /** This will update the current language picked
      * by the user */
     fun changeCurrentPickedLanguage(language: Language) {
-        _currentPickedLanguage.value = language
+        if(_currentPickedLanguage.value?.id != language.id) _currentPickedLanguage.value = language
     }
 
 

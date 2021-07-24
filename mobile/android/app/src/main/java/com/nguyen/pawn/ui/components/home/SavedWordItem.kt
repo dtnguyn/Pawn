@@ -18,7 +18,7 @@ import com.nguyen.pawn.util.UtilFunctions.generateColor
 
 @ExperimentalAnimationApi
 @Composable
-fun SavedWordItem(word: String, pronunciation: String, index: Int, onClick: () -> Unit) {
+fun SavedWordItem(word: String, pronunciation: String?, index: Int, onClick: () -> Unit) {
 
     AnimatedVisibility(
         visible = true,
@@ -43,7 +43,7 @@ fun SavedWordItem(word: String, pronunciation: String, index: Int, onClick: () -
             ) {
                 Column {
                     Text(text = word, style = Typography.body1)
-                    Text(text = pronunciation, style = Typography.body2)
+                    Text(text = pronunciation ?: "", style = Typography.body2)
                 }
 
                 RoundButton(backgroundColor = Color.White, size = 45.dp, icon = R.drawable.speaker) {

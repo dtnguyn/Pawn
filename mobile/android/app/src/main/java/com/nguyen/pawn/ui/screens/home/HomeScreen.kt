@@ -1,5 +1,6 @@
 package com.nguyen.pawn.ui.screens
 
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -81,10 +82,14 @@ fun HomeScreen(
     val coroutineScope = rememberCoroutineScope()
     val homeScaffoldState: ScaffoldState = rememberScaffoldState()
     val pagerState = rememberPagerState(pageCount = user?.dailyWordCount ?: 3)
+    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = rememberBottomSheetState(
+            initialValue = BottomSheetValue.Collapsed,
+        )
+    )
 
     /** Helper variables */
     val context = LocalContext.current
-
 
 
     /**   ---OBSERVERS---   */
@@ -93,46 +98,55 @@ fun HomeScreen(
      * picked learning languages */
     LaunchedEffect(null) {
 
-        sharedViewModel.getUser(getAccessTokenFromDataStore(context), getRefreshTokenFromDataStore(context))
+        sharedViewModel.getUser(
+            getAccessTokenFromDataStore(context),
+            getRefreshTokenFromDataStore(context)
+        )
+
+        homeViewModel.turnOnLoading(LoadingType.PICKED_LANGUAGE_LOADING)
         sharedViewModel.getPickedLanguages(getAccessTokenFromDataStore(context))
 
-        homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, SupportedLanguage.ENGLISH.id)
-        homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, SupportedLanguage.SPANISH.id)
-        homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, SupportedLanguage.FRENCH.id)
-        homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, SupportedLanguage.GERMANY.id)
+
     }
 
     /** Whenever picked languages change,
-     * if picked languages is null (initial trigger), display loading animation
-     * else (update trigger), show language menu if it's empty and hide loading animation*/
+     * if picked languages is not null, show all the languages */
     LaunchedEffect(pickedLanguages) {
-        if(pickedLanguages == null)
-            homeViewModel.turnOnLoading(LoadingType.PICKED_LANGUAGE_LOADING)
-        else {
+        if (pickedLanguages != null) {
             showAddLanguageMenu = pickedLanguages!!.isEmpty()
-            homeViewModel.goToIdle()
+            homeViewModel.goToIdle(UIState.Loading(LoadingType.PICKED_LANGUAGE_LOADING))
+        }
+    }
+
+    /** Whenever the current picked languages change,
+     * if it is not null, then get the daily words of that language */
+    LaunchedEffect(currentPickedLanguage){
+        if (currentPickedLanguage != null){
+            Log.d(TAG, "Change language to $currentPickedLanguage")
+            homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, currentPickedLanguage!!.id)
         }
     }
 
     /** Whenever the uiState changes, Update the UI so that
      * the user can tell the app is loading, error or idle */
     LaunchedEffect(uiState) {
-        when(uiState){
+        when (uiState) {
             is UIState.Idle -> {
-                when((uiState as UIState.Idle).loadingOrError){
+                when (val loadingOrError = (uiState as UIState.Idle).loadingOrError) {
                     is UIState.Error -> errorMsg = ""
                     is UIState.Loading -> {
-                        when((uiState as UIState.Loading).type){
+                        when (loadingOrError.type) {
                             LoadingType.AUTH_LOADING -> isLoadingUser = false
                             LoadingType.PICKED_LANGUAGE_LOADING -> isLoadingPickedLanguage = false
                             LoadingType.DAILY_WORDS_LOADING -> isLoadingDailyWords = false
                         }
                     }
+                    else -> {
+                    } // If idle is not from loading or error, do nothing
                 }
-                isLoadingPickedLanguage = false
             }
             is UIState.Loading -> {
-                when((uiState as UIState.Loading).type){
+                when ((uiState as UIState.Loading).type) {
                     LoadingType.AUTH_LOADING -> isLoadingUser = true
                     LoadingType.PICKED_LANGUAGE_LOADING -> isLoadingPickedLanguage = true
                     LoadingType.DAILY_WORDS_LOADING -> isLoadingDailyWords = true
@@ -149,9 +163,10 @@ fun HomeScreen(
 
     /**   ---HELPER FUNCTIONS---   */
 
-    fun dailyWords(): ArrayList<Word>{
-        if(currentPickedLanguage == null) return arrayListOf()
-        return when(currentPickedLanguage?.id){
+    fun dailyWords(): ArrayList<Word> {
+        Log.d(TAG, "Trigger")
+        if (currentPickedLanguage == null) return arrayListOf()
+        return when (currentPickedLanguage?.id) {
             SupportedLanguage.ENGLISH.id -> {
                 dailyEnWords
             }
@@ -169,10 +184,7 @@ fun HomeScreen(
     }
 
 
-
     /**   ---COMPOSE UI---   */
-
-    if(isLoadingPickedLanguage) return
 
     Surface(
         color = AlmostBlack,
@@ -185,11 +197,7 @@ fun HomeScreen(
 
         ) {
 
-            val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-                bottomSheetState = rememberBottomSheetState(
-                    initialValue = BottomSheetValue.Collapsed,
-                )
-            )
+
             BottomSheetScaffold(
                 sheetShape = RoundedCornerShape(topStart = 60.dp, topEnd = 60.dp),
                 sheetContent = {
@@ -201,131 +209,133 @@ fun HomeScreen(
                         elevation = 10.dp,
 
                         ) {
-
-                        LazyColumn(Modifier.padding(bottom = 50.dp)) {
-                            if (showAddLanguageMenu) {
-                                item {
-                                    ChooseLanguagesHeader(pickedLanguages = displayPickedLanguages) {
-                                        coroutineScope.launch {
-                                            showAddLanguageMenu = false
-                                            sharedViewModel.savePickedLanguages(
-                                                displayPickedLanguages,
-                                                getAccessTokenFromDataStore(context)
-                                            )
-                                        }
-
-                                    }
-                                }
-
-                                items(supportedLanguages.size) { index ->
-                                    LanguageItem(
-                                        language = supportedLanguages[index],
-                                        isPicked = displayPickedLanguages!!.filter {
-                                            it.id == supportedLanguages[index].id
-                                        }.size == 1
-                                    ) { language ->
-                                        sharedViewModel.togglePickedLanguage(language)
-                                    }
-                                }
-
-
-                            } else {
-                                if (pickedLanguages!!.isNotEmpty()) {
+                        if (!isLoadingPickedLanguage) {
+                            LazyColumn(Modifier.padding(bottom = 50.dp)) {
+                                if (showAddLanguageMenu) {
                                     item {
-                                        Row(
-                                            modifier = Modifier.padding(
-                                                start = 30.dp,
-                                                end = 30.dp,
-                                                top = 30.dp
-                                            ),
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            displayPickedLanguages.forEach { language ->
-                                                Image(
-                                                    painter = painterResource(
-                                                        id = generateFlagForLanguage(
-                                                            language.id
-                                                        )
-                                                    ),
-                                                    contentDescription = "language icon",
-                                                    modifier = Modifier
-                                                        .padding(horizontal = 5.dp)
-                                                        .size(if (language.id == currentPickedLanguage?.id) 46.dp else 38.dp)
-                                                        .clip(CircleShape)
-                                                        .border(
-                                                            if (language.id == currentPickedLanguage?.id) 3.dp else 0.dp,
-                                                            DarkBlue,
-                                                            CircleShape
-                                                        )
-                                                        .clickable {
-                                                            sharedViewModel.changeCurrentPickedLanguage(
-                                                                language
-                                                            )
-                                                        }
+                                        ChooseLanguagesHeader(pickedLanguages = displayPickedLanguages) {
+                                            coroutineScope.launch {
+                                                showAddLanguageMenu = false
+                                                sharedViewModel.savePickedLanguages(
+                                                    displayPickedLanguages,
+                                                    getAccessTokenFromDataStore(context)
                                                 )
                                             }
-                                            Spacer(modifier = Modifier.padding(horizontal = 5.dp))
-                                            RoundButton(
-                                                backgroundColor = Grey,
-                                                size = 38.dp,
-                                                icon = R.drawable.add_32_black
+
+                                        }
+                                    }
+
+                                    items(supportedLanguages.size) { index ->
+                                        LanguageItem(
+                                            language = supportedLanguages[index],
+                                            isPicked = displayPickedLanguages!!.filter {
+                                                it.id == supportedLanguages[index].id
+                                            }.size == 1
+                                        ) { language ->
+                                            sharedViewModel.togglePickedLanguage(language)
+                                        }
+                                    }
+
+
+                                } else {
+                                    if (pickedLanguages!!.isNotEmpty()) {
+                                        item {
+                                            Row(
+                                                modifier = Modifier.padding(
+                                                    start = 30.dp,
+                                                    end = 30.dp,
+                                                    top = 30.dp
+                                                ),
+                                                verticalAlignment = Alignment.CenterVertically
                                             ) {
-                                                showAddLanguageMenu = true
+                                                displayPickedLanguages.forEach { language ->
+                                                    Image(
+                                                        painter = painterResource(
+                                                            id = generateFlagForLanguage(
+                                                                language.id
+                                                            )
+                                                        ),
+                                                        contentDescription = "language icon",
+                                                        modifier = Modifier
+                                                            .padding(horizontal = 5.dp)
+                                                            .size(if (language.id == currentPickedLanguage?.id) 46.dp else 38.dp)
+                                                            .clip(CircleShape)
+                                                            .border(
+                                                                if (language.id == currentPickedLanguage?.id) 3.dp else 0.dp,
+                                                                DarkBlue,
+                                                                CircleShape
+                                                            )
+                                                            .clickable {
+                                                                sharedViewModel.changeCurrentPickedLanguage(
+                                                                    language
+                                                                )
+                                                            }
+                                                    )
+                                                }
+                                                Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+                                                RoundButton(
+                                                    backgroundColor = Grey,
+                                                    size = 38.dp,
+                                                    icon = R.drawable.add_32_black
+                                                ) {
+                                                    showAddLanguageMenu = true
+                                                }
                                             }
                                         }
                                     }
-                                }
 
-                                item {
-                                    DailyWordSection(
-                                        viewModel = sharedViewModel,
-                                        pagerState = pagerState,
-                                        navController = navController,
-                                        words = dailyWords(),
-                                    )
-                                }
-                                stickyHeader {
-                                    Column(
-                                        Modifier
-                                            .background(Color.White)
-                                            .padding(start = 30.dp, top = 20.dp)
-                                            .fillMaxWidth()
-                                    ) {
-                                        Text(
-                                            text = "Your saved words",
-                                            style = Typography.h6,
-                                            fontSize = 18.sp
+                                    item {
+                                        DailyWordSection(
+                                            viewModel = sharedViewModel,
+                                            pagerState = pagerState,
+                                            navController = navController,
+                                            words = dailyWords(),
                                         )
+                                    }
+                                    stickyHeader {
+                                        Column(
+                                            Modifier
+                                                .background(Color.White)
+                                                .padding(start = 30.dp, top = 20.dp)
+                                                .fillMaxWidth()
+                                        ) {
+                                            Text(
+                                                text = "Your saved words",
+                                                style = Typography.h6,
+                                                fontSize = 18.sp
+                                            )
 
-                                        Row(Modifier.padding(vertical = 5.dp)) {
-                                            RoundButton(
-                                                backgroundColor = Blue,
-                                                size = 32.dp,
-                                                icon = R.drawable.add,
-                                                onClick = {})
-                                            Spacer(modifier = Modifier.padding(horizontal = 5.dp))
-                                            RoundButton(
-                                                backgroundColor = Grey,
-                                                size = 32.dp,
-                                                icon = R.drawable.review,
-                                                onClick = {})
+                                            Row(Modifier.padding(vertical = 5.dp)) {
+                                                RoundButton(
+                                                    backgroundColor = Blue,
+                                                    size = 32.dp,
+                                                    icon = R.drawable.add,
+                                                    onClick = {})
+                                                Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+                                                RoundButton(
+                                                    backgroundColor = Grey,
+                                                    size = 32.dp,
+                                                    icon = R.drawable.review,
+                                                    onClick = {})
+                                            }
                                         }
+                                    }
+
+                                    items(savedWords.size) { index ->
+                                        SavedWordItem(
+                                            word = savedWords[index].value,
+                                            pronunciation = savedWords[index].pronunciations[0].symbol,
+                                            index = index,
+                                            onClick = {
+                                                navController.navigate("word")
+                                            }
+                                        )
                                     }
                                 }
 
-                                items(savedWords.size) { index ->
-                                    SavedWordItem(
-                                        word = savedWords[index].value,
-                                        pronunciation = savedWords[index].pronunciations[0].symbol,
-                                        index = index,
-                                        onClick = {
-                                            navController.navigate("word")
-                                        }
-                                    )
-                                }
                             }
-
                         }
+
                     }
                 },
                 scaffoldState = bottomSheetScaffoldState,

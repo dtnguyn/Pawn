@@ -27,7 +27,7 @@ class WordRepository
         return try {
             val response: ApiResponse<ArrayList<Word>?> = apiClient.get("${apiURL}/word/daily?language=${language}&dailyWordCount=${wordCount}")
             Log.d(TAG, "Response $language: $response")
-            arrayListOf()
+            response.data ?: arrayListOf()
         } catch (error: ClientRequestException) {
             Log.d(TAG, "getRandomDailyWord error: ${error.message}")
             arrayListOf()

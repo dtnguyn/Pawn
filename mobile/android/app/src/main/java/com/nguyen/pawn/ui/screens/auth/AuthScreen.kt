@@ -293,7 +293,7 @@ fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, n
                 title = "Whoops!",
                 content = errorMsg,
                 icon = R.drawable.error,
-                onDismiss = { coroutineScope.launch { authViewModel.goToIdle() } }
+                onDismiss = { coroutineScope.launch { authViewModel.goToIdle(UIState.Error(errorMsg)) } }
             )
         }
     }

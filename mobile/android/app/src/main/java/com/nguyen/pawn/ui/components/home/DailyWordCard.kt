@@ -1,5 +1,6 @@
 package com.nguyen.pawn.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,8 +21,10 @@ import com.nguyen.pawn.ui.theme.Blue
 import com.nguyen.pawn.ui.theme.ReallyRed
 import com.nguyen.pawn.ui.theme.Typography
 
+private const val TAG = "DailyWordCard"
+
 @Composable
-fun DailyWordCard(word: String, definition: String, pronunciation: String, onClick: () -> Unit) {
+fun DailyWordCard(word: String, definition: String, pronunciation: String?, onClick: () -> Unit) {
 
     Box(Modifier.padding(horizontal = 30.dp)) {
         Card(
@@ -37,7 +40,7 @@ fun DailyWordCard(word: String, definition: String, pronunciation: String, onCli
                 Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                     Column {
                         Text(text = word, style = Typography.h1, color = Color.White)
-                        Text(text = pronunciation, style = Typography.body2, color = Color.White)
+                        Text(text = pronunciation ?: "", style = Typography.body2, color = Color.White)
                     }
                     RoundButton(backgroundColor = Color.White, size = 45.dp, icon = R.drawable.speaker, onClick = {})
                 }

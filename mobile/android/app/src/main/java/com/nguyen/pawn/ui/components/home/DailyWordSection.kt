@@ -1,5 +1,6 @@
 package com.nguyen.pawn.ui.components
 
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
@@ -22,6 +23,8 @@ import com.nguyen.pawn.ui.SharedViewModel
 import com.nguyen.pawn.ui.theme.*
 import kotlinx.coroutines.launch
 
+private const val TAG = "DailyWordSection"
+
 @ExperimentalAnimationApi
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -32,8 +35,10 @@ fun DailyWordSection(
     words: ArrayList<Word>
 ) {
 
+
     val coroutineScope = rememberCoroutineScope()
     val isSaved = remember { mutableStateOf(false)}
+
 
     if (words.size > 0)
         Column {
@@ -56,7 +61,7 @@ fun DailyWordSection(
 
                 DailyWordCard(
                     word = words[page].value,
-                    definition = words[page].definitions[0].meaning,
+                    definition = words[page].definitions[0].meaning ,
                     pronunciation = words[page].pronunciations[0].symbol,
                     onClick = {
                         navController.navigate("Word")

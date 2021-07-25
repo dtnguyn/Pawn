@@ -30,17 +30,17 @@ class HomeViewModel
 ): ViewModel() {
 
     // This is a list of daily English random words
-    private val _dailyEnWords: MutableState<ArrayList<Word>> = mutableStateOf(arrayListOf())
-    val dailyEnWords: State<ArrayList<Word>> = _dailyEnWords
+    private val _dailyEnWords: MutableState<ArrayList<Word>?> = mutableStateOf(null)
+    val dailyEnWords: State<ArrayList<Word>?> = _dailyEnWords
 
-    private val _dailyEsWords: MutableState<ArrayList<Word>> = mutableStateOf(arrayListOf())
-    val dailyEsWords: State<ArrayList<Word>> = _dailyEnWords
+    private val _dailyEsWords: MutableState<ArrayList<Word>?> = mutableStateOf(null)
+    val dailyEsWords: State<ArrayList<Word>?> = _dailyEnWords
 
-    private val _dailyFrWords: MutableState<ArrayList<Word>> = mutableStateOf(arrayListOf())
-    val dailyFrWords: State<ArrayList<Word>> = _dailyEnWords
+    private val _dailyFrWords: MutableState<ArrayList<Word>?> = mutableStateOf(null)
+    val dailyFrWords: State<ArrayList<Word>?> = _dailyEnWords
 
-    private val _dailyDeWords: MutableState<ArrayList<Word>> = mutableStateOf(arrayListOf())
-    val dailyDeWords: State<ArrayList<Word>> = _dailyEnWords
+    private val _dailyDeWords: MutableState<ArrayList<Word>?> = mutableStateOf(null)
+    val dailyDeWords: State<ArrayList<Word>?> = _dailyEnWords
 
     private val _uiState = mutableStateOf<UIState>(UIState.Idle())
     val uiState: State<UIState> = _uiState
@@ -96,5 +96,7 @@ class HomeViewModel
             _uiState.value = UIState.Error(errMsg)
         }
     }
+
+
 
 }

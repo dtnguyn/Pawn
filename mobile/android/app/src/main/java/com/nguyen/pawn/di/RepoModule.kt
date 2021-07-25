@@ -23,8 +23,8 @@ object RepoModule {
 
     @Singleton
     @Provides
-    fun provideWordRepository(client: HttpClient): WordRepository {
-        return WordRepository(client)
+    fun provideWordRepository(client: HttpClient, database: PawnDatabase): WordRepository {
+        return WordRepository(client, database)
     }
 
     @Singleton

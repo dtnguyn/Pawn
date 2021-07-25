@@ -42,7 +42,11 @@ import com.nguyen.pawn.util.SupportedLanguage
 import com.nguyen.pawn.util.UIState
 import com.nguyen.pawn.util.UtilFunctions.convertHeightToDp
 import com.nguyen.pawn.util.UtilFunctions.generateFlagForLanguage
+import io.ktor.util.date.*
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 private const val TAG = "HomeScreen"
 
@@ -60,10 +64,10 @@ fun HomeScreen(
     /**   ---STATES---   */
 
     /** States from viewModel */
-    val dailyEnWords: ArrayList<Word> by homeViewModel.dailyEnWords
-    val dailyEsWords: ArrayList<Word> by homeViewModel.dailyEsWords
-    val dailyFrWords: ArrayList<Word> by homeViewModel.dailyFrWords
-    val dailyDeWords: ArrayList<Word> by homeViewModel.dailyDeWords
+    val dailyEnWords: ArrayList<Word>? by homeViewModel.dailyEnWords
+    val dailyEsWords: ArrayList<Word>? by homeViewModel.dailyEsWords
+    val dailyFrWords: ArrayList<Word>? by homeViewModel.dailyFrWords
+    val dailyDeWords: ArrayList<Word>? by homeViewModel.dailyDeWords
     val savedWords: ArrayList<Word> by sharedViewModel.savedWords
     val pickedLanguages: List<Language>? by sharedViewModel.pickedLanguages
     val displayPickedLanguages: ArrayList<Language> by sharedViewModel.displayPickedLanguages
@@ -97,21 +101,23 @@ fun HomeScreen(
     /** Initialize the user and get the current
      * picked learning languages */
     LaunchedEffect(null) {
-
+        Log.d(TAG, "Trigger 1")
         sharedViewModel.getUser(
             getAccessTokenFromDataStore(context),
             getRefreshTokenFromDataStore(context)
         )
 
-        homeViewModel.turnOnLoading(LoadingType.PICKED_LANGUAGE_LOADING)
-        sharedViewModel.getPickedLanguages(getAccessTokenFromDataStore(context))
-
+        if(pickedLanguages == null){
+            homeViewModel.turnOnLoading(LoadingType.PICKED_LANGUAGE_LOADING)
+            sharedViewModel.getPickedLanguages(getAccessTokenFromDataStore(context))
+        }
 
     }
 
     /** Whenever picked languages change,
      * if picked languages is not null, show all the languages */
     LaunchedEffect(pickedLanguages) {
+        Log.d(TAG, "Trigger 2")
         if (pickedLanguages != null) {
             showAddLanguageMenu = pickedLanguages!!.isEmpty()
             homeViewModel.goToIdle(UIState.Loading(LoadingType.PICKED_LANGUAGE_LOADING))
@@ -121,8 +127,8 @@ fun HomeScreen(
     /** Whenever the current picked languages change,
      * if it is not null, then get the daily words of that language */
     LaunchedEffect(currentPickedLanguage){
+        Log.d(TAG, "Trigger 3")
         if (currentPickedLanguage != null){
-            Log.d(TAG, "Change language to $currentPickedLanguage")
             homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, currentPickedLanguage!!.id)
         }
     }
@@ -130,6 +136,7 @@ fun HomeScreen(
     /** Whenever the uiState changes, Update the UI so that
      * the user can tell the app is loading, error or idle */
     LaunchedEffect(uiState) {
+        Log.d(TAG, "Trigger 4")
         when (uiState) {
             is UIState.Idle -> {
                 when (val loadingOrError = (uiState as UIState.Idle).loadingOrError) {
@@ -163,8 +170,7 @@ fun HomeScreen(
 
     /**   ---HELPER FUNCTIONS---   */
 
-    fun dailyWords(): ArrayList<Word> {
-        Log.d(TAG, "Trigger")
+    fun dailyWords(): ArrayList<Word>? {
         if (currentPickedLanguage == null) return arrayListOf()
         return when (currentPickedLanguage?.id) {
             SupportedLanguage.ENGLISH.id -> {
@@ -289,7 +295,7 @@ fun HomeScreen(
                                             viewModel = sharedViewModel,
                                             pagerState = pagerState,
                                             navController = navController,
-                                            words = dailyWords(),
+                                            words = dailyWords() ?: arrayListOf(),
                                         )
                                     }
                                     stickyHeader {

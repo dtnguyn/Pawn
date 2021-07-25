@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.nguyen.pawn.db.PawnDatabase
 import com.nguyen.pawn.db.PawnDatabase.Companion.DATABASE_NAME
+import com.nguyen.pawn.db.dao.DailyWordCacheDao
 import com.nguyen.pawn.db.dao.LanguageCacheDao
 import dagger.Module
 import dagger.Provides
@@ -25,6 +26,7 @@ object RoomModule {
                 PawnDatabase::class.java,
                 DATABASE_NAME
             )
+            .fallbackToDestructiveMigration()
             .build()
     }
 
@@ -34,5 +36,11 @@ object RoomModule {
     @Provides
     fun provideLanguageCacheDao(database: PawnDatabase): LanguageCacheDao {
         return database.languageDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideDailyWordCacheDao(database: PawnDatabase): DailyWordCacheDao {
+        return database.dailyWordDao()
     }
 }

@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nguyen.pawn.ui.theme.LightGrey
@@ -23,9 +24,8 @@ import com.nguyen.pawn.ui.theme.ShimmerColorShades
 
 @Composable
 fun ShimmerAnimation(
-    width: Dp,
-    height: Dp,
-    borderRadius: Dp,
+    modifier: Modifier,
+    shape: Shape,
 ) {
 
     /*
@@ -64,13 +64,10 @@ fun ShimmerAnimation(
         end = Offset(translateAnim, translateAnim)
     )
 
-    Box(Modifier.background(LightGrey, RoundedCornerShape(borderRadius))) {
+    Box(Modifier.background(LightGrey, shape)) {
         Card(
-            shape = RoundedCornerShape(borderRadius),
-            modifier = Modifier
-                .width(width)
-                .height(height)
-                .background(brush, RoundedCornerShape(borderRadius)),
+            shape = shape,
+            modifier = modifier.background(brush, shape),
             backgroundColor = Color.Transparent,
             content = {}
         )

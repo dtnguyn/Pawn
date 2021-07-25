@@ -76,7 +76,7 @@ fun HomeScreen(
     val uiState: UIState by homeViewModel.uiState
 
     /** Local ui states */
-    var showAddLanguageMenu by remember { mutableStateOf(pickedLanguages?.isEmpty() ?: true) }
+    var showAddLanguageMenu by remember { mutableStateOf(pickedLanguages?.isEmpty()) }
     var isLoadingPickedLanguage by remember { mutableStateOf(true) }
     var isLoadingUser by remember { mutableStateOf(true) }
     var isLoadingDailyWords by remember { mutableStateOf(true) }
@@ -215,8 +215,9 @@ fun HomeScreen(
                         elevation = 10.dp,
 
                         ) {
+                        if(showAddLanguageMenu != null)
                         LazyColumn(Modifier.padding(bottom = 50.dp)) {
-                            if (showAddLanguageMenu) {
+                            if (showAddLanguageMenu!!) {
                                 item {
                                     ChooseLanguagesHeader(pickedLanguages = displayPickedLanguages) {
                                         coroutineScope.launch {
@@ -240,57 +241,52 @@ fun HomeScreen(
                                         sharedViewModel.togglePickedLanguage(language)
                                     }
                                 }
-
-
                             } else {
-                                if (pickedLanguages!!.isNotEmpty()) {
-                                    item {
-                                        Row(
-                                            modifier = Modifier.padding(
-                                                start = 30.dp,
-                                                end = 30.dp,
-                                                top = 30.dp
-                                            ),
-                                            verticalAlignment = Alignment.CenterVertically
+                                item {
+                                    Row(
+                                        modifier = Modifier.padding(
+                                            start = 30.dp,
+                                            end = 30.dp,
+                                            top = 30.dp
+                                        ),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        displayPickedLanguages.forEach { language ->
+                                            Image(
+                                                painter = painterResource(
+                                                    id = generateFlagForLanguage(
+                                                        language.id
+                                                    )
+                                                ),
+                                                contentDescription = "language icon",
+                                                modifier = Modifier
+                                                    .padding(horizontal = 5.dp)
+                                                    .size(if (language.id == currentPickedLanguage?.id) 46.dp else 38.dp)
+                                                    .clip(CircleShape)
+                                                    .border(
+                                                        if (language.id == currentPickedLanguage?.id) 3.dp else 0.dp,
+                                                        DarkBlue,
+                                                        CircleShape
+                                                    )
+                                                    .clickable {
+                                                        sharedViewModel.changeCurrentPickedLanguage(
+                                                            language
+                                                        )
+                                                    }
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+                                        RoundButton(
+                                            backgroundColor = Grey,
+                                            size = 38.dp,
+                                            icon = R.drawable.add_32_black
                                         ) {
-                                            displayPickedLanguages.forEach { language ->
-                                                Image(
-                                                    painter = painterResource(
-                                                        id = generateFlagForLanguage(
-                                                            language.id
-                                                        )
-                                                    ),
-                                                    contentDescription = "language icon",
-                                                    modifier = Modifier
-                                                        .padding(horizontal = 5.dp)
-                                                        .size(if (language.id == currentPickedLanguage?.id) 46.dp else 38.dp)
-                                                        .clip(CircleShape)
-                                                        .border(
-                                                            if (language.id == currentPickedLanguage?.id) 3.dp else 0.dp,
-                                                            DarkBlue,
-                                                            CircleShape
-                                                        )
-                                                        .clickable {
-                                                            sharedViewModel.changeCurrentPickedLanguage(
-                                                                language
-                                                            )
-                                                        }
-                                                )
-                                            }
-                                            Spacer(modifier = Modifier.padding(horizontal = 5.dp))
-                                            RoundButton(
-                                                backgroundColor = Grey,
-                                                size = 38.dp,
-                                                icon = R.drawable.add_32_black
-                                            ) {
-                                                showAddLanguageMenu = true
-                                            }
+                                            showAddLanguageMenu = true
                                         }
                                     }
                                 }
-
                                 item {
-                                    Log.d(TAG, "isLoadingDailyWords: $isLoadingDailyWords")
+
                                     DailyWordSection(
                                         isLoading = isLoadingDailyWords,
                                         viewModel = sharedViewModel,

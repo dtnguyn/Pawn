@@ -20,6 +20,7 @@ import com.google.accompanist.pager.PagerState
 import com.nguyen.pawn.R
 import com.nguyen.pawn.model.Word
 import com.nguyen.pawn.ui.SharedViewModel
+import com.nguyen.pawn.ui.components.home.DailyWordCard
 import com.nguyen.pawn.ui.theme.*
 import kotlinx.coroutines.launch
 
@@ -41,7 +42,7 @@ fun DailyWordSection(
     val isSaved = remember { mutableStateOf(false)}
 
 
-    if (words.size > 0)
+    if (words.size > 0 || isLoading)
         Column {
             Text(
                 text = "Daily words",
@@ -53,7 +54,7 @@ fun DailyWordSection(
                 fontSize = 18.sp
 
             )
-
+            Log.d(TAG, "isLoadingDailyWords: $isLoading")
             if(isLoading) {
                 DailyWordCard(
                     isLoading = isLoading,
@@ -67,8 +68,6 @@ fun DailyWordSection(
                     state = pagerState,
                     modifier = Modifier.fillMaxWidth()
                 ) { page ->
-
-
                     DailyWordCard(
                         isLoading = isLoading,
                         word = words[page].value,
@@ -86,50 +85,45 @@ fun DailyWordSection(
                         .align(Alignment.CenterHorizontally)
                         .padding(top = 30.dp, bottom = 10.dp)
                 )
-            }
-
-
-
-
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 20.dp)
-            ) {
-                RoundedSquareButton(LightGreen, R.drawable.next2, onClick = {
-                    coroutineScope.launch {
-                        val page =
-                            if (pagerState.currentPage == 0) 0 else pagerState.currentPage - 1
-                        pagerState.animateScrollToPage(page)
-                    }
-                })
-                RoundedSquareButton(Grey, R.drawable.trash) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp)
+                ) {
+                    RoundedSquareButton(LightGreen, R.drawable.next2, onClick = {
+                        coroutineScope.launch {
+                            val page =
+                                if (pagerState.currentPage == 0) 0 else pagerState.currentPage - 1
+                            pagerState.animateScrollToPage(page)
+                        }
+                    })
+                    RoundedSquareButton(Grey, R.drawable.trash) {
 //                    viewModel.removeDailyWords(words[pagerState.currentPage].id)
 
-                }
-                if(viewModel.checkIsSaved(words[pagerState.currentPage].value)){
-                    RoundedSquareButton(LightRed, R.drawable.heart_red , onClick = {
-                        isSaved.value = !isSaved.value
-                        viewModel.toggleSavedWord(words[pagerState.currentPage])
-                    })
-                } else {
-                    RoundedSquareButton(LightRed, R.drawable.heart , onClick = {
-                        isSaved.value = !isSaved.value
-                        viewModel.toggleSavedWord(words[pagerState.currentPage])
-                    })
-                }
-
-
-                RoundedSquareButton(LightOrange, R.drawable.next2_right, onClick = {
-                    coroutineScope.launch {
-                        val nextPage =
-                            if (pagerState.currentPage == words.size - 1) 0 else pagerState.currentPage + 1
-                        pagerState.animateScrollToPage(nextPage)
                     }
-                })
-            }
+                    if(viewModel.checkIsSaved(words[pagerState.currentPage].value)){
+                        RoundedSquareButton(LightRed, R.drawable.heart_red , onClick = {
+                            isSaved.value = !isSaved.value
+                            viewModel.toggleSavedWord(words[pagerState.currentPage])
+                        })
+                    } else {
+                        RoundedSquareButton(LightRed, R.drawable.heart , onClick = {
+                            isSaved.value = !isSaved.value
+                            viewModel.toggleSavedWord(words[pagerState.currentPage])
+                        })
+                    }
 
+
+                    RoundedSquareButton(LightOrange, R.drawable.next2_right, onClick = {
+                        coroutineScope.launch {
+                            val nextPage =
+                                if (pagerState.currentPage == words.size - 1) 0 else pagerState.currentPage + 1
+                            pagerState.animateScrollToPage(nextPage)
+                        }
+                    })
+                }
+            }
         }
 
 }

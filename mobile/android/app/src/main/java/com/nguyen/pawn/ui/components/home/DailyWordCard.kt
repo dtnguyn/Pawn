@@ -1,8 +1,5 @@
-package com.nguyen.pawn.ui.components
+package com.nguyen.pawn.ui.components.home
 
-import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -10,13 +7,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.nguyen.pawn.R
+import com.nguyen.pawn.ui.components.RoundButton
 import com.nguyen.pawn.ui.theme.ReallyRed
 import com.nguyen.pawn.ui.theme.Typography
 import com.nguyen.pawn.util.ShimmerAnimation
@@ -48,19 +44,15 @@ fun DailyWordCard(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        ShimmerAnimation(width = 200.dp, height = 40.dp, borderRadius = 30.dp)
-                        RoundButton(
-                            backgroundColor = Color.White,
-                            size = 45.dp,
-                            icon = R.drawable.speaker,
-                            onClick = {})
+                        ShimmerAnimation(modifier = Modifier.width(200.dp).height(40.dp), shape = RoundedCornerShape(30.dp))
+                        ShimmerAnimation(modifier = Modifier.width(45.dp).height(44.dp), shape = CircleShape)
                     }
                     Spacer(Modifier.padding(15.dp))
-                    ShimmerAnimation(width = 250.dp, height = 20.dp, borderRadius = 30.dp)
+                    ShimmerAnimation(modifier = Modifier.width(250.dp).height(20.dp), shape = RoundedCornerShape(30.dp))
                     Spacer(Modifier.padding(5.dp))
-                    ShimmerAnimation(width = 250.dp, height = 20.dp, borderRadius = 30.dp)
+                    ShimmerAnimation(modifier = Modifier.width(250.dp).height(20.dp), shape = RoundedCornerShape(30.dp))
                     Spacer(Modifier.padding(5.dp))
-                    ShimmerAnimation(width = 150.dp, height = 20.dp, borderRadius = 30.dp)
+                    ShimmerAnimation(modifier = Modifier.width(150.dp).height(20.dp), shape = RoundedCornerShape(30.dp))
                 }
             } else {
                 Column(Modifier.padding(25.dp)) {

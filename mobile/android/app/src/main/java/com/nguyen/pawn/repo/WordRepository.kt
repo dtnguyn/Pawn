@@ -35,15 +35,12 @@ class WordRepository
         return try {
             val cacheDailyWords = db.dailyWordDao().getMany(SimpleDateFormat("yyyy.MM.dd").format(Date()), language)
             if(cacheDailyWords.isNotEmpty()) {
-                Log.d(TAG, "cache: ${cacheDailyWords[0].value}")
-
                 DailyWordMapper.mapToListNetworkEntity(cacheDailyWords) as ArrayList<Word>
             } else {
                 val response: ApiResponse<ArrayList<Word>?> = apiClient.get("${apiURL}/word/daily?language=${language}&dailyWordCount=${wordCount}")
-                Log.d(TAG, "Response $language: $response")
                 if(response.status){
                     db.dailyWordDao().insertMany(DailyWordMapper.mapToListCacheEntity(response.data!!))
-                    response.data
+                    response.data!!
                 } else {
                     arrayListOf()
                 }

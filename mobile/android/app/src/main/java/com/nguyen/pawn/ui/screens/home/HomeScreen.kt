@@ -107,7 +107,7 @@ fun HomeScreen(
             getRefreshTokenFromDataStore(context)
         )
 
-        if(pickedLanguages == null){
+        if (pickedLanguages == null) {
             homeViewModel.turnOnLoading(LoadingType.PICKED_LANGUAGE_LOADING)
             sharedViewModel.getPickedLanguages(getAccessTokenFromDataStore(context))
         }
@@ -126,9 +126,9 @@ fun HomeScreen(
 
     /** Whenever the current picked languages change,
      * if it is not null, then get the daily words of that language */
-    LaunchedEffect(currentPickedLanguage){
+    LaunchedEffect(currentPickedLanguage) {
         Log.d(TAG, "Trigger 3")
-        if (currentPickedLanguage != null){
+        if (currentPickedLanguage != null) {
             homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, currentPickedLanguage!!.id)
         }
     }
@@ -215,131 +215,131 @@ fun HomeScreen(
                         elevation = 10.dp,
 
                         ) {
-                        if (!isLoadingPickedLanguage) {
-                            LazyColumn(Modifier.padding(bottom = 50.dp)) {
-                                if (showAddLanguageMenu) {
-                                    item {
-                                        ChooseLanguagesHeader(pickedLanguages = displayPickedLanguages) {
-                                            coroutineScope.launch {
-                                                showAddLanguageMenu = false
-                                                sharedViewModel.savePickedLanguages(
-                                                    displayPickedLanguages,
-                                                    getAccessTokenFromDataStore(context)
-                                                )
-                                            }
-
-                                        }
-                                    }
-
-                                    items(supportedLanguages.size) { index ->
-                                        LanguageItem(
-                                            language = supportedLanguages[index],
-                                            isPicked = displayPickedLanguages!!.filter {
-                                                it.id == supportedLanguages[index].id
-                                            }.size == 1
-                                        ) { language ->
-                                            sharedViewModel.togglePickedLanguage(language)
-                                        }
-                                    }
-
-
-                                } else {
-                                    if (pickedLanguages!!.isNotEmpty()) {
-                                        item {
-                                            Row(
-                                                modifier = Modifier.padding(
-                                                    start = 30.dp,
-                                                    end = 30.dp,
-                                                    top = 30.dp
-                                                ),
-                                                verticalAlignment = Alignment.CenterVertically
-                                            ) {
-                                                displayPickedLanguages.forEach { language ->
-                                                    Image(
-                                                        painter = painterResource(
-                                                            id = generateFlagForLanguage(
-                                                                language.id
-                                                            )
-                                                        ),
-                                                        contentDescription = "language icon",
-                                                        modifier = Modifier
-                                                            .padding(horizontal = 5.dp)
-                                                            .size(if (language.id == currentPickedLanguage?.id) 46.dp else 38.dp)
-                                                            .clip(CircleShape)
-                                                            .border(
-                                                                if (language.id == currentPickedLanguage?.id) 3.dp else 0.dp,
-                                                                DarkBlue,
-                                                                CircleShape
-                                                            )
-                                                            .clickable {
-                                                                sharedViewModel.changeCurrentPickedLanguage(
-                                                                    language
-                                                                )
-                                                            }
-                                                    )
-                                                }
-                                                Spacer(modifier = Modifier.padding(horizontal = 5.dp))
-                                                RoundButton(
-                                                    backgroundColor = Grey,
-                                                    size = 38.dp,
-                                                    icon = R.drawable.add_32_black
-                                                ) {
-                                                    showAddLanguageMenu = true
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    item {
-                                        DailyWordSection(
-                                            viewModel = sharedViewModel,
-                                            pagerState = pagerState,
-                                            navController = navController,
-                                            words = dailyWords() ?: arrayListOf(),
-                                        )
-                                    }
-                                    stickyHeader {
-                                        Column(
-                                            Modifier
-                                                .background(Color.White)
-                                                .padding(start = 30.dp, top = 20.dp)
-                                                .fillMaxWidth()
-                                        ) {
-                                            Text(
-                                                text = "Your saved words",
-                                                style = Typography.h6,
-                                                fontSize = 18.sp
+                        LazyColumn(Modifier.padding(bottom = 50.dp)) {
+                            if (showAddLanguageMenu) {
+                                item {
+                                    ChooseLanguagesHeader(pickedLanguages = displayPickedLanguages) {
+                                        coroutineScope.launch {
+                                            showAddLanguageMenu = false
+                                            sharedViewModel.savePickedLanguages(
+                                                displayPickedLanguages,
+                                                getAccessTokenFromDataStore(context)
                                             )
-
-                                            Row(Modifier.padding(vertical = 5.dp)) {
-                                                RoundButton(
-                                                    backgroundColor = Blue,
-                                                    size = 32.dp,
-                                                    icon = R.drawable.add,
-                                                    onClick = {})
-                                                Spacer(modifier = Modifier.padding(horizontal = 5.dp))
-                                                RoundButton(
-                                                    backgroundColor = Grey,
-                                                    size = 32.dp,
-                                                    icon = R.drawable.review,
-                                                    onClick = {})
-                                            }
                                         }
-                                    }
 
-                                    items(savedWords.size) { index ->
-                                        SavedWordItem(
-                                            word = savedWords[index].value,
-                                            pronunciation = savedWords[index].pronunciations[0].symbol,
-                                            index = index,
-                                            onClick = {
-                                                navController.navigate("word")
-                                            }
-                                        )
                                     }
                                 }
 
+                                items(supportedLanguages.size) { index ->
+                                    LanguageItem(
+                                        language = supportedLanguages[index],
+                                        isPicked = displayPickedLanguages!!.filter {
+                                            it.id == supportedLanguages[index].id
+                                        }.size == 1
+                                    ) { language ->
+                                        sharedViewModel.togglePickedLanguage(language)
+                                    }
+                                }
+
+
+                            } else {
+                                if (pickedLanguages!!.isNotEmpty()) {
+                                    item {
+                                        Row(
+                                            modifier = Modifier.padding(
+                                                start = 30.dp,
+                                                end = 30.dp,
+                                                top = 30.dp
+                                            ),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            displayPickedLanguages.forEach { language ->
+                                                Image(
+                                                    painter = painterResource(
+                                                        id = generateFlagForLanguage(
+                                                            language.id
+                                                        )
+                                                    ),
+                                                    contentDescription = "language icon",
+                                                    modifier = Modifier
+                                                        .padding(horizontal = 5.dp)
+                                                        .size(if (language.id == currentPickedLanguage?.id) 46.dp else 38.dp)
+                                                        .clip(CircleShape)
+                                                        .border(
+                                                            if (language.id == currentPickedLanguage?.id) 3.dp else 0.dp,
+                                                            DarkBlue,
+                                                            CircleShape
+                                                        )
+                                                        .clickable {
+                                                            sharedViewModel.changeCurrentPickedLanguage(
+                                                                language
+                                                            )
+                                                        }
+                                                )
+                                            }
+                                            Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+                                            RoundButton(
+                                                backgroundColor = Grey,
+                                                size = 38.dp,
+                                                icon = R.drawable.add_32_black
+                                            ) {
+                                                showAddLanguageMenu = true
+                                            }
+                                        }
+                                    }
+                                }
+
+                                item {
+                                    Log.d(TAG, "isLoadingDailyWords: $isLoadingDailyWords")
+                                    DailyWordSection(
+                                        isLoading = isLoadingDailyWords,
+                                        viewModel = sharedViewModel,
+                                        pagerState = pagerState,
+                                        navController = navController,
+                                        words = dailyWords() ?: arrayListOf(),
+                                    )
+                                }
+                                stickyHeader {
+                                    Column(
+                                        Modifier
+                                            .background(Color.White)
+                                            .padding(start = 30.dp, top = 20.dp)
+                                            .fillMaxWidth()
+                                    ) {
+                                        Text(
+                                            text = "Your saved words",
+                                            style = Typography.h6,
+                                            fontSize = 18.sp
+                                        )
+
+                                        Row(Modifier.padding(vertical = 5.dp)) {
+                                            RoundButton(
+                                                backgroundColor = Blue,
+                                                size = 32.dp,
+                                                icon = R.drawable.add,
+                                                onClick = {})
+                                            Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+                                            RoundButton(
+                                                backgroundColor = Grey,
+                                                size = 32.dp,
+                                                icon = R.drawable.review,
+                                                onClick = {})
+                                        }
+                                    }
+                                }
+
+                                items(savedWords.size) { index ->
+                                    SavedWordItem(
+                                        word = savedWords[index].value,
+                                        pronunciation = savedWords[index].pronunciations[0].symbol,
+                                        index = index,
+                                        onClick = {
+                                            navController.navigate("word")
+                                        }
+                                    )
+                                }
                             }
+
                         }
 
                     }

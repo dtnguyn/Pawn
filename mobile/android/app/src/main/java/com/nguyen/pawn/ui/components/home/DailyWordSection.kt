@@ -32,7 +32,8 @@ fun DailyWordSection(
     viewModel: SharedViewModel,
     pagerState: PagerState,
     navController: NavController,
-    words: ArrayList<Word>
+    words: ArrayList<Word>,
+    isLoading: Boolean,
 ) {
 
 
@@ -53,28 +54,41 @@ fun DailyWordSection(
 
             )
 
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxWidth()
-            ) { page ->
-
-
+            if(isLoading) {
                 DailyWordCard(
-                    word = words[page].value,
-                    definition = words[page].definitions[0].meaning ,
-                    pronunciation = words[page].pronunciations[0].symbol,
-                    onClick = {
-                        navController.navigate("Word")
+                    isLoading = isLoading,
+                    word = "",
+                    definition = "" ,
+                    pronunciation = "",
+                    onClick = {}
+                )
+            } else {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxWidth()
+                ) { page ->
 
-                    }
+
+                    DailyWordCard(
+                        isLoading = isLoading,
+                        word = words[page].value,
+                        definition = words[page].definitions[0].meaning ,
+                        pronunciation = words[page].pronunciations[0].symbol,
+                        onClick = {
+                            navController.navigate("Word")
+
+                        }
+                    )
+                }
+                HorizontalPagerIndicator(
+                    pagerState = pagerState,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 30.dp, bottom = 10.dp)
                 )
             }
-            HorizontalPagerIndicator(
-                pagerState = pagerState,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(top = 30.dp, bottom = 10.dp)
-            )
+
+
 
 
             Row(

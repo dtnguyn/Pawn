@@ -17,3 +17,12 @@ val LightOrange = Color(0xFFFFBA92)
 val Grey = Color(0xFFC4C4C4)
 val TextFieldGrey = Color (0xFFE0E0E0)
 val Blue = Color(0xFF34ACEF)
+
+val ShimmerColorShades = listOf(
+    Color.LightGray.copy(0.2f),
+
+    Color.LightGray.copy(0.9f),
+
+    Color.LightGray.copy(0.2f)
+)
+

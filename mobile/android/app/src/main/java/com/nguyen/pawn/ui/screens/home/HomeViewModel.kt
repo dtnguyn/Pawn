@@ -48,6 +48,7 @@ class HomeViewModel
 
     fun getDailyWords(dailyWordCount: Int, languageId: String) {
         viewModelScope.launch {
+            turnOnLoading(LoadingType.DAILY_WORDS_LOADING)
             val words = wordRepo.getRandomDailyWord(dailyWordCount, languageId) as ArrayList<Word>
             withContext(Main){
                 when(languageId){
@@ -68,7 +69,7 @@ class HomeViewModel
                     }
                 }
             }
-
+            goToIdle(UIState.Loading(LoadingType.DAILY_WORDS_LOADING))
         }
     }
 

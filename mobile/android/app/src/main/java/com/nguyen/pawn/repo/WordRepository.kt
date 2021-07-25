@@ -39,8 +39,9 @@ class WordRepository
             } else {
                 val response: ApiResponse<ArrayList<Word>?> = apiClient.get("${apiURL}/word/daily?language=${language}&dailyWordCount=${wordCount}")
                 if(response.status){
+                    db.dailyWordDao().clearAll(language = language)
                     db.dailyWordDao().insertMany(DailyWordMapper.mapToListCacheEntity(response.data!!))
-                    response.data!!
+                    response.data
                 } else {
                     arrayListOf()
                 }

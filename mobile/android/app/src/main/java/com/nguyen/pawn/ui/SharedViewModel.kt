@@ -117,14 +117,18 @@ class SharedViewModel
      *  from network or room database */
     fun getPickedLanguages(accessToken: String?) {
         viewModelScope.launch {
-
             val languages = languageRepo.getLearningLanguages(accessToken)
             _pickedLanguages.value = languages
             _displayPickedLanguages.value = languages as ArrayList<Language>
+            val currentLanguageId = _currentPickedLanguage.value?.id
+            var currentInList = false
             for (language in languages) {
                 pickedLanguageMap[language.id] = true
+                if(!currentInList && currentLanguageId != null) {
+                    currentInList = language.id == currentLanguageId
+                }
             }
-            if (languages.isNotEmpty()) {
+            if (languages.isNotEmpty() && !currentInList) {
                 _currentPickedLanguage.value = languages.first()
             }
         }

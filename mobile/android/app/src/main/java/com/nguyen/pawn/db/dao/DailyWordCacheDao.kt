@@ -19,7 +19,7 @@ interface DailyWordCacheDao {
     @Query("SELECT * FROM dailyWords WHERE createdDate = :date AND language = :language")
     suspend fun getMany(date: String, language: String): List<DailyWordCacheEntity>
 
-    @Query("DELETE FROM dailyWords")
-    suspend fun clearAll()
+    @Query("DELETE FROM dailyWords WHERE language = :language")
+    suspend fun clearAll(language: String)
 
 }

@@ -14,8 +14,10 @@ import com.nguyen.pawn.model.Word
 import com.nguyen.pawn.repo.AuthRepository
 import com.nguyen.pawn.repo.LanguageRepository
 import com.nguyen.pawn.repo.WordRepository
+import com.nguyen.pawn.util.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -34,8 +36,8 @@ class SharedViewModel
     /** ---STATES--- */
 
     /** This is the current user (null when no user is logged in) */
-    private val _user = mutableStateOf<User?>(null)
-    val user: State<User?> = _user
+    private val _userUIState: MutableState<UIState<User>> = mutableStateOf(UIState.Initial(null))
+    val userUIState: State<UIState<User>> = _userUIState
 
     /** The current language that the app is on */
     private val _currentPickedLanguage: MutableState<Language?> = mutableStateOf(null)
@@ -46,7 +48,8 @@ class SharedViewModel
     val pickedLanguages: State<List<Language>?> = _pickedLanguages
 
     /** The list of languages that user wants to learn (this list is used when user is choosing languages) */
-    private val _displayPickedLanguages: MutableState<ArrayList<Language>> = mutableStateOf(arrayListOf())
+    private val _displayPickedLanguages: MutableState<ArrayList<Language>> =
+        mutableStateOf(arrayListOf())
     val displayPickedLanguages: State<ArrayList<Language>> = _displayPickedLanguages
 
     /** This is a list of words that user saved */
@@ -60,7 +63,6 @@ class SharedViewModel
     private val pickedLanguageMap = HashMap<String, Boolean>()
 
 
-
     /** ---INTENTS--- */
 
     /** Auth intents*/
@@ -69,13 +71,12 @@ class SharedViewModel
      *  the current user null if not logged in */
     fun getUser(accessToken: String?, refreshToken: String?) {
         if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) {
-            _user.value = null
+            _userUIState.value = UIState.Loaded(null)
             return
         }
         viewModelScope.launch {
-            val user = authRepo.checkAuthStatus(accessToken)
-            withContext(Dispatchers.Main) {
-                _user.value = user
+            authRepo.checkAuthStatus(accessToken).collectLatest {
+                _userUIState.value = it
             }
         }
     }
@@ -85,11 +86,15 @@ class SharedViewModel
     fun logout(refreshToken: String?) {
         viewModelScope.launch {
             if (refreshToken != null) {
-                authRepo.logout(refreshToken)
-            }
-            withContext(Dispatchers.Main) {
-                _user.value = null
-            }
+                authRepo.logout(refreshToken).collectLatest {
+                    if (it is UIState.Error) {
+                        _userUIState.value = UIState.Error(it.errorMsg ?: "")
+                    } else if (it is UIState.Loaded) {
+                        _userUIState.value = UIState.Loaded(null)
+                    }
+                }
+            } else _userUIState.value = UIState.Loaded(null)
+
         }
     }
 
@@ -124,7 +129,7 @@ class SharedViewModel
             var currentInList = false
             for (language in languages) {
                 pickedLanguageMap[language.id] = true
-                if(!currentInList && currentLanguageId != null) {
+                if (!currentInList && currentLanguageId != null) {
                     currentInList = language.id == currentLanguageId
                 }
             }
@@ -161,7 +166,7 @@ class SharedViewModel
     /** This will update the current language picked
      * by the user */
     fun changeCurrentPickedLanguage(language: Language) {
-        if(_currentPickedLanguage.value?.id != language.id) _currentPickedLanguage.value = language
+        if (_currentPickedLanguage.value?.id != language.id) _currentPickedLanguage.value = language
     }
 
 
@@ -172,7 +177,7 @@ class SharedViewModel
     fun toggleSavedWord(word: Word) {
         if (savedWordMap[word.value] == true) {
             _savedWords.value = _savedWords.value.filter { savedWord ->
-                savedWord.value!= word.value
+                savedWord.value != word.value
             } as ArrayList<Word>
             savedWordMap[word.value] = false
         } else {

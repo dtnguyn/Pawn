@@ -72,7 +72,7 @@ fun HomeScreen(
     val pickedLanguages: List<Language>? by sharedViewModel.pickedLanguages
     val displayPickedLanguages: ArrayList<Language> by sharedViewModel.displayPickedLanguages
     val currentPickedLanguage: Language? by sharedViewModel.currentPickedLanguage
-    val user: User? by sharedViewModel.user
+    val userUIState: UIState<User> by sharedViewModel.userUIState
     val isLoadingDailyWords: Boolean by homeViewModel.isLoadingDailyWords
     val isLoadingCurrentUser: Boolean by homeViewModel.isLoadingCurrentUser
 
@@ -82,11 +82,13 @@ fun HomeScreen(
     var isLoadingPickedLanguage by remember { mutableStateOf(true) }
     var isLoadingUser by remember { mutableStateOf(true) }
     var errorMsg by remember { mutableStateOf("") }
+    var dailyWordCount by remember { mutableStateOf(3) }
+    var user by remember { mutableStateOf<User?>(null) }
 
     /** Compose state */
     val coroutineScope = rememberCoroutineScope()
     val homeScaffoldState: ScaffoldState = rememberScaffoldState()
-    val pagerState = rememberPagerState(pageCount = user?.dailyWordCount ?: 3)
+    val pagerState = rememberPagerState(pageCount = dailyWordCount ?: 3)
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(
             initialValue = BottomSheetValue.Collapsed,
@@ -113,8 +115,25 @@ fun HomeScreen(
         sharedViewModel.getPickedLanguages(getAccessTokenFromDataStore(context))
     }
 
-    LaunchedEffect(user) {
-        homeViewModel.displayLoadingUser(false)
+    LaunchedEffect(userUIState) {
+        when(userUIState){
+            is UIState.Initial -> {
+                isLoadingUser = true
+            }
+            is UIState.Error -> {
+                isLoadingUser = false
+            }
+            is UIState.Loading -> {
+                isLoadingUser = true
+            }
+            is UIState.Loaded -> {
+                isLoadingUser = false
+                user = userUIState.loadedValue
+                userUIState.loadedValue?.let{user ->
+                    dailyWordCount = user.dailyWordCount
+                }
+            }
+        }
     }
 
 

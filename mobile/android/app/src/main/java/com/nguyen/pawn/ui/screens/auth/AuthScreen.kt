@@ -46,9 +46,7 @@ fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, n
     /**   ---STATES---   */
 
     /** States from AuthViewModel */
-    val token: Token by authViewModel.token
-    val uiState: UIState? by authViewModel.uiState
-
+    val tokenUIState: UIState<Token> by authViewModel.tokenUIState
 
     /** Local ui states */
     var errorMsg by remember { mutableStateOf("") }
@@ -84,42 +82,34 @@ fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, n
         authViewModel.initializeToken(getAccessTokenFromDataStore(context), getRefreshTokenFromDataStore(context))
     }
 
-    /** Whenever the token changes, store it in DataStore,
-     * then if the token is not null then get the current
-     * logged user and move to home screen*/
-    LaunchedEffect(token) {
-        DataStoreUtils.saveAccessTokenToAuthDataStore(context, authViewModel.token.value.accessToken)
-        DataStoreUtils.saveRefreshTokenToAuthDataStore(context, authViewModel.token.value.refreshToken)
-        if (token.accessToken != null && token.refreshToken != null) {
-            sharedViewModel.getUser(token.accessToken, token.refreshToken)
-            navController.navigate("home") {
-                popUpTo("home") { inclusive = true }
-            }
-        }
-    }
-
-    /** Whenever the uiState changes, Update the UI so that
-     * the user can tell the app is loading, error or idle */
-    LaunchedEffect(uiState) {
-        when(uiState){
-            is UIState.Loaded -> {
-                // Hide loading animation and error dialog
-                errorMsg = ""
-                isLoading = false
-            }
-            is UIState.Loading -> {
-                // Display loading animation
-                isLoading = true
+    /** React to changes of [tokenUIState]*/
+    LaunchedEffect(tokenUIState) {
+        when(tokenUIState){
+            is UIState.Initial -> {
+                // Do nothing
             }
             is UIState.Error -> {
-                // Display error message to user
-                errorMsg = (uiState as UIState.Error).msg
+                // Emit error message
+                isLoading = false
+                errorMsg = tokenUIState.errorMsg ?: ""
+            }
+            is UIState.Loading -> {
+                // Turn on loading
+                isLoading = true
+            }
+            is UIState.Loaded -> {
+                // If the token is not null then go back home
+                isLoading = false
+                DataStoreUtils.saveAccessTokenToAuthDataStore(context, tokenUIState.loadedValue?.accessToken)
+                DataStoreUtils.saveRefreshTokenToAuthDataStore(context, tokenUIState.loadedValue?.refreshToken)
+                tokenUIState.loadedValue?.accessToken?.let {
+                    navController.navigate("home") {
+                        popUpTo("home") { inclusive = true }
+                    }
+                }
             }
         }
     }
-
-
-
     /**   ---HELPER FUNCTIONS---   */
 
     /** Expand or collapse the bottom sheet view */
@@ -293,8 +283,11 @@ fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, n
                 title = "Whoops!",
                 content = errorMsg,
                 icon = R.drawable.error,
-                onDismiss = { coroutineScope.launch { authViewModel.goToIdle(UIState.Error(errorMsg)) } }
+                onDismiss = { coroutineScope.launch { authViewModel.clearError() } }
             )
+        }
+        if (isLoading){
+            // Show loading animation
         }
     }
 

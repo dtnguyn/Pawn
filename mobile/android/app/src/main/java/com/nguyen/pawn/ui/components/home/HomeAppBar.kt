@@ -23,6 +23,7 @@ import com.nguyen.pawn.model.User
 import com.nguyen.pawn.ui.theme.*
 import com.nguyen.pawn.util.DataStoreUtils.getRefreshTokenFromDataStore
 import com.nguyen.pawn.util.DataStoreUtils.saveAccessTokenToAuthDataStore
+import com.nguyen.pawn.util.DataStoreUtils.saveRefreshTokenToAuthDataStore
 import kotlinx.coroutines.launch
 
 @Composable
@@ -72,6 +73,7 @@ fun HomeAppBar(navController: NavController, user: User?, onLogout: (refreshToke
             coroutineScope.launch {
                 val refreshToken = getRefreshTokenFromDataStore(context)
                 saveAccessTokenToAuthDataStore(context, null)
+                saveRefreshTokenToAuthDataStore(context, null)
                 onLogout(refreshToken)
             }
         })

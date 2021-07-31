@@ -75,4 +75,8 @@ class AuthViewModel
     fun initializeToken(accessToken: String?, refreshToken: String?){
         _tokenUIState.value = UIState.Loaded(Token(accessToken, refreshToken))
     }
+
+    fun clearError(){
+        _tokenUIState.value = UIState.Error("")
+    }
 }

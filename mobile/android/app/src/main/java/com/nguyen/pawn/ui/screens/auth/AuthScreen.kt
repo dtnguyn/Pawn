@@ -102,7 +102,7 @@ fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, n
      * the user can tell the app is loading, error or idle */
     LaunchedEffect(uiState) {
         when(uiState){
-            is UIState.Idle -> {
+            is UIState.Loaded -> {
                 // Hide loading animation and error dialog
                 errorMsg = ""
                 isLoading = false

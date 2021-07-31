@@ -1,7 +1,6 @@
 package com.nguyen.pawn.repo.utils
 
 import android.util.Log
-import com.nguyen.pawn.repo.AuthRepository
 import com.nguyen.pawn.util.CustomAppException
 import com.nguyen.pawn.util.UIState
 import io.ktor.client.features.*
@@ -22,12 +21,12 @@ inline fun <DomainType> mainNetworkBoundResource(
             val cacheData = query().first()
 
             if(cacheData != null){
-                emit(UIState.Idle<DomainType>(cacheData))
+                emit(UIState.Loaded<DomainType>(cacheData))
             }
 
             if(shouldFetch(cacheData)){
                 saveFetchResult(fetch())
-                emitAll(query().map { UIState.Idle<DomainType>(it) })
+                emitAll(query().map { UIState.Loaded<DomainType>(it) })
             }
         } catch(error: CustomAppException){
             Log.d(tag, "CustomAppException: ${error.message}")

@@ -64,23 +64,32 @@ fun HomeScreen(
     /**   ---STATES---   */
 
     /** States from viewModel */
-    val dailyEnWords: ArrayList<Word>? by homeViewModel.dailyEnWords
-    val dailyEsWords: ArrayList<Word>? by homeViewModel.dailyEsWords
-    val dailyFrWords: ArrayList<Word>? by homeViewModel.dailyFrWords
-    val dailyDeWords: ArrayList<Word>? by homeViewModel.dailyDeWords
-    val savedWords: ArrayList<Word> by sharedViewModel.savedWords
+    val dailyEnWordsUIState: UIState<List<Word>> by homeViewModel.dailyEnWordsUIState
+    var dailyEnWords by remember { mutableStateOf<ArrayList<Word>>(arrayListOf()) }
+
+    val dailyEsWordsUIState: UIState<List<Word>> by homeViewModel.dailyEsWordsUIState
+    var dailyEsWords by remember { mutableStateOf<ArrayList<Word>>(arrayListOf()) }
+
+    val dailyFrWordsUIState: UIState<List<Word>> by homeViewModel.dailyFrWordsUIState
+    var dailyFrWords by remember { mutableStateOf<ArrayList<Word>>(arrayListOf()) }
+
+    val dailyDeWordsUIState: UIState<List<Word>> by homeViewModel.dailyDeWordsUIState
+    var dailyDeWords by remember { mutableStateOf<ArrayList<Word>>(arrayListOf()) }
+
+
+    val savedWords: List<Word> by sharedViewModel.savedWords
     val pickedLanguages: List<Language>? by sharedViewModel.pickedLanguages
     val displayPickedLanguages: ArrayList<Language> by sharedViewModel.displayPickedLanguages
     val currentPickedLanguage: Language? by sharedViewModel.currentPickedLanguage
     val userUIState: UIState<User> by sharedViewModel.userUIState
-    val isLoadingDailyWords: Boolean by homeViewModel.isLoadingDailyWords
-    val isLoadingCurrentUser: Boolean by homeViewModel.isLoadingCurrentUser
+
 
 
     /** Local ui states */
     var showAddLanguageMenu by remember { mutableStateOf(pickedLanguages?.isEmpty()) }
     var isLoadingPickedLanguage by remember { mutableStateOf(true) }
     var isLoadingUser by remember { mutableStateOf(true) }
+    var isLoadingDailyWords by remember { mutableStateOf(true) }
     var errorMsg by remember { mutableStateOf("") }
     var dailyWordCount by remember { mutableStateOf(3) }
     var user by remember { mutableStateOf<User?>(null) }
@@ -106,7 +115,6 @@ fun HomeScreen(
     LaunchedEffect(null) {
         Log.d(TAG, "Trigger 1")
 
-        homeViewModel.displayLoadingUser(true)
         sharedViewModel.getUser(
             getAccessTokenFromDataStore(context),
             getRefreshTokenFromDataStore(context)
@@ -157,7 +165,111 @@ fun HomeScreen(
 
     /** Whenever the uiState changes, Update the UI so that
      * the user can tell the app is loading, error or idle */
+    LaunchedEffect(dailyEnWordsUIState, dailyEsWordsUIState, dailyDeWordsUIState, dailyFrWordsUIState){
+        when(dailyEnWordsUIState){
+            is UIState.Initial -> {
+                //Do nothing
+            }
+            is UIState.Error -> {
+                if(currentPickedLanguage?.id == "en_US"){
+                    isLoadingDailyWords = false
+                }
+            }
+            is UIState.Loading -> {
+                if(currentPickedLanguage?.id == "en_US"){
+                    isLoadingDailyWords = true
+                }
+            }
+            is UIState.Loaded -> {
+                Log.d(TAG, "isLoadingDailyWords: $isLoadingDailyWords ${currentPickedLanguage?.id}")
+                if(currentPickedLanguage?.id == "en_US"){
+                    isLoadingDailyWords = false
+                }
+                dailyEnWordsUIState.loadedValue?.let{
+                    dailyEnWords = it as ArrayList<Word>
+                }
+            }
+        }
 
+        when(dailyEsWordsUIState){
+            is UIState.Initial -> {
+                //Do nothing
+            }
+            is UIState.Error -> {
+                if(currentPickedLanguage?.id == "es"){
+                    isLoadingDailyWords = false
+                }
+            }
+            is UIState.Loading -> {
+                Log.d(TAG, "isLoadingDailyWords: $isLoadingDailyWords ${currentPickedLanguage?.id}")
+                if(currentPickedLanguage?.id == "es"){
+                    isLoadingDailyWords = true
+                }
+            }
+            is UIState.Loaded -> {
+                if(currentPickedLanguage?.id == "es"){
+                    isLoadingDailyWords = false
+                }
+                dailyEsWordsUIState.loadedValue?.let{
+                    dailyEsWords = it as ArrayList<Word>
+                }
+            }
+
+        }
+
+        when(dailyFrWordsUIState){
+            is UIState.Initial -> {
+                //Do nothing
+            }
+            is UIState.Error -> {
+                if(currentPickedLanguage?.id == "fr"){
+                    isLoadingDailyWords = false
+                }
+            }
+            is UIState.Loading -> {
+                Log.d(TAG, "isLoadingDailyWords: $isLoadingDailyWords ${currentPickedLanguage?.id}")
+                if(currentPickedLanguage?.id == "fr"){
+                    isLoadingDailyWords = true
+                }
+            }
+            is UIState.Loaded -> {
+                if(currentPickedLanguage?.id == "fr"){
+                    isLoadingDailyWords = false
+                }
+                dailyFrWordsUIState.loadedValue?.let{
+                    dailyFrWords = it as ArrayList<Word>
+                }
+            }
+
+        }
+
+        when(dailyDeWordsUIState){
+            is UIState.Initial -> {
+                //Do nothing
+            }
+            is UIState.Error -> {
+                if(currentPickedLanguage?.id == "de"){
+                    isLoadingDailyWords = false
+                }
+            }
+            is UIState.Loading -> {
+                Log.d(TAG, "isLoadingDailyWords: $isLoadingDailyWords ${currentPickedLanguage?.id}")
+                if(currentPickedLanguage?.id == "de"){
+                    isLoadingDailyWords = true
+                }
+            }
+            is UIState.Loaded -> {
+
+                if(currentPickedLanguage?.id == "de"){
+                    isLoadingDailyWords = false
+                }
+                dailyDeWordsUIState.loadedValue?.let{
+                    dailyDeWords = it as ArrayList<Word>
+                }
+            }
+
+        }
+    }
 
     /**   ---HELPER FUNCTIONS---   */
 

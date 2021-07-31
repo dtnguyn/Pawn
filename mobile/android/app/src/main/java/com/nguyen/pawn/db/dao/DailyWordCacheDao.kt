@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.nguyen.pawn.db.entity.DailyWordCacheEntity
 import com.nguyen.pawn.db.entity.LanguageCacheEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DailyWordCacheDao {
@@ -17,7 +18,7 @@ interface DailyWordCacheDao {
     suspend fun insertMany(dailyWords: List<DailyWordCacheEntity>)
 
     @Query("SELECT * FROM dailyWords WHERE createdDate = :date AND language = :language")
-    suspend fun getMany(date: String, language: String): List<DailyWordCacheEntity>
+    fun getMany(date: String, language: String): Flow<List<DailyWordCacheEntity>>
 
     @Query("DELETE FROM dailyWords WHERE language = :language")
     suspend fun clearAll(language: String)

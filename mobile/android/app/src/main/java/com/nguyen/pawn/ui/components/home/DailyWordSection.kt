@@ -3,6 +3,7 @@ package com.nguyen.pawn.ui.components
 import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +23,7 @@ import com.nguyen.pawn.model.Word
 import com.nguyen.pawn.ui.SharedViewModel
 import com.nguyen.pawn.ui.components.home.DailyWordCard
 import com.nguyen.pawn.ui.theme.*
+import com.nguyen.pawn.util.ShimmerAnimation
 import kotlinx.coroutines.launch
 
 private const val TAG = "DailyWordSection"
@@ -41,7 +43,7 @@ fun DailyWordSection(
     val coroutineScope = rememberCoroutineScope()
     val isSaved = remember { mutableStateOf(false)}
 
-
+    Log.d(TAG, "isLoadingDailyWords: $isLoading")
     if (words.size > 0 || isLoading)
         Column {
             Text(
@@ -54,8 +56,9 @@ fun DailyWordSection(
                 fontSize = 18.sp
 
             )
-            Log.d(TAG, "isLoadingDailyWords: $isLoading")
+
             if(isLoading) {
+                Log.d(TAG, "loading UI")
                 DailyWordCard(
                     isLoading = isLoading,
                     word = "",
@@ -78,6 +81,7 @@ fun DailyWordSection(
 
                         }
                     )
+
                 }
                 HorizontalPagerIndicator(
                     pagerState = pagerState,

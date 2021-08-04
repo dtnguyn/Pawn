@@ -5,6 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nguyen.pawn.model.Language
 import com.nguyen.pawn.model.Word
 import com.nguyen.pawn.repo.WordRepository
 import com.nguyen.pawn.util.LoadingType
@@ -42,6 +43,7 @@ class HomeViewModel
 
     private val _dailyDeWordsUIState: MutableState<UIState<List<Word>>> = mutableStateOf(UIState.Initial(null))
     val dailyDeWordsUIState: State<UIState<List<Word>>> = _dailyDeWordsUIState
+
 
 
 

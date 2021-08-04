@@ -7,7 +7,7 @@ import io.ktor.client.features.*
 import kotlinx.coroutines.flow.*
 import java.net.ConnectException
 
-inline fun <DomainType> mainNetworkBoundResource(
+inline fun <DomainType> mainGetNetworkBoundResource(
     crossinline query: () -> Flow<DomainType?>,
     crossinline fetch: suspend () -> DomainType?,
     crossinline saveFetchResult: suspend (DomainType?) -> Unit,
@@ -37,6 +37,33 @@ inline fun <DomainType> mainNetworkBoundResource(
         } catch (error: ConnectException) {
             Log.d(tag, "ConnectException: ${error.message}")
             emit(UIState.Error<DomainType>("Something went wrong with connection!"))
+        }
+
+    }
+}
+
+
+inline fun <ResponseType> mainPostNetworkBoundResource(
+    crossinline submit: suspend () -> ResponseType?,
+    crossinline shouldSave: suspend (response: ResponseType?) -> Boolean,
+    crossinline saveSubmitResult: suspend (ResponseType?) -> Unit,
+): Flow<UIState<ResponseType>> {
+    return flow {
+        try {
+            emit(UIState.Loading())
+            val response = submit()
+            if(shouldSave(response)){
+                saveSubmitResult(response)
+            }
+            emit(UIState.Loaded(response))
+
+
+        } catch(error: CustomAppException){
+            emit(UIState.Error<ResponseType>(error.message))
+        } catch (error: ClientRequestException) {
+            emit(UIState.Error<ResponseType>("Something went wrong!"))
+        } catch (error: ConnectException) {
+            emit(UIState.Error<ResponseType>("Something went wrong with connection!"))
         }
 
     }

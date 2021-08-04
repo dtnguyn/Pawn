@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.nguyen.pawn.db.entity.LanguageCacheEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LanguageCacheDao {
@@ -16,7 +17,7 @@ interface LanguageCacheDao {
     suspend fun insertMany(languages: List<LanguageCacheEntity>)
 
     @Query("SELECT * FROM languages")
-    suspend fun getMany(): List<LanguageCacheEntity>
+    fun getMany(): Flow<List<LanguageCacheEntity>>
 
     @Query("DELETE FROM languages")
     suspend fun clearAll()

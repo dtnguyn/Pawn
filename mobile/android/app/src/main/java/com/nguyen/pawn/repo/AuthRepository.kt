@@ -1,20 +1,17 @@
 package com.nguyen.pawn.repo
 
-import android.util.Log
 import com.nguyen.pawn.api.model.*
 import com.nguyen.pawn.model.Token
 import com.nguyen.pawn.model.User
-import com.nguyen.pawn.repo.utils.mainNetworkBoundResource
+import com.nguyen.pawn.repo.utils.mainGetNetworkBoundResource
 import com.nguyen.pawn.util.Constants
 import com.nguyen.pawn.util.CustomAppException
 import com.nguyen.pawn.util.UIState
 import io.ktor.client.*
-import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import java.net.ConnectException
 import javax.inject.Inject
 
 class AuthRepository
@@ -32,7 +29,7 @@ class AuthRepository
         nativeLanguage: String
     ): Flow<UIState<Token>> {
         var token: Token? = null
-        return mainNetworkBoundResource(
+        return mainGetNetworkBoundResource(
             query = {
                 flow { emit(token) }
             },
@@ -65,7 +62,7 @@ class AuthRepository
 
     suspend fun login(emailOrUsername: String, password: String): Flow<UIState<Token>> {
         var token: Token? = null
-        return mainNetworkBoundResource(
+        return mainGetNetworkBoundResource(
             query = {
                 flow { emit(token) }
             },
@@ -86,7 +83,7 @@ class AuthRepository
 
     suspend fun logout(refreshToken: String): Flow<UIState<Boolean>> {
         var result: Boolean? = null
-        return mainNetworkBoundResource(
+        return mainGetNetworkBoundResource(
             query = {
                 flow { emit(result) }
             },
@@ -108,7 +105,7 @@ class AuthRepository
 
     suspend fun checkAuthStatus(accessToken: String?): Flow<UIState<User>> {
         var currentUser: User? = null
-        return mainNetworkBoundResource(
+        return mainGetNetworkBoundResource(
             query = {
                 flow { emit(currentUser) }
             },
@@ -129,7 +126,7 @@ class AuthRepository
 
     suspend fun refreshAccessToken(refreshToken: String?): Flow<UIState<String>> {
         var newAccessToken: String? = null
-        return mainNetworkBoundResource(
+        return mainGetNetworkBoundResource(
             query = {
                 flow { emit(newAccessToken) }
             },

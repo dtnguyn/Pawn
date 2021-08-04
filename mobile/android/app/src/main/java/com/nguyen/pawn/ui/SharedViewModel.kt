@@ -44,13 +44,12 @@ class SharedViewModel
     val currentPickedLanguage: State<Language?> = _currentPickedLanguage
 
     /** The list of languages that user wants to learn */
-    private val _pickedLanguages: MutableState<List<Language>?> = mutableStateOf(null)
-    val pickedLanguages: State<List<Language>?> = _pickedLanguages
+    private val _pickedLanguagesUIState: MutableState<UIState<List<Language>>> = mutableStateOf(UIState.Initial(null))
+    val pickedLanguagesUIState: State<UIState<List<Language>>> = _pickedLanguagesUIState
 
     /** The list of languages that user wants to learn (this list is used when user is choosing languages) */
-    private val _displayPickedLanguages: MutableState<ArrayList<Language>> =
-        mutableStateOf(arrayListOf())
-    val displayPickedLanguages: State<ArrayList<Language>> = _displayPickedLanguages
+//    private val _displayPickedLanguages: MutableState<ArrayList<Language>> = mutableStateOf(arrayListOf())
+//    val displayPickedLanguages: State<ArrayList<Language>> = _displayPickedLanguages
 
     /** This is a list of words that user saved */
     private val _savedWords: MutableState<ArrayList<Word>> = mutableStateOf(arrayListOf())
@@ -105,60 +104,50 @@ class SharedViewModel
      * if yes then remove it from map and display list,
      * if no then add to the map and display list */
     fun togglePickedLanguage(language: Language) {
-        if (pickedLanguageMap[language.id] == true) {
-            pickedLanguageMap[language.id] = false
-            _displayPickedLanguages.value =
-                _displayPickedLanguages.value!!.filter { pickedLanguage ->
-                    pickedLanguage.id != language.id
-                } as ArrayList<Language>
-        } else {
-            pickedLanguageMap[language.id] = true
-            _displayPickedLanguages.value =
-                (displayPickedLanguages.value!! + arrayListOf(language)) as ArrayList<Language>
-        }
+        pickedLanguageMap[language.id] = pickedLanguageMap[language.id] != true
     }
 
     /** Get the current picked languages either
      *  from network or room database */
     fun getPickedLanguages(accessToken: String?) {
         viewModelScope.launch {
-            val languages = languageRepo.getLearningLanguages(accessToken)
-            _pickedLanguages.value = languages
-            _displayPickedLanguages.value = languages as ArrayList<Language>
-            val currentLanguageId = _currentPickedLanguage.value?.id
-            var currentInList = false
-            for (language in languages) {
-                pickedLanguageMap[language.id] = true
-                if (!currentInList && currentLanguageId != null) {
-                    currentInList = language.id == currentLanguageId
+            languageRepo.getLearningLanguages(accessToken).collectLatest {
+                _pickedLanguagesUIState.value = it
+                if(it is UIState.Loaded && it.loadedValue != null){
+                    val languages = it.loadedValue
+                    val currentLanguageId = _currentPickedLanguage.value?.id
+                    var currentInList = false
+                    for (language in languages) {
+                        pickedLanguageMap[language.id] = true
+                        if (!currentInList && currentLanguageId != null) {
+                            currentInList = language.id == currentLanguageId
+                        }
+                    }
+                    if (languages.isNotEmpty() && !currentInList) {
+                        _currentPickedLanguage.value = languages.first()
+                    }
                 }
-            }
-            if (languages.isNotEmpty() && !currentInList) {
-                _currentPickedLanguage.value = languages.first()
             }
         }
     }
 
     /** Save the picked languages to network and/or room database
      *  Update the picked list and current pick language*/
-    fun savePickedLanguages(languages: ArrayList<Language>, accessToken: String?) {
+    fun savePickedLanguages(languages: List<Language>, accessToken: String?) {
         viewModelScope.launch {
-            val response = languageRepo.pickLearningLanguages(languages, accessToken)
-            if (response) {
-                _pickedLanguages.value = languages
-                _displayPickedLanguages.value = languages
-                if (_currentPickedLanguage.value == null) {
-                    if (languages.isNotEmpty()) {
-                        _currentPickedLanguage.value = languages.first()
-                    }
-                } else {
-                    if (languages.isNotEmpty() && languages.filter { it.id == _currentPickedLanguage.value!!.id }
-                            .isEmpty()) {
-                        _currentPickedLanguage.value = languages.first()
+            languageRepo.pickLearningLanguages(languages, accessToken).collectLatest { it ->
+                _pickedLanguagesUIState.value = it
+                if(it is UIState.Loaded && it.loadedValue != null){
+                    if (_currentPickedLanguage.value == null) {
+                        if (languages.isNotEmpty()) {
+                            _currentPickedLanguage.value = languages.first()
+                        }
+                    } else {
+                        if (languages.isNotEmpty() && languages.none { language -> language.id == _currentPickedLanguage.value!!.id }) {
+                            _currentPickedLanguage.value = languages.first()
+                        }
                     }
                 }
-            } else {
-                //Handle error
             }
         }
     }

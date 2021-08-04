@@ -9,44 +9,36 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
 import com.nguyen.pawn.R
+import com.nguyen.pawn.model.Language
+import com.nguyen.pawn.model.User
 import com.nguyen.pawn.model.Word
+import com.nguyen.pawn.ui.SharedViewModel
 import com.nguyen.pawn.ui.components.DailyWordSection
 import com.nguyen.pawn.ui.components.HomeAppBar
 import com.nguyen.pawn.ui.components.RoundButton
 import com.nguyen.pawn.ui.components.SavedWordItem
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
-import com.nguyen.pawn.model.Language
-import com.nguyen.pawn.model.User
-import com.nguyen.pawn.ui.SharedViewModel
-import com.nguyen.pawn.ui.components.home.ChooseLanguagesHeader
-import com.nguyen.pawn.ui.components.home.LanguageItem
-import com.nguyen.pawn.ui.theme.*
+import com.nguyen.pawn.ui.components.home.ChooseLanguageSection
 import com.nguyen.pawn.ui.screens.home.HomeViewModel
-
-import com.nguyen.pawn.util.Constants.supportedLanguages
+import com.nguyen.pawn.ui.theme.*
 import com.nguyen.pawn.util.DataStoreUtils.getAccessTokenFromDataStore
 import com.nguyen.pawn.util.DataStoreUtils.getRefreshTokenFromDataStore
-import com.nguyen.pawn.util.LoadingType
 import com.nguyen.pawn.util.SupportedLanguage
 import com.nguyen.pawn.util.UIState
 import com.nguyen.pawn.util.UtilFunctions.convertHeightToDp
 import com.nguyen.pawn.util.UtilFunctions.generateFlagForLanguage
-import io.ktor.util.date.*
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.collections.ArrayList
 
 private const val TAG = "HomeScreen"
 
@@ -76,23 +68,25 @@ fun HomeScreen(
     val dailyDeWordsUIState: UIState<List<Word>> by homeViewModel.dailyDeWordsUIState
     var dailyDeWords by remember { mutableStateOf<ArrayList<Word>>(arrayListOf()) }
 
+    val pickedLanguagesUIState: UIState<List<Language>> by sharedViewModel.pickedLanguagesUIState
+    var pickedLanguages by remember { mutableStateOf<List<Language>?>(null) }
 
     val savedWords: List<Word> by sharedViewModel.savedWords
-    val pickedLanguages: List<Language>? by sharedViewModel.pickedLanguages
-    val displayPickedLanguages: ArrayList<Language> by sharedViewModel.displayPickedLanguages
+
     val currentPickedLanguage: Language? by sharedViewModel.currentPickedLanguage
     val userUIState: UIState<User> by sharedViewModel.userUIState
 
 
-
     /** Local ui states */
-    var showAddLanguageMenu by remember { mutableStateOf(pickedLanguages?.isEmpty()) }
-    var isLoadingPickedLanguage by remember { mutableStateOf(true) }
-    var isLoadingUser by remember { mutableStateOf(true) }
-    var isLoadingDailyWords by remember { mutableStateOf(true) }
+    var showAddLanguageMenu by remember { mutableStateOf(false)  }
+//    var showAddLanguageMenu by remember { mutableStateOf(pickedLanguages?.isEmpty())  }
     var errorMsg by remember { mutableStateOf("") }
     var dailyWordCount by remember { mutableStateOf(3) }
     var user by remember { mutableStateOf<User?>(null) }
+    //Loading states
+    var isLoadingPickedLanguage by remember { mutableStateOf(true) }
+    var isLoadingUser by remember { mutableStateOf(true) }
+    var isLoadingDailyWords by remember { mutableStateOf(true) }
 
     /** Compose state */
     val coroutineScope = rememberCoroutineScope()
@@ -113,18 +107,19 @@ fun HomeScreen(
     /** Initialize the user and get the current
      * picked learning languages */
     LaunchedEffect(null) {
-        Log.d(TAG, "Trigger 1")
-
         sharedViewModel.getUser(
             getAccessTokenFromDataStore(context),
             getRefreshTokenFromDataStore(context)
         )
 
-        sharedViewModel.getPickedLanguages(getAccessTokenFromDataStore(context))
+//        if(pickedLanguagesUIState.loadedValue == null){
+//            sharedViewModel.getPickedLanguages(getAccessTokenFromDataStore(context))
+//        }
     }
 
+
     LaunchedEffect(userUIState) {
-        when(userUIState){
+        when (userUIState) {
             is UIState.Initial -> {
                 isLoadingUser = true
             }
@@ -137,7 +132,7 @@ fun HomeScreen(
             is UIState.Loaded -> {
                 isLoadingUser = false
                 user = userUIState.loadedValue
-                userUIState.loadedValue?.let{user ->
+                userUIState.loadedValue?.let { user ->
                     dailyWordCount = user.dailyWordCount
                 }
             }
@@ -147,17 +142,32 @@ fun HomeScreen(
 
     /** Whenever picked languages change,
      * if picked languages is not null, show all the languages */
-    LaunchedEffect(pickedLanguages) {
-        Log.d(TAG, "Trigger 2")
-        if (pickedLanguages != null) {
-            showAddLanguageMenu = pickedLanguages!!.isEmpty()
+    LaunchedEffect(pickedLanguagesUIState) {
+
+        when (pickedLanguagesUIState) {
+            is UIState.Initial -> {
+
+            }
+            is UIState.Error -> {
+                Log.d("TAG", "pickedLanguages error: ${pickedLanguagesUIState.errorMsg}")
+
+            }
+            is UIState.Loading -> {
+                Log.d("TAG", "pickedLanguages loading")
+            }
+
+            is UIState.Loaded -> {
+                if (pickedLanguagesUIState.loadedValue != null) {
+                    pickedLanguages = pickedLanguagesUIState.loadedValue as ArrayList<Language>
+//                    showAddLanguageMenu = pickedLanguages?.isEmpty()
+                }
+            }
         }
     }
 
     /** Whenever the current picked languages change,
      * if it is not null, then get the daily words of that language */
     LaunchedEffect(currentPickedLanguage) {
-        Log.d(TAG, "Trigger 3 ${currentPickedLanguage?.value}")
         if (currentPickedLanguage != null) {
             homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, currentPickedLanguage!!.id)
         }
@@ -165,105 +175,113 @@ fun HomeScreen(
 
     /** Whenever the uiState changes, Update the UI so that
      * the user can tell the app is loading, error or idle */
-    LaunchedEffect(dailyEnWordsUIState, dailyEsWordsUIState, dailyDeWordsUIState, dailyFrWordsUIState){
-        when(dailyEnWordsUIState){
+    LaunchedEffect(
+        dailyEnWordsUIState,
+        dailyEsWordsUIState,
+        dailyDeWordsUIState,
+        dailyFrWordsUIState
+    ) {
+        Log.d(TAG, "en words: ${dailyEnWords.size}")
+        when (dailyEnWordsUIState) {
             is UIState.Initial -> {
                 //Do nothing
             }
             is UIState.Error -> {
-                if(currentPickedLanguage?.id == "en_US"){
+                if (currentPickedLanguage?.id == "en_US") {
                     isLoadingDailyWords = false
                 }
             }
             is UIState.Loading -> {
-                if(currentPickedLanguage?.id == "en_US"){
+                if (currentPickedLanguage?.id == "en_US") {
                     isLoadingDailyWords = true
                 }
             }
             is UIState.Loaded -> {
                 Log.d(TAG, "isLoadingDailyWords: $isLoadingDailyWords ${currentPickedLanguage?.id}")
-                if(currentPickedLanguage?.id == "en_US"){
+                if (currentPickedLanguage?.id == "en_US") {
                     isLoadingDailyWords = false
                 }
-                dailyEnWordsUIState.loadedValue?.let{
+                dailyEnWordsUIState.loadedValue?.let {
                     dailyEnWords = it as ArrayList<Word>
                 }
             }
         }
 
-        when(dailyEsWordsUIState){
+        when (dailyEsWordsUIState) {
             is UIState.Initial -> {
-                //Do nothing
+                if (currentPickedLanguage?.id == "es") {
+                    isLoadingDailyWords = true
+                }
             }
             is UIState.Error -> {
-                if(currentPickedLanguage?.id == "es"){
+                if (currentPickedLanguage?.id == "es") {
                     isLoadingDailyWords = false
                 }
             }
             is UIState.Loading -> {
                 Log.d(TAG, "isLoadingDailyWords: $isLoadingDailyWords ${currentPickedLanguage?.id}")
-                if(currentPickedLanguage?.id == "es"){
+                if (currentPickedLanguage?.id == "es") {
                     isLoadingDailyWords = true
                 }
             }
             is UIState.Loaded -> {
-                if(currentPickedLanguage?.id == "es"){
+                if (currentPickedLanguage?.id == "es") {
                     isLoadingDailyWords = false
                 }
-                dailyEsWordsUIState.loadedValue?.let{
+                dailyEsWordsUIState.loadedValue?.let {
                     dailyEsWords = it as ArrayList<Word>
                 }
             }
 
         }
 
-        when(dailyFrWordsUIState){
+        when (dailyFrWordsUIState) {
             is UIState.Initial -> {
                 //Do nothing
             }
             is UIState.Error -> {
-                if(currentPickedLanguage?.id == "fr"){
+                if (currentPickedLanguage?.id == "fr") {
                     isLoadingDailyWords = false
                 }
             }
             is UIState.Loading -> {
                 Log.d(TAG, "isLoadingDailyWords: $isLoadingDailyWords ${currentPickedLanguage?.id}")
-                if(currentPickedLanguage?.id == "fr"){
+                if (currentPickedLanguage?.id == "fr") {
                     isLoadingDailyWords = true
                 }
             }
             is UIState.Loaded -> {
-                if(currentPickedLanguage?.id == "fr"){
+                if (currentPickedLanguage?.id == "fr") {
                     isLoadingDailyWords = false
                 }
-                dailyFrWordsUIState.loadedValue?.let{
+                dailyFrWordsUIState.loadedValue?.let {
                     dailyFrWords = it as ArrayList<Word>
                 }
             }
 
         }
 
-        when(dailyDeWordsUIState){
+        when (dailyDeWordsUIState) {
             is UIState.Initial -> {
                 //Do nothing
             }
             is UIState.Error -> {
-                if(currentPickedLanguage?.id == "de"){
+                if (currentPickedLanguage?.id == "de") {
                     isLoadingDailyWords = false
                 }
             }
             is UIState.Loading -> {
                 Log.d(TAG, "isLoadingDailyWords: $isLoadingDailyWords ${currentPickedLanguage?.id}")
-                if(currentPickedLanguage?.id == "de"){
+                if (currentPickedLanguage?.id == "de") {
                     isLoadingDailyWords = true
                 }
             }
             is UIState.Loaded -> {
 
-                if(currentPickedLanguage?.id == "de"){
+                if (currentPickedLanguage?.id == "de") {
                     isLoadingDailyWords = false
                 }
-                dailyDeWordsUIState.loadedValue?.let{
+                dailyDeWordsUIState.loadedValue?.let {
                     dailyDeWords = it as ArrayList<Word>
                 }
             }
@@ -318,33 +336,21 @@ fun HomeScreen(
                         elevation = 10.dp,
 
                         ) {
-                        if (showAddLanguageMenu != null) {
-                            LazyColumn(Modifier.padding(bottom = 50.dp)) {
-                                if (showAddLanguageMenu!!) {
-                                    item {
-                                        ChooseLanguagesHeader(pickedLanguages = displayPickedLanguages) {
-                                            coroutineScope.launch {
-                                                showAddLanguageMenu = false
-                                                sharedViewModel.savePickedLanguages(
-                                                    displayPickedLanguages,
-                                                    getAccessTokenFromDataStore(context)
-                                                )
-                                            }
+                        if(showAddLanguageMenu != null) {
+                            if (showAddLanguageMenu!!) {
+//                                ChooseLanguageSection(pickedLanguages = pickedLanguages!!) {
+//                                    coroutineScope.launch {
+//                                        showAddLanguageMenu = false
+//                                        Log.d(TAG, "save size: ${it.size}")
+//                                        sharedViewModel.savePickedLanguages(
+//                                            it,
+//                                            getAccessTokenFromDataStore(context)
+//                                        )
+//                                    }
+//                                }
+                            } else {
+                                LazyColumn(Modifier.padding(bottom = 50.dp)) {
 
-                                        }
-                                    }
-
-                                    items(supportedLanguages.size) { index ->
-                                        LanguageItem(
-                                            language = supportedLanguages[index],
-                                            isPicked = displayPickedLanguages!!.filter {
-                                                it.id == supportedLanguages[index].id
-                                            }.size == 1
-                                        ) { language ->
-                                            sharedViewModel.togglePickedLanguage(language)
-                                        }
-                                    }
-                                } else {
                                     item {
                                         Row(
                                             modifier = Modifier.padding(
@@ -354,7 +360,7 @@ fun HomeScreen(
                                             ),
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            displayPickedLanguages.forEach { language ->
+                                            pickedLanguages?.forEach { language ->
                                                 Image(
                                                     painter = painterResource(
                                                         id = generateFlagForLanguage(
@@ -389,7 +395,6 @@ fun HomeScreen(
                                         }
                                     }
                                     item {
-
                                         DailyWordSection(
                                             isLoading = isLoadingDailyWords,
                                             viewModel = sharedViewModel,
@@ -441,8 +446,6 @@ fun HomeScreen(
 
                             }
                         }
-
-
                     }
                 },
                 scaffoldState = bottomSheetScaffoldState,

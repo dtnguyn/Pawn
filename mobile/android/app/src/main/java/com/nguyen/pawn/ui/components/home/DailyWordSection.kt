@@ -2,6 +2,7 @@ package com.nguyen.pawn.ui.components
 
 import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
@@ -11,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -35,34 +37,33 @@ fun DailyWordSection(
     viewModel: SharedViewModel,
     pagerState: PagerState,
     navController: NavController,
-    words: ArrayList<Word>,
+    words: List<Word>,
     isLoading: Boolean,
 ) {
 
 
     val coroutineScope = rememberCoroutineScope()
-    val isSaved = remember { mutableStateOf(false)}
+    val isSaved = remember { mutableStateOf(false) }
 
     Log.d(TAG, "isLoadingDailyWords: $isLoading")
-    if (words.size > 0 || isLoading)
-        Column {
-            Text(
-                text = "Daily words",
-                modifier = Modifier.padding(
-                    horizontal = 30.dp,
-                    vertical = 20.dp
-                ),
-                style = Typography.h6,
-                fontSize = 18.sp
+//    if (words.size > 0 || isLoading) {
+    Column {
+        Text(
+            text = "Daily words",
+            modifier = Modifier.padding(
+                horizontal = 30.dp,
+                vertical = 20.dp
+            ),
+            style = Typography.h6,
+            fontSize = 18.sp
 
-            )
-
-            if(isLoading) {
-                Log.d(TAG, "loading UI")
+        )
+        if (words.size > 0) {
+            if (isLoading) {
                 DailyWordCard(
                     isLoading = isLoading,
                     word = "",
-                    definition = "" ,
+                    definition = "",
                     pronunciation = "",
                     onClick = {}
                 )
@@ -74,60 +75,69 @@ fun DailyWordSection(
                     DailyWordCard(
                         isLoading = isLoading,
                         word = words[page].value,
-                        definition = words[page].definitions[0].meaning ,
+                        definition = words[page].definitions[0].meaning,
                         pronunciation = words[page].pronunciations[0].symbol,
                         onClick = {
                             navController.navigate("Word")
 
                         }
                     )
-
-                }
-                HorizontalPagerIndicator(
-                    pagerState = pagerState,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(top = 30.dp, bottom = 10.dp)
-                )
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 20.dp)
-                ) {
-                    RoundedSquareButton(LightGreen, R.drawable.next2, onClick = {
-                        coroutineScope.launch {
-                            val page =
-                                if (pagerState.currentPage == 0) 0 else pagerState.currentPage - 1
-                            pagerState.animateScrollToPage(page)
-                        }
-                    })
-                    RoundedSquareButton(Grey, R.drawable.trash) {
-//                    viewModel.removeDailyWords(words[pagerState.currentPage].id)
-
-                    }
-                    if(viewModel.checkIsSaved(words[pagerState.currentPage].value)){
-                        RoundedSquareButton(LightRed, R.drawable.heart_red , onClick = {
-                            isSaved.value = !isSaved.value
-                            viewModel.toggleSavedWord(words[pagerState.currentPage])
-                        })
-                    } else {
-                        RoundedSquareButton(LightRed, R.drawable.heart , onClick = {
-                            isSaved.value = !isSaved.value
-                            viewModel.toggleSavedWord(words[pagerState.currentPage])
-                        })
-                    }
-
-
-                    RoundedSquareButton(LightOrange, R.drawable.next2_right, onClick = {
-                        coroutineScope.launch {
-                            val nextPage =
-                                if (pagerState.currentPage == words.size - 1) 0 else pagerState.currentPage + 1
-                            pagerState.animateScrollToPage(nextPage)
-                        }
-                    })
                 }
             }
+            HorizontalPagerIndicator(
+                pagerState = pagerState,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 30.dp, bottom = 10.dp)
+            )
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 20.dp)
+            ) {
+                RoundedSquareButton(LightGreen, R.drawable.next2, onClick = {
+                    coroutineScope.launch {
+                        val page =
+                            if (pagerState.currentPage == 0) 0 else pagerState.currentPage - 1
+                        pagerState.animateScrollToPage(page)
+                    }
+                })
+                RoundedSquareButton(Grey, R.drawable.trash) {
+//                    viewModel.removeDailyWords(words[pagerState.currentPage].id)
+
+                }
+                if (viewModel.checkIsSaved(words[pagerState.currentPage].value)) {
+                    RoundedSquareButton(LightRed, R.drawable.heart_red, onClick = {
+                        isSaved.value = !isSaved.value
+                        viewModel.toggleSavedWord(words[pagerState.currentPage])
+                    })
+                } else {
+                    RoundedSquareButton(LightRed, R.drawable.heart, onClick = {
+                        isSaved.value = !isSaved.value
+                        viewModel.toggleSavedWord(words[pagerState.currentPage])
+                    })
+                }
+
+
+                RoundedSquareButton(LightOrange, R.drawable.next2_right, onClick = {
+                    coroutineScope.launch {
+                        val nextPage =
+                            if (pagerState.currentPage == words.size - 1) 0 else pagerState.currentPage + 1
+                        pagerState.animateScrollToPage(nextPage)
+                    }
+                })
+            }
+        } else {
+            DailyWordCard(
+                isLoading = true,
+                word = "",
+                definition = "",
+                pronunciation = "",
+                onClick = {}
+            )
         }
 
+
+    }
 }

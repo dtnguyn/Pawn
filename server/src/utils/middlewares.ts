@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { getOneUser } from "../controllers/UserController";
 import ApiResponse from "./ApiResponse";
+import jwt from "jsonwebtoken";
 
 export const checkAuthentication = (
   req: Request,
@@ -21,7 +22,6 @@ export const checkAuthentication = (
           res.send(new ApiResponse(false, "Something went wrong!", null));
         } else {
           (req as any).user = await getOneUser(decoded.user.email);
-
           next();
         }
       }

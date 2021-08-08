@@ -20,9 +20,6 @@ export class Word {
   @Column()
   language: string;
 
-  @OneToMany(() => SavedWord, (savedWord) => savedWord.word)
-  savedWords: SavedWord[];
-
   @CreateDateColumn()
   createdAt: Date;
 

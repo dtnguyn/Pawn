@@ -30,6 +30,7 @@ const Word_1 = require("./entity/Word");
 const auth_1 = __importDefault(require("./routes/auth"));
 const word_1 = __importDefault(require("./routes/word"));
 const language_1 = __importDefault(require("./routes/language"));
+const DailyWord_1 = require("./entity/DailyWord");
 typeorm_1.createConnection({
     type: "postgres",
     host: "localhost",
@@ -41,6 +42,7 @@ typeorm_1.createConnection({
     entities: [
         Word_1.Word,
         SavedWord_1.SavedWord,
+        DailyWord_1.DailyWord,
         User_1.User,
         UserRefreshToken_1.UserRefreshToken,
         Topic_1.Topic,

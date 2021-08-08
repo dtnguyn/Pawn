@@ -26,7 +26,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "oauthId", void 0);
 __decorate([
-    typeorm_1.Column(),
+    typeorm_1.Column({ unique: true }),
     __metadata("design:type", String)
 ], User.prototype, "username", void 0);
 __decorate([
@@ -53,6 +53,10 @@ __decorate([
     typeorm_1.OneToMany(() => SavedWord_1.SavedWord, (word) => word.user),
     __metadata("design:type", Array)
 ], User.prototype, "savedWords", void 0);
+__decorate([
+    typeorm_1.OneToMany(() => SavedWord_1.SavedWord, (word) => word.user),
+    __metadata("design:type", Array)
+], User.prototype, "dailyWords", void 0);
 __decorate([
     typeorm_1.OneToMany(() => UserRefreshToken_1.UserRefreshToken, (token) => token.user),
     __metadata("design:type", Array)

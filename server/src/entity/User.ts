@@ -11,6 +11,7 @@ import {
 } from "typeorm";
 import { ChatImage } from "./ChatImage";
 import { ChatMessage } from "./ChatMessage";
+import { DailyWord } from "./DailyWord";
 import { GroupChat } from "./GroupChat";
 import { Language } from "./Language";
 import { Notification } from "./Notification";
@@ -27,7 +28,7 @@ export class User {
   @Column({ nullable: true })
   oauthId: string;
 
-  @Column()
+  @Column({ unique: true })
   username: string;
 
   @Column({ nullable: true })
@@ -47,6 +48,9 @@ export class User {
 
   @OneToMany(() => SavedWord, (word) => word.user)
   savedWords: SavedWord[];
+
+  @OneToMany(() => SavedWord, (word) => word.user)
+  dailyWords: DailyWord[];
 
   @OneToMany(() => UserRefreshToken, (token) => token.user)
   refreshTokens: UserRefreshToken[];

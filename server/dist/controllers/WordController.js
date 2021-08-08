@@ -41,6 +41,7 @@ exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, v
                     }
                 }
             }
+            console.log("tries: ", i);
             break;
         }
         case "de": {
@@ -116,11 +117,13 @@ exports.getDefinition = (word, language) => __awaiter(this, void 0, void 0, func
         };
         if (def.phonetics.length) {
             for (const phonetic of def.phonetics) {
-                const pron = {
-                    audio: phonetic.audio,
-                    symbol: phonetic.text,
-                };
-                word.pronunciations.push(pron);
+                if (phonetic.audio && phonetic.text) {
+                    const pron = {
+                        audio: phonetic.audio,
+                        symbol: phonetic.text,
+                    };
+                    word.pronunciations.push(pron);
+                }
             }
         }
         else
@@ -128,12 +131,14 @@ exports.getDefinition = (word, language) => __awaiter(this, void 0, void 0, func
         if (def.meanings.length) {
             for (const meaning of def.meanings) {
                 for (const definition of meaning.definitions) {
-                    const defValue = {
-                        meaning: definition.definition,
-                        partOfSpeech: meaning.partOfSpeech,
-                        example: definition.example,
-                    };
-                    word.definitions.push(defValue);
+                    if (definition.definition) {
+                        const defValue = {
+                            meaning: definition.definition,
+                            partOfSpeech: meaning.partOfSpeech,
+                            example: definition.example,
+                        };
+                        word.definitions.push(defValue);
+                    }
                 }
             }
         }
@@ -158,7 +163,7 @@ exports.toggleSaveWord = (word, language, userId) => __awaiter(this, void 0, voi
     const savedWordRepo = typeorm_1.getRepository(SavedWord_1.SavedWord);
     const wordRepo = typeorm_1.getRepository(Word_1.Word);
     const savedWord = yield savedWordRepo.findOne({
-        wordValue: word,
+        value: word,
         language,
         userId,
     });
@@ -169,12 +174,7 @@ exports.toggleSaveWord = (word, language, userId) => __awaiter(this, void 0, voi
     }
     else {
         const def = yield exports.getDefinition(word, language);
-        const wordDb = yield wordRepo.findOne({
-            value: word,
-            language,
-        });
-        if (!wordDb)
-            throw new Error("Not found word!");
+        console.log("Definition: ", def);
         if (def) {
             const queryRunner = typeorm_1.getConnection().createQueryRunner();
             yield queryRunner.connect();
@@ -183,9 +183,8 @@ exports.toggleSaveWord = (word, language, userId) => __awaiter(this, void 0, voi
                 const manager = queryRunner.manager;
                 const length = yield savedWordRepo.count({ userId, language });
                 const savedWordDb = manager.create(SavedWord_1.SavedWord, {
-                    wordId: wordDb.id,
                     userId,
-                    wordValue: word,
+                    value: word,
                     language,
                     position: length + 1,
                 });
@@ -219,16 +218,17 @@ exports.toggleSaveWord = (word, language, userId) => __awaiter(this, void 0, voi
             throw new Error("Not found definition");
     }
 });
-exports.getSavedWords = (userId) => __awaiter(this, void 0, void 0, function* () {
+exports.getSavedWords = (userId, language) => __awaiter(this, void 0, void 0, function* () {
     const savedWordRepo = typeorm_1.getRepository(SavedWord_1.SavedWord);
+    console.log("Getting saved words... ");
     const savedWords = yield savedWordRepo
         .createQueryBuilder("savedWord")
-        .leftJoinAndSelect("savedWord.word", "word")
         .leftJoinAndSelect("savedWord.pronunciations", "pronunciations")
         .leftJoinAndSelect("savedWord.definitions", "definitions")
         .orderBy("definitions.position", "ASC")
         .leftJoinAndSelect("savedWord.user", "user")
         .where("user.id = :userId", { userId })
+        .andWhere("savedWord.language = :language", { language })
         .orderBy("savedWord.position", "ASC")
         .getMany();
     console.log(savedWords);

@@ -30,7 +30,7 @@ export class Definition {
   @Column()
   position: number;
 
-  @Column()
+  @Column({ nullable: true })
   partOfSpeech: string;
 
   @Column({ nullable: true })

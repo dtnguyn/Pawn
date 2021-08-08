@@ -1,6 +1,6 @@
 import express from "express";
 import "reflect-metadata";
-import { createConnection } from "typeorm";
+import { createConnection, getRepository } from "typeorm";
 import { ChatImage } from "./entity/ChatImage";
 import { ChatMessage } from "./entity/ChatMessage";
 import { Definition } from "./entity/Definition";
@@ -17,6 +17,8 @@ import { Word } from "./entity/Word";
 import auth from "./routes/auth";
 import word from "./routes/word";
 import language from "./routes/language";
+import { importAllWords } from "./controllers/WordController";
+import { DailyWord } from "./entity/DailyWord";
 
 createConnection({
   type: "postgres",
@@ -29,6 +31,7 @@ createConnection({
   entities: [
     Word,
     SavedWord,
+    DailyWord,
     User,
     UserRefreshToken,
     Topic,
@@ -53,12 +56,7 @@ createConnection({
     // await importAllWords();
     // console.log(await getRepository(User).delete({ email: "test@test.com" }));
     // await importAllLanguages();
-    // console.log(
-    //   await getRepository(User)
-    //     .createQueryBuilder("user")
-    //     .leftJoinAndSelect("user.learningLanguages", "language")
-    //     .getMany()
-    // );
+
     // console.log(
     //   await getRepository(Language)
     //     .createQueryBuilder("language")
@@ -66,6 +64,8 @@ createConnection({
     //     .getMany()
     // );
     // console.log(await getRepository(Language).find());
+
+    // console.log(await getRepository(User).find());
 
     app.listen(4000, () => {
       console.log("Server is running on port 4000");

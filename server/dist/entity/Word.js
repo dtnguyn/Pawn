@@ -10,7 +10,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const SavedWord_1 = require("./SavedWord");
 let Word = class Word {
 };
 __decorate([
@@ -25,10 +24,6 @@ __decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)
 ], Word.prototype, "language", void 0);
-__decorate([
-    typeorm_1.OneToMany(() => SavedWord_1.SavedWord, (savedWord) => savedWord.word),
-    __metadata("design:type", Array)
-], Word.prototype, "savedWords", void 0);
 __decorate([
     typeorm_1.CreateDateColumn(),
     __metadata("design:type", Date)

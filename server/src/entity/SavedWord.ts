@@ -13,21 +13,14 @@ import {
 import { Definition } from "./Definition";
 import { Pronunciation } from "./Pronunciation";
 import { User } from "./User";
-import { Word } from "./Word";
 
 @Entity()
 export class SavedWord {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column("uuid")
-  wordId: string;
-  @ManyToOne(() => Word, (word) => word.savedWords)
-  @JoinColumn({ name: "wordId" })
-  word: Word;
-
   @Column()
-  wordValue: string;
+  value: string;
 
   @Column()
   language: string;

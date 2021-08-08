@@ -4,8 +4,8 @@ import esWords from "an-array-of-spanish-words";
 import deWords from "all-the-german-words";
 import { getRandomNumber } from "../utils/getRandomNumber";
 import superagent from "superagent";
-import { WordJSON } from "../utils/types";
-import { getConnection, getRepository } from "typeorm";
+import { DefinitionJSON, PronunciationJSON, WordJSON } from "../utils/types";
+import { getConnection, getRepository, MoreThan } from "typeorm";
 import { Word } from "../entity/Word";
 import { SavedWord } from "../entity/SavedWord";
 import { Pronunciation } from "../entity/Pronunciation";
@@ -13,12 +13,14 @@ import { Definition } from "../entity/Definition";
 import { rejects } from "assert";
 import { User } from "../entity/User";
 import { Language } from "../entity/Language";
+import { DailyWord } from "../entity/DailyWord";
 
 export const getDailyRandomWords = async (
   wordCount: number,
   language: string
 ) => {
   const results: WordJSON[] = [];
+  // console.log(new Date().toISOString().split("T")[0])
 
   switch (language) {
     case "en_US": {
@@ -27,7 +29,6 @@ export const getDailyRandomWords = async (
       while (i < wordCount) {
         const num = getRandomNumber(0, 274936);
         const word = enWords[num];
-
         if (!arr.includes(word)) {
           const def = await getDefinition(word, language);
           if (def) {
@@ -37,6 +38,7 @@ export const getDailyRandomWords = async (
           }
         }
       }
+      console.log("tries: ", i);
       break;
     }
     case "de": {
@@ -45,7 +47,6 @@ export const getDailyRandomWords = async (
       while (i < wordCount) {
         const num = getRandomNumber(0, 1680837);
         const word = deWords[num];
-
         if (!arr.includes(word)) {
           const def = await getDefinition(word, language);
           if (def) {
@@ -63,7 +64,6 @@ export const getDailyRandomWords = async (
       while (i < wordCount) {
         const num = getRandomNumber(0, 336523);
         const word = (frWords as string[])[num];
-
         if (!arr.includes(word)) {
           const def = await getDefinition(word, language);
           if (def) {
@@ -81,7 +81,6 @@ export const getDailyRandomWords = async (
       while (i < wordCount) {
         const num = getRandomNumber(0, 636597);
         const word = (esWords as string[])[num];
-
         if (!arr.includes(word)) {
           const def = await getDefinition(word, language);
           if (def) {
@@ -97,6 +96,7 @@ export const getDailyRandomWords = async (
       throw new Error("Please provide supported language!");
     }
   }
+
   return results;
 };
 
@@ -119,23 +119,27 @@ export const getDefinition = async (word: string, language: string) => {
 
     if (def.phonetics.length) {
       for (const phonetic of def.phonetics) {
-        const pron = {
-          audio: phonetic.audio,
-          symbol: phonetic.text,
-        };
-        word.pronunciations.push(pron);
+        if (phonetic.audio && phonetic.text) {
+          const pron = {
+            audio: phonetic.audio,
+            symbol: phonetic.text,
+          };
+          word.pronunciations.push(pron);
+        }
       }
     } else return null;
 
     if (def.meanings.length) {
       for (const meaning of def.meanings) {
         for (const definition of meaning.definitions) {
-          const defValue = {
-            meaning: definition.definition,
-            partOfSpeech: meaning.partOfSpeech,
-            example: definition.example,
-          };
-          word.definitions.push(defValue);
+          if (definition.definition) {
+            const defValue = {
+              meaning: definition.definition,
+              partOfSpeech: meaning.partOfSpeech,
+              example: definition.example,
+            };
+            word.definitions.push(defValue);
+          }
         }
       }
     } else return null;
@@ -165,26 +169,20 @@ export const toggleSaveWord = async (
   const wordRepo = getRepository(Word);
 
   const savedWord = await savedWordRepo.findOne({
-    wordValue: word,
+    value: word,
     language,
     userId,
   });
 
   if (savedWord) {
-    //Remove save word
+    // Remove saved word
     await savedWordRepo.delete({
       id: savedWord.id,
     });
   } else {
+    /// Add to saved word list
     const def = await getDefinition(word, language);
-
-    const wordDb = await wordRepo.findOne({
-      value: word,
-      language,
-    });
-
-    if (!wordDb) throw new Error("Not found word!");
-
+    console.log("Definition: ", def);
     if (def) {
       const queryRunner = getConnection().createQueryRunner();
       await queryRunner.connect();
@@ -193,9 +191,8 @@ export const toggleSaveWord = async (
         const manager = queryRunner.manager;
         const length = await savedWordRepo.count({ userId, language });
         const savedWordDb = manager.create(SavedWord, {
-          wordId: wordDb.id,
           userId,
-          wordValue: word,
+          value: word,
           language,
           position: length + 1,
         });
@@ -231,17 +228,18 @@ export const toggleSaveWord = async (
   }
 };
 
-export const getSavedWords = async (userId: string) => {
+export const getSavedWords = async (userId: string, language: string) => {
   const savedWordRepo = getRepository(SavedWord);
-
+  console.log("Getting saved words... ");
   const savedWords = await savedWordRepo
     .createQueryBuilder("savedWord")
-    .leftJoinAndSelect("savedWord.word", "word")
+    // .leftJoinAndSelect("savedWord.word", "word")
     .leftJoinAndSelect("savedWord.pronunciations", "pronunciations")
     .leftJoinAndSelect("savedWord.definitions", "definitions")
     .orderBy("definitions.position", "ASC")
     .leftJoinAndSelect("savedWord.user", "user")
     .where("user.id = :userId", { userId })
+    .andWhere("savedWord.language = :language", { language })
     .orderBy("savedWord.position", "ASC")
     .getMany();
 

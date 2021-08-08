@@ -16,12 +16,13 @@ const router = Router();
 router.get("/daily", async (req, res) => {
   try {
     let dailyWordCount = 3;
-    if (req.body.dailyWordCount) {
-      dailyWordCount = req.body.dailyWordCount;
+    console.log(req.query);
+    if (req.query.dailyWordCount) {
+      dailyWordCount = parseInt(req.query.dailyWordCount as string);
     }
 
-    const language = req.body.language;
-    if (language)
+    const language = req.query.language as string;
+    if (!language)
       return res.send(
         new ApiResponse(false, "Please provide the target language!", null)
       );
@@ -68,7 +69,8 @@ router.get("/autocomplete", async (req, res) => {
 router.get("/save", checkAuthentication, async (req, res) => {
   try {
     const userId = (req as any).user.id;
-    const savedWords = await getSavedWords(userId);
+    const language = req.query.language as string;
+    const savedWords = await getSavedWords(userId, language);
     return res.send(new ApiResponse(true, "", savedWords));
   } catch (error) {
     return res.send(new ApiResponse(false, error.message, null));

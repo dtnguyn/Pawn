@@ -19,11 +19,12 @@ const router = express_1.Router();
 router.get("/daily", (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         let dailyWordCount = 3;
-        if (req.body.dailyWordCount) {
-            dailyWordCount = req.body.dailyWordCount;
+        console.log(req.query);
+        if (req.query.dailyWordCount) {
+            dailyWordCount = parseInt(req.query.dailyWordCount);
         }
-        const language = req.body.language;
-        if (language)
+        const language = req.query.language;
+        if (!language)
             return res.send(new ApiResponse_1.default(false, "Please provide the target language!", null));
         const words = yield WordController_1.getDailyRandomWords(dailyWordCount, language);
         return res.send(new ApiResponse_1.default(true, "", words));
@@ -63,7 +64,8 @@ router.get("/autocomplete", (req, res) => __awaiter(this, void 0, void 0, functi
 router.get("/save", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         const userId = req.user.id;
-        const savedWords = yield WordController_1.getSavedWords(userId);
+        const language = req.query.language;
+        const savedWords = yield WordController_1.getSavedWords(userId, language);
         return res.send(new ApiResponse_1.default(true, "", savedWords));
     }
     catch (error) {

@@ -13,7 +13,6 @@ const typeorm_1 = require("typeorm");
 const Definition_1 = require("./Definition");
 const Pronunciation_1 = require("./Pronunciation");
 const User_1 = require("./User");
-const Word_1 = require("./Word");
 let SavedWord = class SavedWord {
 };
 __decorate([
@@ -21,18 +20,9 @@ __decorate([
     __metadata("design:type", String)
 ], SavedWord.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column("uuid"),
-    __metadata("design:type", String)
-], SavedWord.prototype, "wordId", void 0);
-__decorate([
-    typeorm_1.ManyToOne(() => Word_1.Word, (word) => word.savedWords),
-    typeorm_1.JoinColumn({ name: "wordId" }),
-    __metadata("design:type", Word_1.Word)
-], SavedWord.prototype, "word", void 0);
-__decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)
-], SavedWord.prototype, "wordValue", void 0);
+], SavedWord.prototype, "value", void 0);
 __decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)

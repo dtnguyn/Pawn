@@ -57,27 +57,28 @@ fun HomeScreen(
 
     /** States from viewModel */
     val dailyEnWordsUIState: UIState<List<Word>> by homeViewModel.dailyEnWordsUIState
-    var dailyEnWords by remember { mutableStateOf(dailyEnWordsUIState.loadedValue) }
+    var dailyEnWords by remember { mutableStateOf(dailyEnWordsUIState.value) }
 
     val dailyEsWordsUIState: UIState<List<Word>> by homeViewModel.dailyEsWordsUIState
-    var dailyEsWords by remember { mutableStateOf(dailyEsWordsUIState.loadedValue) }
+    var dailyEsWords by remember { mutableStateOf(dailyEsWordsUIState.value) }
 
     val dailyFrWordsUIState: UIState<List<Word>> by homeViewModel.dailyFrWordsUIState
-    var dailyFrWords by remember { mutableStateOf(dailyFrWordsUIState.loadedValue) }
+    var dailyFrWords by remember { mutableStateOf(dailyFrWordsUIState.value) }
 
     val dailyDeWordsUIState: UIState<List<Word>> by homeViewModel.dailyDeWordsUIState
-    var dailyDeWords by remember { mutableStateOf(homeViewModel.dailyDeWordsUIState.value.loadedValue) }
+    var dailyDeWords by remember { mutableStateOf(dailyDeWordsUIState.value) }
 
     val pickedLanguagesUIState: UIState<List<Language>> by sharedViewModel.pickedLanguagesUIState
-    var pickedLanguages by remember { mutableStateOf(pickedLanguagesUIState.loadedValue) }
-    var showAddLanguageMenu by remember { mutableStateOf(pickedLanguagesUIState.loadedValue?.isEmpty()) }
+    var pickedLanguages by remember { mutableStateOf(pickedLanguagesUIState.value) }
+    var showAddLanguageMenu by remember { mutableStateOf(pickedLanguagesUIState.value?.isEmpty()) }
 
     val userUIState: UIState<User> by sharedViewModel.userUIState
-    var user by remember { mutableStateOf(userUIState.loadedValue) }
+    var user by remember { mutableStateOf(userUIState.value) }
 
     val currentPickedLanguage: Language? by sharedViewModel.currentPickedLanguage
 
-    val savedWords: List<Word> by sharedViewModel.savedWords
+    val savedWordsUIState: UIState<List<Word>> by sharedViewModel.savedWordsUIState
+    var savedWords by remember { mutableStateOf(savedWordsUIState.value) }
 
 
     /** Error states */
@@ -133,13 +134,12 @@ fun HomeScreen(
             }
             is UIState.Loaded -> {
                 isLoadingUser = false
-                if(user == null && userUIState.loadedValue != null){
+                if(user == null && userUIState.value != null){
                     // When user login
-                    Log.d(TAG, "User just login")
                     sharedViewModel.getPickedLanguages(getAccessTokenFromDataStore(context))
                 }
-                user = userUIState.loadedValue
-                userUIState.loadedValue?.let { user ->
+                user = userUIState.value
+                userUIState.value?.let { user ->
                     dailyWordCount = user.dailyWordCount
                 }
             }
@@ -162,8 +162,8 @@ fun HomeScreen(
             }
 
             is UIState.Loaded -> {
-                if (pickedLanguagesUIState.loadedValue != null) {
-                    pickedLanguages = pickedLanguagesUIState.loadedValue
+                if (pickedLanguagesUIState.value != null) {
+                    pickedLanguages = pickedLanguagesUIState.value
                     showAddLanguageMenu = pickedLanguages?.isEmpty()
                 }
             }
@@ -176,6 +176,7 @@ fun HomeScreen(
         if (currentPickedLanguage != null) {
             isLoadingDailyWords = false
             homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, currentPickedLanguage!!.id)
+            sharedViewModel.getSavedWords(getAccessTokenFromDataStore(context))
         }
     }
 
@@ -205,7 +206,7 @@ fun HomeScreen(
                 if (currentPickedLanguage?.id == "en_US") {
                     isLoadingDailyWords = false
                 }
-                dailyEnWordsUIState.loadedValue?.let {
+                dailyEnWordsUIState.value?.let {
                     dailyEnWords = it as ArrayList<Word>
                 }
             }
@@ -231,7 +232,7 @@ fun HomeScreen(
                 if (currentPickedLanguage?.id == "es") {
                     isLoadingDailyWords = false
                 }
-                dailyEsWordsUIState.loadedValue?.let {
+                dailyEsWordsUIState.value?.let {
                     dailyEsWords = it
                 }
             }
@@ -256,7 +257,7 @@ fun HomeScreen(
                 if (currentPickedLanguage?.id == "fr") {
                     isLoadingDailyWords = false
                 }
-                dailyFrWordsUIState.loadedValue?.let {
+                dailyFrWordsUIState.value?.let {
                     dailyFrWords = it as ArrayList<Word>
                 }
             }
@@ -282,13 +283,34 @@ fun HomeScreen(
                 if (currentPickedLanguage?.id == "de") {
                     isLoadingDailyWords = false
                 }
-                dailyDeWordsUIState.loadedValue?.let {
+                dailyDeWordsUIState.value?.let {
                     dailyDeWords = it as ArrayList<Word>
                 }
             }
 
         }
     }
+
+
+    LaunchedEffect(savedWordsUIState){
+        when(savedWordsUIState){
+            is UIState.Error -> {
+                Log.d(TAG, "saved words error: ${savedWordsUIState.errorMsg}")
+            }
+            is UIState.Initial -> {
+                savedWords = savedWordsUIState.value
+            }
+            is UIState.Loading -> {
+                Log.d(TAG, "saved words loading: ${savedWordsUIState.value}")
+
+            }
+            is UIState.Loaded -> {
+                Log.d(TAG, "saved words loaded: ${savedWordsUIState.value}")
+                savedWords = savedWordsUIState.value
+            }
+        }
+    }
+
 
     /**   ---HELPER FUNCTIONS---   */
 
@@ -324,8 +346,6 @@ fun HomeScreen(
             scaffoldState = homeScaffoldState
 
         ) {
-
-
             BottomSheetScaffold(
                 sheetShape = RoundedCornerShape(topStart = 60.dp, topEnd = 60.dp),
                 sheetContent = {
@@ -396,10 +416,15 @@ fun HomeScreen(
                                 item {
                                     DailyWordSection(
                                         isLoading = isLoadingDailyWords,
-                                        viewModel = sharedViewModel,
                                         pagerState = pagerState,
                                         navController = navController,
                                         words = dailyWords() ?: listOf(),
+                                        onToggleSaveWord = {
+                                            coroutineScope.launch {
+                                                sharedViewModel.toggleSavedWord(it, getAccessTokenFromDataStore(context))
+                                            }
+                                        },
+                                        onRemoveWord = {}
                                     )
                                 }
                                 stickyHeader {
@@ -431,15 +456,17 @@ fun HomeScreen(
                                     }
                                 }
 
-                                items(savedWords.size) { index ->
-                                    SavedWordItem(
-                                        word = savedWords[index].value,
-                                        pronunciation = savedWords[index].pronunciations[0].symbol,
-                                        index = index,
-                                        onClick = {
-                                            navController.navigate("word")
-                                        }
-                                    )
+                                if(savedWords != null) {
+                                    items(savedWords!!.size) { index ->
+                                        SavedWordItem(
+                                            word = savedWords!![index].value,
+                                            pronunciation = savedWords!![index].pronunciations[0].symbol,
+                                            index = index,
+                                            onClick = {
+                                                navController.navigate("word")
+                                            }
+                                        )
+                                    }
                                 }
                             }
 

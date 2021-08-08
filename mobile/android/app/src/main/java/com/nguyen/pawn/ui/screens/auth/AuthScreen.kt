@@ -100,9 +100,9 @@ fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, n
             is UIState.Loaded -> {
                 // If the token is not null then go back home
                 isLoading = false
-                DataStoreUtils.saveAccessTokenToAuthDataStore(context, tokenUIState.loadedValue?.accessToken)
-                DataStoreUtils.saveRefreshTokenToAuthDataStore(context, tokenUIState.loadedValue?.refreshToken)
-                tokenUIState.loadedValue?.accessToken?.let {
+                DataStoreUtils.saveAccessTokenToAuthDataStore(context, tokenUIState.value?.accessToken)
+                DataStoreUtils.saveRefreshTokenToAuthDataStore(context, tokenUIState.value?.refreshToken)
+                tokenUIState.value?.accessToken?.let {
                     navController.navigate("home") {
                         popUpTo("home") { inclusive = true }
                     }

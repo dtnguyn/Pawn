@@ -34,11 +34,12 @@ private const val TAG = "DailyWordSection"
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun DailyWordSection(
-    viewModel: SharedViewModel,
     pagerState: PagerState,
     navController: NavController,
     words: List<Word>,
     isLoading: Boolean,
+    onToggleSaveWord: (word: Word) -> Unit,
+    onRemoveWord: () -> Unit,
 ) {
 
 
@@ -58,7 +59,7 @@ fun DailyWordSection(
             fontSize = 18.sp
 
         )
-        if (words.size > 0) {
+        if (words.isNotEmpty()) {
             if (isLoading) {
                 DailyWordCard(
                     isLoading = isLoading,
@@ -107,17 +108,9 @@ fun DailyWordSection(
 //                    viewModel.removeDailyWords(words[pagerState.currentPage].id)
 
                 }
-                if (viewModel.checkIsSaved(words[pagerState.currentPage].value)) {
-                    RoundedSquareButton(LightRed, R.drawable.heart_red, onClick = {
-                        isSaved.value = !isSaved.value
-                        viewModel.toggleSavedWord(words[pagerState.currentPage])
-                    })
-                } else {
-                    RoundedSquareButton(LightRed, R.drawable.heart, onClick = {
-                        isSaved.value = !isSaved.value
-                        viewModel.toggleSavedWord(words[pagerState.currentPage])
-                    })
-                }
+                RoundedSquareButton(LightRed, R.drawable.heart, onClick = {
+                    onToggleSaveWord(words[pagerState.currentPage])
+                })
 
 
                 RoundedSquareButton(LightOrange, R.drawable.next2_right, onClick = {

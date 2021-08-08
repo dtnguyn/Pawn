@@ -5,19 +5,13 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nguyen.pawn.model.Language
 import com.nguyen.pawn.model.Word
 import com.nguyen.pawn.repo.WordRepository
-import com.nguyen.pawn.util.LoadingType
 import com.nguyen.pawn.util.SupportedLanguage
 import com.nguyen.pawn.util.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.ktor.http.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -51,7 +45,7 @@ class HomeViewModel
         viewModelScope.launch {
                 when(languageId){
                     SupportedLanguage.ENGLISH.id -> {
-                        if(_dailyEnWordsUIState.value.loadedValue == null) {
+                        if(_dailyEnWordsUIState.value.value == null) {
                             wordRepo.getRandomDailyWord(dailyWordCount, languageId).collectLatest {
                                 _dailyEnWordsUIState.value = it
                             }
@@ -59,7 +53,7 @@ class HomeViewModel
                     }
 
                     SupportedLanguage.SPANISH.id -> {
-                        if(_dailyEsWordsUIState.value.loadedValue == null) {
+                        if(_dailyEsWordsUIState.value.value == null) {
                             wordRepo.getRandomDailyWord(dailyWordCount, languageId).collectLatest {
                                 _dailyEsWordsUIState.value = it
                             }
@@ -67,7 +61,7 @@ class HomeViewModel
                     }
 
                     SupportedLanguage.FRENCH.id -> {
-                        if(_dailyFrWordsUIState.value.loadedValue == null) {
+                        if(_dailyFrWordsUIState.value.value == null) {
                             wordRepo.getRandomDailyWord(dailyWordCount, languageId).collectLatest {
                                 _dailyFrWordsUIState.value = it
                             }
@@ -75,7 +69,7 @@ class HomeViewModel
 
                     }
                     SupportedLanguage.GERMANY.id -> {
-                        if(_dailyDeWordsUIState.value.loadedValue == null) {
+                        if(_dailyDeWordsUIState.value.value == null) {
                             wordRepo.getRandomDailyWord(dailyWordCount, languageId).collectLatest {
                                 _dailyDeWordsUIState.value = it
                             }

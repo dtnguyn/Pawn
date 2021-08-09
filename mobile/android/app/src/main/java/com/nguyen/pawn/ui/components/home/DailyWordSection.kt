@@ -40,6 +40,7 @@ fun DailyWordSection(
     isLoading: Boolean,
     onToggleSaveWord: (word: Word) -> Unit,
     onRemoveWord: () -> Unit,
+    checkIsSaved: (wordValue: String) -> Boolean
 ) {
 
 
@@ -106,11 +107,18 @@ fun DailyWordSection(
                 })
                 RoundedSquareButton(Grey, R.drawable.trash) {
 //                    viewModel.removeDailyWords(words[pagerState.currentPage].id)
-
                 }
-                RoundedSquareButton(LightRed, R.drawable.heart, onClick = {
-                    onToggleSaveWord(words[pagerState.currentPage])
-                })
+
+                if(checkIsSaved(words[pagerState.currentPage].value)){
+                    RoundedSquareButton(LightRed, R.drawable.heart_red, onClick = {
+                        onToggleSaveWord(words[pagerState.currentPage])
+                    })
+                } else {
+                    RoundedSquareButton(LightRed, R.drawable.heart, onClick = {
+                        onToggleSaveWord(words[pagerState.currentPage])
+                    })
+                }
+
 
 
                 RoundedSquareButton(LightOrange, R.drawable.next2_right, onClick = {

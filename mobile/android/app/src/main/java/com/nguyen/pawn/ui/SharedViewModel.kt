@@ -12,6 +12,7 @@ import com.nguyen.pawn.model.Word
 import com.nguyen.pawn.repo.AuthRepository
 import com.nguyen.pawn.repo.LanguageRepository
 import com.nguyen.pawn.repo.WordRepository
+import com.nguyen.pawn.util.SupportedLanguage
 import com.nguyen.pawn.util.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -45,11 +46,10 @@ class SharedViewModel
 
 
     /** This is a list of words that user saved */
-    private val _savedWordsUIState: MutableState<UIState<List<Word>>> = mutableStateOf(UIState.Initial(listOf()))
-    val savedWordsUIState: State<UIState<List<Word>>> = _savedWordsUIState
+    private val _savedEnWordsUIState: MutableState<UIState<List<Word>>> = mutableStateOf(UIState.Initial(listOf()))
+    val savedEnWordsUIState: State<UIState<List<Word>>> = _savedEnWordsUIState
+    private val savedEnWordMap = HashMap<String, Boolean>()
 
-    /** A hash map that helps update saved words quicker */
-    private val savedWordMap = HashMap<String, Boolean>()
 
     /** A hash map that helps update picked languages quicker */
     private val pickedLanguageMap = HashMap<String, Boolean>()
@@ -156,33 +156,79 @@ class SharedViewModel
 
     /** If the word is saved, then remove it from map and list
      * else add it to the map and list */
-    fun toggleSavedWord(word: Word, accessToken: String?) {
+    fun toggleSavedWord(word: Word, accessToken: String?, targetLanguage: Language?) {
         Log.d("SharedViewModel", "Toggle Saved Word")
         viewModelScope.launch {
             if(accessToken == null){
-                _savedWordsUIState.value = UIState.Error("You have to log in first!")
+                _savedEnWordsUIState.value = UIState.Error("You have to log in first!")
                 return@launch
             }
-            savedWordsUIState.value.value?.let { currentSavedWordList ->
-                currentPickedLanguage.value?.let {language ->
+            savedEnWordsUIState.value.value?.let { currentSavedWordList ->
+                targetLanguage?.let {language ->
                     wordRepo.toggleSavedWord(word, language.id, currentSavedWordList, accessToken).collectLatest {
-                        _savedWordsUIState.value = it
+                        when(language.id){
+                            SupportedLanguage.ENGLISH.id -> {
+                                _savedEnWordsUIState.value = it
+                                if(it is UIState.Loaded){
+                                    savedEnWordMap.clear()
+                                    it.value?.forEach { word ->
+                                        savedEnWordMap[word.value] = true
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
     }
 
-    fun getSavedWords(accessToken: String?){
+    fun getSavedWords(accessToken: String?, targetLanguage: Language?){
         viewModelScope.launch {
             if(accessToken == null){
-                _savedWordsUIState.value = UIState.Loaded(listOf())
+                _savedEnWordsUIState.value = UIState.Loaded(listOf())
                 return@launch
             }
-            currentPickedLanguage.value?.let { language ->
+            targetLanguage?.let { language ->
                 Log.d("SharedViewModel", "Getting saved words")
                 wordRepo.getSavedWords(language.id, accessToken).collectLatest {
-                    _savedWordsUIState.value = it
+                    when(language.id){
+                        SupportedLanguage.ENGLISH.id -> {
+                            _savedEnWordsUIState.value = it
+                            if(it is UIState.Loaded){
+                                savedEnWordMap.clear()
+                                it.value?.forEach { word ->
+                                    savedEnWordMap[word.value] = true
+                                }
+                            }
+                        }
+//                        SupportedLanguage.SPANISH.id -> {
+//                            _savedEnWordsUIState.value = it
+//                            if(it is UIState.Loaded){
+//                                savedEnWordMap.clear()
+//                                it.value?.forEach { word ->
+//                                    savedEnWordMap[word.value] = true
+//                                }
+//                            }
+//                        }
+//                        SupportedLanguage.FRENCH.id -> {
+//                            _savedEnWordsUIState.value = it
+//                            if(it is UIState.Loaded){
+//                                savedEnWordMap.clear()
+//                                it.value?.forEach { word ->
+//                                    savedEnWordMap[word.value] = true
+//                                }
+//                            }
+//                        }
+//                        SupportedLanguage.GERMANY.id -> {
+//                            _savedEnWordsUIState.value = it
+//                            if(it is UIState.Loaded){
+//                                savedEnWordMap.clear()
+//                                it.value?.forEach { word ->
+//                                    savedEnWordMap[word.value] = true
+//                                }
+//                            }
+                        }
                 }
             }
         }
@@ -190,8 +236,17 @@ class SharedViewModel
 
 
     /** A helper function to check if the word is in the map */
-    fun checkIsSaved(wordId: String): Boolean {
-        return savedWordMap[wordId] == true
+    fun checkIsSaved(wordValue: String, targetLanguage: Language?): Boolean {
+        return if (targetLanguage != null) {
+            when(targetLanguage.id){
+                SupportedLanguage.ENGLISH.id -> {
+                    savedEnWordMap[wordValue] == true
+                }
+                else -> {
+                    false
+                }
+            }
+        } else false
     }
 
 }

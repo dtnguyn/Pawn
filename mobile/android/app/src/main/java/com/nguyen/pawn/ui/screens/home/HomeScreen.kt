@@ -77,8 +77,8 @@ fun HomeScreen(
 
     val currentPickedLanguage: Language? by sharedViewModel.currentPickedLanguage
 
-    val savedWordsUIState: UIState<List<Word>> by sharedViewModel.savedWordsUIState
-    var savedWords by remember { mutableStateOf(savedWordsUIState.value) }
+    val savedEnWordsUIState: UIState<List<Word>> by sharedViewModel.savedEnWordsUIState
+    var savedEnWords by remember { mutableStateOf(savedEnWordsUIState.value) }
 
 
     /** Error states */
@@ -176,7 +176,7 @@ fun HomeScreen(
         if (currentPickedLanguage != null) {
             isLoadingDailyWords = false
             homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, currentPickedLanguage!!.id)
-            sharedViewModel.getSavedWords(getAccessTokenFromDataStore(context))
+            sharedViewModel.getSavedWords(getAccessTokenFromDataStore(context), currentPickedLanguage)
         }
     }
 
@@ -292,21 +292,21 @@ fun HomeScreen(
     }
 
 
-    LaunchedEffect(savedWordsUIState){
-        when(savedWordsUIState){
+    LaunchedEffect(savedEnWordsUIState){
+        when(savedEnWordsUIState){
             is UIState.Error -> {
-                Log.d(TAG, "saved words error: ${savedWordsUIState.errorMsg}")
+                Log.d(TAG, "saved words error: ${savedEnWordsUIState.errorMsg}")
             }
             is UIState.Initial -> {
-                savedWords = savedWordsUIState.value
+                savedEnWords = savedEnWordsUIState.value
             }
             is UIState.Loading -> {
-                Log.d(TAG, "saved words loading: ${savedWordsUIState.value}")
+                Log.d(TAG, "saved words loading: ${savedEnWordsUIState.value}")
 
             }
             is UIState.Loaded -> {
-                Log.d(TAG, "saved words loaded: ${savedWordsUIState.value}")
-                savedWords = savedWordsUIState.value
+                Log.d(TAG, "saved words loaded: ${savedEnWordsUIState.value}")
+                savedEnWords = savedEnWordsUIState.value
             }
         }
     }
@@ -421,8 +421,11 @@ fun HomeScreen(
                                         words = dailyWords() ?: listOf(),
                                         onToggleSaveWord = {
                                             coroutineScope.launch {
-                                                sharedViewModel.toggleSavedWord(it, getAccessTokenFromDataStore(context))
+                                                sharedViewModel.toggleSavedWord(it, getAccessTokenFromDataStore(context), currentPickedLanguage)
                                             }
+                                        },
+                                        checkIsSaved = {wordValue ->
+                                            sharedViewModel.checkIsSaved(wordValue, currentPickedLanguage)
                                         },
                                         onRemoveWord = {}
                                     )
@@ -456,11 +459,11 @@ fun HomeScreen(
                                     }
                                 }
 
-                                if(savedWords != null) {
-                                    items(savedWords!!.size) { index ->
+                                if(savedEnWords != null) {
+                                    items(savedEnWords!!.size) { index ->
                                         SavedWordItem(
-                                            word = savedWords!![index].value,
-                                            pronunciation = savedWords!![index].pronunciations[0].symbol,
+                                            word = savedEnWords!![index].value,
+                                            pronunciation = savedEnWords!![index].pronunciations[0].symbol,
                                             index = index,
                                             onClick = {
                                                 navController.navigate("word")

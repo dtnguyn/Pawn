@@ -8,7 +8,9 @@ import com.nguyen.pawn.api.model.ToggleSavedWordRequestBody
 import com.nguyen.pawn.db.PawnDatabase
 import com.nguyen.pawn.db.mapper.DailyWordMapper
 import com.nguyen.pawn.db.mapper.SavedWordMapper
+import com.nguyen.pawn.model.Definition
 import com.nguyen.pawn.model.Word
+import com.nguyen.pawn.model.WordDetail
 import com.nguyen.pawn.repo.utils.mainGetNetworkBoundResource
 import com.nguyen.pawn.repo.utils.mainPostNetworkBoundResource
 import com.nguyen.pawn.util.Constants.apiURL
@@ -42,6 +44,7 @@ class WordRepository
                     .map { if (it.isEmpty()) null else DailyWordMapper.mapToListNetworkEntity(it) }
             },
             fetch = {
+                Log.d(TAG, "get random words")
                 val response: ApiResponse<ArrayList<Word>?> =
                     apiClient.get("${apiURL}/word/daily?language=${language}&dailyWordCount=${wordCount}")
                 Log.d(TAG, "response: $response")
@@ -124,5 +127,23 @@ class WordRepository
         )
     }
 
+    fun getWordDetail(wordValue: String, language: String): Flow<UIState<WordDetail>>{
+        var wordDetail: WordDetail? = null
+        return mainGetNetworkBoundResource(
+            query = {
+                flow { emit(wordDetail) }
+            },
+            fetch = {
+                Log.d(TAG, "Fetching word detail")
+                val response: ApiResponse<WordDetail> = apiClient.get("${apiURL}/word/detail?word=${wordValue}&language=${language}")
+                Log.d(TAG, "word detail response $response")
+                if(response.status) response.data
+                else throw CustomAppException(response.message)
+            },
+            saveFetchResult = {
+                wordDetail = it
+            }
+        )
+    }
 
 }

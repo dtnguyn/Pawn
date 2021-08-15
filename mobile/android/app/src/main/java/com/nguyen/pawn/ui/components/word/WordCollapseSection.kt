@@ -9,11 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
+import com.nguyen.pawn.model.WordDetail
 import com.nguyen.pawn.ui.theme.ReallyRed
 import com.nguyen.pawn.ui.theme.Typography
 
 @Composable
-fun WordCollapseSection(){
+fun WordCollapseSection(wordDetail: WordDetail?){
+    if(wordDetail == null) return
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -30,18 +32,19 @@ fun WordCollapseSection(){
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Pepper", style = Typography.h1, color = Color.White)
+            Text(text = wordDetail.value, style = Typography.h1, color = Color.White)
             Spacer(modifier = Modifier.padding(5.dp))
-            Text(
-                text = "UK /ˈpepə(r)/",
-                style = Typography.body2,
-                color = Color.White
-            )
-            Text(
-                text = "UK /ˈpepə(r)/",
-                style = Typography.body2,
-                color = Color.White
-            )
+            wordDetail.pronunciations.forEach {
+                if(it.symbol != null){
+                    Text(
+                        text = it.symbol,
+                        style = Typography.body2,
+                        color = Color.White
+                    )
+                }
+            }
+
+
             Spacer(modifier = Modifier.padding(10.dp))
         }
     }

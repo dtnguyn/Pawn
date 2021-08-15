@@ -30,6 +30,7 @@ import com.nguyen.pawn.ui.components.HomeAppBar
 import com.nguyen.pawn.ui.components.RoundButton
 import com.nguyen.pawn.ui.components.SavedWordItem
 import com.nguyen.pawn.ui.components.home.ChooseLanguageSection
+import com.nguyen.pawn.ui.navigation.PawnScreens
 import com.nguyen.pawn.ui.screens.home.HomeViewModel
 import com.nguyen.pawn.ui.theme.*
 import com.nguyen.pawn.util.DataStoreUtils.getAccessTokenFromDataStore
@@ -79,6 +80,15 @@ fun HomeScreen(
 
     val savedEnWordsUIState: UIState<List<Word>> by sharedViewModel.savedEnWordsUIState
     var savedEnWords by remember { mutableStateOf(savedEnWordsUIState.value) }
+
+    val savedEsWordsUIState: UIState<List<Word>> by sharedViewModel.savedEsWordsUIState
+    var savedEsWords by remember { mutableStateOf(savedEsWordsUIState.value) }
+
+    val savedFrWordsUIState: UIState<List<Word>> by sharedViewModel.savedFrWordsUIState
+    var savedFrWords by remember { mutableStateOf(savedFrWordsUIState.value) }
+
+    val savedDeWordsUIState: UIState<List<Word>> by sharedViewModel.savedDeWordsUIState
+    var savedDeWords by remember { mutableStateOf(savedDeWordsUIState.value) }
 
 
     /** Error states */
@@ -134,7 +144,7 @@ fun HomeScreen(
             }
             is UIState.Loaded -> {
                 isLoadingUser = false
-                if(user == null && userUIState.value != null){
+                if (user == null && userUIState.value != null) {
                     // When user login
                     sharedViewModel.getPickedLanguages(getAccessTokenFromDataStore(context))
                 }
@@ -176,7 +186,10 @@ fun HomeScreen(
         if (currentPickedLanguage != null) {
             isLoadingDailyWords = false
             homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, currentPickedLanguage!!.id)
-            sharedViewModel.getSavedWords(getAccessTokenFromDataStore(context), currentPickedLanguage)
+            sharedViewModel.getSavedWords(
+                getAccessTokenFromDataStore(context),
+                currentPickedLanguage
+            )
         }
     }
 
@@ -193,6 +206,7 @@ fun HomeScreen(
                 //Do nothing
             }
             is UIState.Error -> {
+                Log.d(TAG, "error ${dailyEnWordsUIState.errorMsg}")
                 if (currentPickedLanguage?.id == "en_US") {
                     isLoadingDailyWords = false
                 }
@@ -292,8 +306,13 @@ fun HomeScreen(
     }
 
 
-    LaunchedEffect(savedEnWordsUIState){
-        when(savedEnWordsUIState){
+    LaunchedEffect(
+        savedEnWordsUIState,
+        savedDeWordsUIState,
+        savedFrWordsUIState,
+        savedEsWordsUIState
+    ) {
+        when (savedEnWordsUIState) {
             is UIState.Error -> {
                 Log.d(TAG, "saved words error: ${savedEnWordsUIState.errorMsg}")
             }
@@ -309,14 +328,65 @@ fun HomeScreen(
                 savedEnWords = savedEnWordsUIState.value
             }
         }
+
+        when (savedEsWordsUIState) {
+            is UIState.Error -> {
+                Log.d(TAG, "saved words error: ${savedEsWordsUIState.errorMsg}")
+            }
+            is UIState.Initial -> {
+                savedEsWords = savedEsWordsUIState.value
+            }
+            is UIState.Loading -> {
+                Log.d(TAG, "saved words loading: ${savedEsWordsUIState.value}")
+
+            }
+            is UIState.Loaded -> {
+                Log.d(TAG, "saved words loaded: ${savedEsWordsUIState.value}")
+                savedEsWords = savedEsWordsUIState.value
+            }
+        }
+
+        when (savedFrWordsUIState) {
+            is UIState.Error -> {
+                Log.d(TAG, "saved words error: ${savedFrWordsUIState.errorMsg}")
+            }
+            is UIState.Initial -> {
+                savedFrWords = savedFrWordsUIState.value
+            }
+            is UIState.Loading -> {
+                Log.d(TAG, "saved words loading: ${savedFrWordsUIState.value}")
+
+            }
+            is UIState.Loaded -> {
+                Log.d(TAG, "saved words loaded: ${savedFrWordsUIState.value}")
+                savedFrWords = savedFrWordsUIState.value
+            }
+        }
+
+        when (savedDeWordsUIState) {
+            is UIState.Error -> {
+                Log.d(TAG, "saved words error: ${savedDeWordsUIState.errorMsg}")
+            }
+            is UIState.Initial -> {
+                savedDeWords = savedDeWordsUIState.value
+            }
+            is UIState.Loading -> {
+                Log.d(TAG, "saved words loading: ${savedDeWordsUIState.value}")
+
+            }
+            is UIState.Loaded -> {
+                Log.d(TAG, "saved words loaded: ${savedDeWordsUIState.value}")
+                savedDeWords = savedDeWordsUIState.value
+            }
+        }
     }
 
 
     /**   ---HELPER FUNCTIONS---   */
 
     fun dailyWords(): List<Word>? {
-        if (currentPickedLanguage == null) return arrayListOf()
-        return when (currentPickedLanguage?.id) {
+        if (currentPickedLanguage == null) return listOf()
+        return when (currentPickedLanguage!!.id) {
             SupportedLanguage.ENGLISH.id -> {
                 dailyEnWords
             }
@@ -329,7 +399,26 @@ fun HomeScreen(
             SupportedLanguage.GERMANY.id -> {
                 dailyDeWords
             }
-            else -> arrayListOf()
+            else -> listOf()
+        }
+    }
+
+    fun savedWords(): List<Word>? {
+        if (currentPickedLanguage == null) return listOf()
+        return when (currentPickedLanguage!!.id) {
+            SupportedLanguage.ENGLISH.id -> {
+                savedEnWords
+            }
+            SupportedLanguage.SPANISH.id -> {
+                savedEsWords
+            }
+            SupportedLanguage.FRENCH.id -> {
+                savedFrWords
+            }
+            SupportedLanguage.GERMANY.id -> {
+                savedDeWords
+            }
+            else -> listOf()
         }
     }
 
@@ -419,13 +508,23 @@ fun HomeScreen(
                                         pagerState = pagerState,
                                         navController = navController,
                                         words = dailyWords() ?: listOf(),
+                                        onDailyWordClick = {
+                                            navController.navigate("${PawnScreens.WordDetail.route}/${it}/${currentPickedLanguage?.id}")
+                                        },
                                         onToggleSaveWord = {
                                             coroutineScope.launch {
-                                                sharedViewModel.toggleSavedWord(it, getAccessTokenFromDataStore(context), currentPickedLanguage)
+                                                sharedViewModel.toggleSavedWord(
+                                                    it,
+                                                    getAccessTokenFromDataStore(context),
+                                                    currentPickedLanguage
+                                                )
                                             }
                                         },
-                                        checkIsSaved = {wordValue ->
-                                            sharedViewModel.checkIsSaved(wordValue, currentPickedLanguage)
+                                        checkIsSaved = { wordValue ->
+                                            sharedViewModel.checkIsSaved(
+                                                wordValue,
+                                                currentPickedLanguage
+                                            )
                                         },
                                         onRemoveWord = {}
                                     )
@@ -459,14 +558,14 @@ fun HomeScreen(
                                     }
                                 }
 
-                                if(savedEnWords != null) {
-                                    items(savedEnWords!!.size) { index ->
+                                savedWords()?.let { savedWords ->
+                                    items(savedWords.size) { index ->
                                         SavedWordItem(
-                                            word = savedEnWords!![index].value,
-                                            pronunciation = savedEnWords!![index].pronunciations[0].symbol,
+                                            word = savedWords[index].value,
+                                            pronunciation = savedWords[index].pronunciations[0].symbol,
                                             index = index,
                                             onClick = {
-                                                navController.navigate("word")
+                                                navController.navigate("${PawnScreens.WordDetail.route}/${savedWords[index].value}/${currentPickedLanguage?.id}")
                                             }
                                         )
                                     }

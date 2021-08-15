@@ -50,6 +50,21 @@ class SharedViewModel
     val savedEnWordsUIState: State<UIState<List<Word>>> = _savedEnWordsUIState
     private val savedEnWordMap = HashMap<String, Boolean>()
 
+    /** This is a list of words that user saved */
+    private val _savedEsWordsUIState: MutableState<UIState<List<Word>>> = mutableStateOf(UIState.Initial(listOf()))
+    val savedEsWordsUIState: State<UIState<List<Word>>> = _savedEsWordsUIState
+    private val savedEsWordMap = HashMap<String, Boolean>()
+
+    /** This is a list of words that user saved */
+    private val _savedFrWordsUIState: MutableState<UIState<List<Word>>> = mutableStateOf(UIState.Initial(listOf()))
+    val savedFrWordsUIState: State<UIState<List<Word>>> = _savedFrWordsUIState
+    private val savedFrWordMap = HashMap<String, Boolean>()
+
+    /** This is a list of words that user saved */
+    private val _savedDeWordsUIState: MutableState<UIState<List<Word>>> = mutableStateOf(UIState.Initial(listOf()))
+    val savedDeWordsUIState: State<UIState<List<Word>>> = _savedDeWordsUIState
+    private val savedDeWordMap = HashMap<String, Boolean>()
+
 
     /** A hash map that helps update picked languages quicker */
     private val pickedLanguageMap = HashMap<String, Boolean>()
@@ -163,20 +178,10 @@ class SharedViewModel
                 _savedEnWordsUIState.value = UIState.Error("You have to log in first!")
                 return@launch
             }
-            savedEnWordsUIState.value.value?.let { currentSavedWordList ->
+            currentSavedWordList(targetLanguage)?.let { currentSavedWordList ->
                 targetLanguage?.let {language ->
                     wordRepo.toggleSavedWord(word, language.id, currentSavedWordList, accessToken).collectLatest {
-                        when(language.id){
-                            SupportedLanguage.ENGLISH.id -> {
-                                _savedEnWordsUIState.value = it
-                                if(it is UIState.Loaded){
-                                    savedEnWordMap.clear()
-                                    it.value?.forEach { word ->
-                                        savedEnWordMap[word.value] = true
-                                    }
-                                }
-                            }
-                        }
+                        updateSavedWordList(language, it)
                     }
                 }
             }
@@ -192,43 +197,7 @@ class SharedViewModel
             targetLanguage?.let { language ->
                 Log.d("SharedViewModel", "Getting saved words")
                 wordRepo.getSavedWords(language.id, accessToken).collectLatest {
-                    when(language.id){
-                        SupportedLanguage.ENGLISH.id -> {
-                            _savedEnWordsUIState.value = it
-                            if(it is UIState.Loaded){
-                                savedEnWordMap.clear()
-                                it.value?.forEach { word ->
-                                    savedEnWordMap[word.value] = true
-                                }
-                            }
-                        }
-//                        SupportedLanguage.SPANISH.id -> {
-//                            _savedEnWordsUIState.value = it
-//                            if(it is UIState.Loaded){
-//                                savedEnWordMap.clear()
-//                                it.value?.forEach { word ->
-//                                    savedEnWordMap[word.value] = true
-//                                }
-//                            }
-//                        }
-//                        SupportedLanguage.FRENCH.id -> {
-//                            _savedEnWordsUIState.value = it
-//                            if(it is UIState.Loaded){
-//                                savedEnWordMap.clear()
-//                                it.value?.forEach { word ->
-//                                    savedEnWordMap[word.value] = true
-//                                }
-//                            }
-//                        }
-//                        SupportedLanguage.GERMANY.id -> {
-//                            _savedEnWordsUIState.value = it
-//                            if(it is UIState.Loaded){
-//                                savedEnWordMap.clear()
-//                                it.value?.forEach { word ->
-//                                    savedEnWordMap[word.value] = true
-//                                }
-//                            }
-                        }
+                    updateSavedWordList(language, it)
                 }
             }
         }
@@ -242,11 +211,80 @@ class SharedViewModel
                 SupportedLanguage.ENGLISH.id -> {
                     savedEnWordMap[wordValue] == true
                 }
+                SupportedLanguage.SPANISH.id -> {
+                    savedEsWordMap[wordValue] == true
+                }
+                SupportedLanguage.FRENCH.id -> {
+                    savedFrWordMap[wordValue] == true
+                }
+                SupportedLanguage.GERMANY.id -> {
+                    savedDeWordMap[wordValue] == true
+                }
                 else -> {
                     false
                 }
             }
         } else false
+    }
+
+    private fun updateSavedWordList(language: Language, wordsUIState: UIState<List<Word>>){
+        when(language.id) {
+            SupportedLanguage.ENGLISH.id -> {
+                _savedEnWordsUIState.value = wordsUIState
+                if (wordsUIState is UIState.Loaded) {
+                    savedEnWordMap.clear()
+                    wordsUIState.value?.forEach { word ->
+                        savedEnWordMap[word.value] = true
+                    }
+                }
+            }
+            SupportedLanguage.SPANISH.id -> {
+                _savedEsWordsUIState.value = wordsUIState
+                if (wordsUIState is UIState.Loaded) {
+                    savedEsWordMap.clear()
+                    wordsUIState.value?.forEach { word ->
+                        savedEsWordMap[word.value] = true
+                    }
+                }
+            }
+            SupportedLanguage.FRENCH.id -> {
+                _savedFrWordsUIState.value = wordsUIState
+                if (wordsUIState is UIState.Loaded) {
+                    savedFrWordMap.clear()
+                    wordsUIState.value?.forEach { word ->
+                        savedFrWordMap[word.value] = true
+                    }
+                }
+            }
+            SupportedLanguage.GERMANY.id -> {
+                _savedDeWordsUIState.value = wordsUIState
+                if (wordsUIState is UIState.Loaded) {
+                    savedDeWordMap.clear()
+                    wordsUIState.value?.forEach { word ->
+                        savedDeWordMap[word.value] = true
+                    }
+                }
+            }
+        }
+    }
+
+    private fun currentSavedWordList(currentLanguage: Language?): List<Word>?{
+        if (currentLanguage == null) return listOf()
+        return when (currentLanguage.id) {
+            SupportedLanguage.ENGLISH.id -> {
+                savedEnWordsUIState.value.value
+            }
+            SupportedLanguage.SPANISH.id -> {
+                savedEsWordsUIState.value.value
+            }
+            SupportedLanguage.FRENCH.id -> {
+                savedFrWordsUIState.value.value
+            }
+            SupportedLanguage.GERMANY.id -> {
+                savedDeWordsUIState.value.value
+            }
+            else -> listOf()
+        }
     }
 
 }

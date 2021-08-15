@@ -38,6 +38,7 @@ fun DailyWordSection(
     navController: NavController,
     words: List<Word>,
     isLoading: Boolean,
+    onDailyWordClick: (wordValue: String) -> Unit,
     onToggleSaveWord: (word: Word) -> Unit,
     onRemoveWord: () -> Unit,
     checkIsSaved: (wordValue: String) -> Boolean
@@ -80,8 +81,7 @@ fun DailyWordSection(
                         definition = words[page].definitions[0].meaning,
                         pronunciation = words[page].pronunciations[0].symbol,
                         onClick = {
-                            navController.navigate("Word")
-
+                            onDailyWordClick(words[page].value)
                         }
                     )
                 }

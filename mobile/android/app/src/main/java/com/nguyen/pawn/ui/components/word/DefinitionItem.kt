@@ -33,13 +33,12 @@ fun DefinitionItem(index: Int, definition: Definition) {
             Modifier.padding(15.dp)
         ) {
             Text(text = "Definitions ${index + 1}", style = Typography.h6, fontSize = 18.sp)
-            Text(text = definition.partOfSpeech, style = Typography.subtitle1)
+            Text(text = definition.partOfSpeech ?: "", style = Typography.subtitle1)
             Spacer(modifier = Modifier.padding(5.dp))
             Text(text = definition.meaning, style = Typography.h6)
             Spacer(modifier = Modifier.padding(10.dp))
             Text(text = "Example: ", style = Typography.h6, fontSize = 18.sp)
-            Spacer(modifier = Modifier.padding(5.dp))
-            Text(text = definition.example, style = Typography.body1, fontSize = 18.sp)
+            Text(text = definition.example ?: "", style = Typography.body1, fontSize = 18.sp)
         }
     }
 }

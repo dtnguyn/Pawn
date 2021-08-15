@@ -9,6 +9,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.nguyen.pawn.ui.screens.auth.AuthViewModel
+import com.nguyen.pawn.ui.screens.definition.WordDetailViewModel
 import com.nguyen.pawn.ui.screens.home.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -20,6 +21,7 @@ class MainActivity : ComponentActivity() {
     private val homeViewModel: HomeViewModel by viewModels()
     private val authViewModel: AuthViewModel by viewModels()
     private val sharedViewModel: SharedViewModel by viewModels()
+    private val wordDetailViewModel: WordDetailViewModel by viewModels()
 
     @ExperimentalFoundationApi
     @ExperimentalAnimationApi
@@ -29,7 +31,8 @@ class MainActivity : ComponentActivity() {
             PawnApp(
                 authViewModel = authViewModel,
                 homeViewModel = homeViewModel,
-                sharedViewModel = sharedViewModel
+                sharedViewModel = sharedViewModel,
+                wordDetailViewModel = wordDetailViewModel
             )
         }
     }

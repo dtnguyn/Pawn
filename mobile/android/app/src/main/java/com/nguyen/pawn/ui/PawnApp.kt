@@ -16,11 +16,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.nguyen.pawn.R
+import com.nguyen.pawn.model.WordDetail
 import com.nguyen.pawn.ui.navigation.PawnScreens
 import com.nguyen.pawn.ui.screens.*
 import com.nguyen.pawn.ui.screens.auth.AuthViewModel
 import com.nguyen.pawn.ui.screens.auth.ChangePasswordScreen
 import com.nguyen.pawn.ui.screens.auth.VerifyCodeScreen
+import com.nguyen.pawn.ui.screens.definition.WordDetailViewModel
 import com.nguyen.pawn.ui.screens.home.HomeViewModel
 import com.nguyen.pawn.ui.theme.PawnTheme
 
@@ -33,6 +35,7 @@ import com.nguyen.pawn.ui.theme.PawnTheme
 fun PawnApp(
     authViewModel: AuthViewModel,
     homeViewModel: HomeViewModel,
+    wordDetailViewModel: WordDetailViewModel,
     sharedViewModel: SharedViewModel
 ) {
 
@@ -90,7 +93,14 @@ fun PawnApp(
                 }
                 composable(PawnScreens.Feeds.route) { FeedScreen() }
                 composable(PawnScreens.Search.route) { SearchScreen() }
-                composable(PawnScreens.Word.route) { WordScreen(navController = navController) }
+                composable("${PawnScreens.WordDetail.route}/{wordValue}/{language}") {
+                    WordDetailScreen(
+                        navController = navController,
+                        viewModel = wordDetailViewModel,
+                        wordValue = it.arguments?.getString("wordValue"),
+                        language = it.arguments?.getString("language")
+                    )
+                }
                 composable(PawnScreens.Auth.route) {
                     AuthScreen(
                         authViewModel = authViewModel,

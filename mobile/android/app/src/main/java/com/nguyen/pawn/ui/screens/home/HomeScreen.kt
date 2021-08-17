@@ -516,14 +516,14 @@ fun HomeScreen(
                                                 sharedViewModel.toggleSavedWord(
                                                     it,
                                                     getAccessTokenFromDataStore(context),
-                                                    currentPickedLanguage
+                                                    currentPickedLanguage?.id
                                                 )
                                             }
                                         },
                                         checkIsSaved = { wordValue ->
                                             sharedViewModel.checkIsSaved(
                                                 wordValue,
-                                                currentPickedLanguage
+                                                currentPickedLanguage?.id
                                             )
                                         },
                                         onRemoveWord = {}
@@ -560,9 +560,10 @@ fun HomeScreen(
 
                                 savedWords()?.let { savedWords ->
                                     items(savedWords.size) { index ->
+                                        val word = savedWords[index]
                                         SavedWordItem(
-                                            word = savedWords[index].value,
-                                            pronunciation = savedWords[index].pronunciations[0].symbol,
+                                            word = word.value,
+                                            pronunciation = if (word.pronunciations.isNotEmpty()) word.pronunciations.first().symbol else null,
                                             index = index,
                                             onClick = {
                                                 navController.navigate("${PawnScreens.WordDetail.route}/${savedWords[index].value}/${currentPickedLanguage?.id}")

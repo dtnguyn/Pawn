@@ -25,6 +25,7 @@ import com.nguyen.pawn.ui.screens.auth.VerifyCodeScreen
 import com.nguyen.pawn.ui.screens.definition.WordDetailViewModel
 import com.nguyen.pawn.ui.screens.home.HomeViewModel
 import com.nguyen.pawn.ui.theme.PawnTheme
+import io.ktor.utils.io.concurrent.*
 
 
 @ExperimentalPagerApi
@@ -97,6 +98,7 @@ fun PawnApp(
                     WordDetailScreen(
                         navController = navController,
                         viewModel = wordDetailViewModel,
+                        sharedViewModel = sharedViewModel,
                         wordValue = it.arguments?.getString("wordValue"),
                         language = it.arguments?.getString("language")
                     )

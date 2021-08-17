@@ -109,16 +109,18 @@ fun DailyWordSection(
 //                    viewModel.removeDailyWords(words[pagerState.currentPage].id)
                 }
 
-                if(checkIsSaved(words[pagerState.currentPage].value)){
-                    RoundedSquareButton(LightRed, R.drawable.heart_red, onClick = {
-                        onToggleSaveWord(words[pagerState.currentPage])
-                    })
-                } else {
-                    RoundedSquareButton(LightRed, R.drawable.heart, onClick = {
-                        onToggleSaveWord(words[pagerState.currentPage])
-                    })
-                }
-
+//                if(checkIsSaved(words[pagerState.currentPage].value)){
+//                    RoundedSquareButton(LightRed, R.drawable.heart_red, onClick = {
+//                        onToggleSaveWord(words[pagerState.currentPage])
+//                    })
+//                } else {
+//                    RoundedSquareButton(LightRed, R.drawable.heart, onClick = {
+//                        onToggleSaveWord(words[pagerState.currentPage])
+//                    })
+//                }
+                RoundedSquareButton(LightRed, icon = if(checkIsSaved(words[pagerState.currentPage].value)) R.drawable.heart_red else R.drawable.heart, onClick = {
+                    onToggleSaveWord(words[pagerState.currentPage])
+                })
 
 
                 RoundedSquareButton(LightOrange, R.drawable.next2_right, onClick = {

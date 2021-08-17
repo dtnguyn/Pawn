@@ -30,7 +30,12 @@ import com.nguyen.pawn.ui.screens.definition.WordDetailViewModel
 import com.nguyen.pawn.ui.theme.*
 import com.nguyen.pawn.util.UIState
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import com.nguyen.pawn.model.Language
+import com.nguyen.pawn.model.Word
+import com.nguyen.pawn.ui.SharedViewModel
+import com.nguyen.pawn.util.DataStoreUtils
+import kotlinx.coroutines.launch
 
 private const val TAG = "WordDetailScreen"
 
@@ -40,14 +45,20 @@ private const val TAG = "WordDetailScreen"
 fun WordDetailScreen(
     navController: NavController,
     viewModel: WordDetailViewModel,
+    sharedViewModel: SharedViewModel,
     wordValue: String?,
     language: String?
 ) {
-
-
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     val lazyListState = rememberLazyListState()
     val wordDetailUIState: UIState<WordDetail> by viewModel.wordDetailUIState
+    val savedEnWordsUIState: UIState<List<Word>> by sharedViewModel.savedEnWordsUIState
+    val savedEsWordsUIState: UIState<List<Word>> by sharedViewModel.savedEsWordsUIState
+    val savedFrWordsUIState: UIState<List<Word>> by sharedViewModel.savedFrWordsUIState
+    val savedDeWordsUIState: UIState<List<Word>> by sharedViewModel.savedDeWordsUIState
     var wordDetail by remember { mutableStateOf(wordDetailUIState.value) }
+    var isSaved by remember { mutableStateOf(sharedViewModel.checkIsSaved(wordValue ?: "", language)) }
 
     LaunchedEffect(null) {
         viewModel.getWordDetail(wordValue, language)
@@ -73,6 +84,12 @@ fun WordDetailScreen(
             }
         }
     }
+
+    LaunchedEffect(savedEnWordsUIState, savedEsWordsUIState, savedDeWordsUIState, savedFrWordsUIState){
+        isSaved = sharedViewModel.checkIsSaved(wordValue ?: "", language)
+    }
+
+    if (wordDetail == null) return
 
     Surface {
 
@@ -119,12 +136,30 @@ fun WordDetailScreen(
                             icon = R.drawable.speaker,
                             padding = 10.dp
                         ) {}
-                        RoundedSquareButton(backgroundColor = LightRed, icon = R.drawable.heart) {}
+                        RoundedSquareButton(
+                            backgroundColor = LightRed,
+                            icon = if (isSaved) R.drawable.heart_red else R.drawable.heart
+                        ) {
+                            wordDetail?.let {
+                                coroutineScope.launch {
+                                    sharedViewModel.toggleSavedWord(
+                                        Word(
+                                            value = it.value,
+                                            language = it.language,
+                                            definitions = it.definitions,
+                                            pronunciations = it.pronunciations,
+                                        ),
+                                        DataStoreUtils.getAccessTokenFromDataStore(context),
+                                        it.language
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
 
                 wordDetail?.let {
-                    if(it.definitions.isNotEmpty()){
+                    if (it.definitions.isNotEmpty()) {
                         items(it.definitions.size) { index ->
                             DefinitionItem(
                                 index = index,

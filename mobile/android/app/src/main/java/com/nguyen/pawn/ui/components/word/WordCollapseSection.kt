@@ -1,6 +1,7 @@
 package com.nguyen.pawn.ui.components.word
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -12,10 +13,10 @@ import androidx.compose.ui.unit.dp
 import com.nguyen.pawn.model.WordDetail
 import com.nguyen.pawn.ui.theme.ReallyRed
 import com.nguyen.pawn.ui.theme.Typography
+import com.nguyen.pawn.util.ShimmerAnimation
 
 @Composable
-fun WordCollapseSection(wordDetail: WordDetail?){
-    if(wordDetail == null) return
+fun WordCollapseSection(wordDetail: WordDetail?, loading: Boolean){
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -32,20 +33,34 @@ fun WordCollapseSection(wordDetail: WordDetail?){
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = wordDetail.value, style = Typography.h1, color = Color.White)
-            Spacer(modifier = Modifier.padding(5.dp))
-            wordDetail.pronunciations.forEach {
-                if(it.symbol != null){
-                    Text(
-                        text = it.symbol,
-                        style = Typography.body2,
-                        color = Color.White
-                    )
+            if (wordDetail == null || loading) {
+                ShimmerAnimation(
+                    modifier = Modifier
+                        .width(250.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(30.dp)
+                )
+                Spacer(modifier = Modifier.padding(5.dp))
+                ShimmerAnimation(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(30.dp)
+                )
+            } else {
+                Text(text = wordDetail.value, style = Typography.h1, color = Color.White)
+                Spacer(modifier = Modifier.padding(5.dp))
+                wordDetail.pronunciations.forEach {
+                    if (it.symbol != null) {
+                        Text(
+                            text = it.symbol,
+                            style = Typography.body2,
+                            color = Color.White
+                        )
+                    }
                 }
+                Spacer(modifier = Modifier.padding(10.dp))
             }
-
-
-            Spacer(modifier = Modifier.padding(10.dp))
         }
     }
 }

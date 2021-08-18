@@ -19,7 +19,7 @@ import com.nguyen.pawn.util.UtilFunctions.generateColor
 fun DefinitionItem(index: Int, definition: Definition) {
 
     Card(
-        shape = RoundedCornerShape(10.dp),
+        shape = RoundedCornerShape(15.dp),
         elevation = 4.dp,
         backgroundColor = generateColor(index),
         modifier = Modifier

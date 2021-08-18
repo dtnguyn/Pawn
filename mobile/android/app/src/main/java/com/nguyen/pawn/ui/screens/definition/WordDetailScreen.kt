@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,11 +31,16 @@ import com.nguyen.pawn.ui.screens.definition.WordDetailViewModel
 import com.nguyen.pawn.ui.theme.*
 import com.nguyen.pawn.util.UIState
 import androidx.compose.runtime.*
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.sp
 import com.nguyen.pawn.model.Language
 import com.nguyen.pawn.model.Word
 import com.nguyen.pawn.ui.SharedViewModel
 import com.nguyen.pawn.util.DataStoreUtils
+import com.nguyen.pawn.util.ShimmerAnimation
+import com.nguyen.pawn.util.UtilFunctions
 import kotlinx.coroutines.launch
 
 private const val TAG = "WordDetailScreen"
@@ -58,7 +64,15 @@ fun WordDetailScreen(
     val savedFrWordsUIState: UIState<List<Word>> by sharedViewModel.savedFrWordsUIState
     val savedDeWordsUIState: UIState<List<Word>> by sharedViewModel.savedDeWordsUIState
     var wordDetail by remember { mutableStateOf(wordDetailUIState.value) }
-    var isSaved by remember { mutableStateOf(sharedViewModel.checkIsSaved(wordValue ?: "", language)) }
+    var isSaved by remember {
+        mutableStateOf(
+            sharedViewModel.checkIsSaved(
+                wordValue ?: "",
+                language
+            )
+        )
+    }
+    var loading by remember { mutableStateOf(false) }
 
     LaunchedEffect(null) {
         viewModel.getWordDetail(wordValue, language)
@@ -67,29 +81,34 @@ fun WordDetailScreen(
     LaunchedEffect(wordDetailUIState) {
         when (wordDetailUIState) {
             is UIState.Initial -> {
-                // Do nothing
+                loading = true
             }
             is UIState.Loading -> {
-                // Display loading animation
+                loading = true
             }
             is UIState.Error -> {
                 // Show error dialog
+                loading = false
                 Log.d(TAG, "error ${wordDetailUIState.errorMsg}")
             }
             is UIState.Loaded -> {
                 if (wordDetailUIState.value != null) {
-                    Log.d(TAG, "word Detail ${wordDetailUIState.value}")
+                    loading = false
                     wordDetail = wordDetailUIState.value
                 }
             }
         }
     }
 
-    LaunchedEffect(savedEnWordsUIState, savedEsWordsUIState, savedDeWordsUIState, savedFrWordsUIState){
+    LaunchedEffect(
+        savedEnWordsUIState,
+        savedEsWordsUIState,
+        savedDeWordsUIState,
+        savedFrWordsUIState
+    ) {
         isSaved = sharedViewModel.checkIsSaved(wordValue ?: "", language)
     }
 
-    if (wordDetail == null) return
 
     Surface {
 
@@ -105,7 +124,7 @@ fun WordDetailScreen(
                     onBackClick = { navController.popBackStack() })
             }
         ) {
-            WordCollapseSection(wordDetail)
+            WordCollapseSection(wordDetail, loading)
             LazyColumn(
                 modifier = Modifier.fillMaxHeight(),
                 state = lazyListState,
@@ -157,14 +176,48 @@ fun WordDetailScreen(
                         }
                     }
                 }
+                if(loading){
+                    items(3) {index ->
+                        Card(
+                            shape = RoundedCornerShape(15.dp),
+                            elevation = 4.dp,
+                            backgroundColor = UtilFunctions.generateColor(index),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.White)
+                                .padding(15.dp)
+                                .clip(RoundedCornerShape(15.dp))
+                        ) {
 
-                wordDetail?.let {
-                    if (it.definitions.isNotEmpty()) {
-                        items(it.definitions.size) { index ->
-                            DefinitionItem(
-                                index = index,
-                                definition = it.definitions[index]
-                            )
+                            Column(
+                                Modifier.padding(15.dp)
+                            ) {
+                                ShimmerAnimation(modifier = Modifier.width(200.dp).height(30.dp), shape = RoundedCornerShape(30.dp))
+                                Spacer(modifier = Modifier.padding(2.dp))
+                                ShimmerAnimation(modifier = Modifier.width(130.dp).height(30.dp), shape = RoundedCornerShape(30.dp))
+                                Spacer(modifier = Modifier.padding(10.dp))
+                                ShimmerAnimation(modifier = Modifier.fillMaxWidth().height(50.dp), shape = RoundedCornerShape(30.dp))
+                                Spacer(modifier = Modifier.padding(2.dp))
+
+                                ShimmerAnimation(modifier = Modifier.width(150.dp).height(50.dp), shape = RoundedCornerShape(30.dp))
+                                Spacer(modifier = Modifier.padding(10.dp))
+                                ShimmerAnimation(modifier = Modifier.width(200.dp).height(30.dp), shape = RoundedCornerShape(30.dp))
+                                Spacer(modifier = Modifier.padding(5.dp))
+                                ShimmerAnimation(modifier = Modifier.fillMaxWidth().height(30.dp), shape = RoundedCornerShape(30.dp))
+                                Spacer(modifier = Modifier.padding(2.dp))
+                                ShimmerAnimation(modifier = Modifier.width(150.dp).height(30.dp), shape = RoundedCornerShape(30.dp))
+                            }
+                        }
+                    }
+                } else {
+                    wordDetail?.let {
+                        if (it.definitions.isNotEmpty()) {
+                            items(it.definitions.size) { index ->
+                                DefinitionItem(
+                                    index = index,
+                                    definition = it.definitions[index]
+                                )
+                            }
                         }
                     }
                 }

@@ -1,26 +1,22 @@
+import deWords from "all-the-german-words";
 import enWords from "an-array-of-english-words";
 import frWords from "an-array-of-french-words";
 import esWords from "an-array-of-spanish-words";
-import deWords from "all-the-german-words";
-import { getRandomNumber } from "../utils/getRandomNumber";
 import superagent from "superagent";
-import { DefinitionJSON, PronunciationJSON, WordJSON } from "../utils/types";
-import { getConnection, getRepository, MoreThan } from "typeorm";
-import { Word } from "../entity/Word";
-import { SavedWord } from "../entity/SavedWord";
-import { Pronunciation } from "../entity/Pronunciation";
+import { getConnection, getRepository } from "typeorm";
 import { Definition } from "../entity/Definition";
-import { rejects } from "assert";
-import { User } from "../entity/User";
 import { Language } from "../entity/Language";
-import { DailyWord } from "../entity/DailyWord";
+import { Pronunciation } from "../entity/Pronunciation";
+import { SavedWord } from "../entity/SavedWord";
+import { Word } from "../entity/Word";
+import { getRandomNumber } from "../utils/getRandomNumber";
+import { WordDetailJSON, WordDetailSimplifyJSON } from "../utils/types";
 
 export const getDailyRandomWords = async (
   wordCount: number,
   language: string
 ) => {
-  const results: WordJSON[] = [];
-  // console.log(new Date().toISOString().split("T")[0])
+  const results: WordDetailSimplifyJSON[] = [];
 
   switch (language) {
     case "en_US": {
@@ -30,9 +26,9 @@ export const getDailyRandomWords = async (
         const num = getRandomNumber(0, 274936);
         const word = enWords[num];
         if (!arr.includes(word)) {
-          const def = await getDefinition(word, language);
-          if (def) {
-            results.push(def);
+          const detail = await getWordDetailSimplify(word, language);
+          if (detail) {
+            results.push(detail);
             arr.push(word);
             i++;
           }
@@ -48,9 +44,9 @@ export const getDailyRandomWords = async (
         const num = getRandomNumber(0, 1680837);
         const word = deWords[num];
         if (!arr.includes(word)) {
-          const def = await getDefinition(word, language);
-          if (def) {
-            results.push(def);
+          const detail = await getWordDetailSimplify(word, language);
+          if (detail) {
+            results.push(detail);
             arr.push(word);
             i++;
           }
@@ -65,9 +61,9 @@ export const getDailyRandomWords = async (
         const num = getRandomNumber(0, 336523);
         const word = (frWords as string[])[num];
         if (!arr.includes(word)) {
-          const def = await getDefinition(word, language);
-          if (def) {
-            results.push(def);
+          const detail = await getWordDetailSimplify(word, language);
+          if (detail) {
+            results.push(detail);
             arr.push(word);
             i++;
           }
@@ -82,9 +78,9 @@ export const getDailyRandomWords = async (
         const num = getRandomNumber(0, 636597);
         const word = (esWords as string[])[num];
         if (!arr.includes(word)) {
-          const def = await getDefinition(word, language);
-          if (def) {
-            results.push(def);
+          const detail = await getWordDetailSimplify(word, language);
+          if (detail) {
+            results.push(detail);
             arr.push(word);
             i++;
           }
@@ -100,7 +96,7 @@ export const getDailyRandomWords = async (
   return results;
 };
 
-export const getDefinition = async (word: string, language: string) => {
+export const getWordDetail = async (word: string, language: string) => {
   const res = await superagent
     .get(`https://api.dictionaryapi.dev/api/v2/entries/${language}/${word}`)
     .catch(() => {
@@ -108,17 +104,17 @@ export const getDefinition = async (word: string, language: string) => {
     });
 
   if (res && res.body && res.body[0]) {
-    const def = res.body[0];
+    const detail = res.body[0];
 
-    const word: WordJSON = {
-      value: def.word,
+    const word: WordDetailJSON = {
+      value: detail.word,
       language,
       pronunciations: [],
       definitions: [],
     };
 
-    if (def.phonetics.length) {
-      for (const phonetic of def.phonetics) {
+    if (detail.phonetics.length) {
+      for (const phonetic of detail.phonetics) {
         if (phonetic.audio && phonetic.text) {
           const pron = {
             audio: phonetic.audio,
@@ -129,8 +125,8 @@ export const getDefinition = async (word: string, language: string) => {
       }
     } else return null;
 
-    if (def.meanings.length) {
-      for (const meaning of def.meanings) {
+    if (detail.meanings.length) {
+      for (const meaning of detail.meanings) {
         for (const definition of meaning.definitions) {
           if (definition.definition) {
             const defValue = {
@@ -148,6 +144,25 @@ export const getDefinition = async (word: string, language: string) => {
   } else return null;
 };
 
+export const getWordDetailSimplify = async (word: string, language: string) => {
+  const detail = await getWordDetail(word, language);
+  if (detail && detail.definitions.length) {
+    const word: WordDetailSimplifyJSON = {
+      value: detail.value,
+      language: detail.language,
+      mainDefinition: detail.definitions[0].meaning,
+      pronunciationSymbol: detail.pronunciations.length
+        ? detail.pronunciations[0].symbol
+        : null,
+      pronunciationAudio: detail.pronunciations.length
+        ? detail.pronunciations[0].audio
+        : null,
+    };
+
+    return word;
+  } else return null;
+};
+
 export const getWordAutoCompletes = async (language: string, text: string) => {
   const wordRepo = getRepository(Word);
 
@@ -157,7 +172,16 @@ export const getWordAutoCompletes = async (language: string, text: string) => {
     .andWhere("word.language = :language", { language })
     .limit(10)
     .getMany();
-  return autoCompletes;
+
+  return autoCompletes.map((word) => {
+    return {
+      value: word.value,
+      language,
+      mainDefinition: "",
+      pronunciationSymbol: null,
+      pronunciationAudio: null,
+    } as WordDetailSimplifyJSON;
+  });
 };
 
 export const toggleSaveWord = async (
@@ -181,9 +205,8 @@ export const toggleSaveWord = async (
     });
   } else {
     /// Add to saved word list
-    const def = await getDefinition(word, language);
-    console.log("Definition: ", def);
-    if (def) {
+    const detail = await getWordDetail(word, language);
+    if (detail) {
       const queryRunner = getConnection().createQueryRunner();
       await queryRunner.connect();
       await queryRunner.startTransaction();
@@ -199,7 +222,7 @@ export const toggleSaveWord = async (
 
         await manager.save(SavedWord, savedWordDb);
 
-        for (const pron of def.pronunciations) {
+        for (const pron of detail.pronunciations) {
           await manager.insert(Pronunciation, {
             savedWordId: savedWordDb.id,
             symbol: pron.symbol,
@@ -207,8 +230,10 @@ export const toggleSaveWord = async (
           });
         }
 
-        for (let i = 0; i < def.definitions.length; i++) {
-          const definition = def.definitions[i];
+        if (detail.definitions.length == 0)
+          throw new Error("No definition found!");
+        for (let i = 0; i < detail.definitions.length; i++) {
+          const definition = detail.definitions[i];
           await manager.insert(Definition, {
             savedWordId: savedWordDb.id,
             meaning: definition.meaning,
@@ -243,9 +268,21 @@ export const getSavedWords = async (userId: string, language: string) => {
     .orderBy("savedWord.position", "ASC")
     .getMany();
 
-  // const savedWords = await savedWordRepo.find();
-  console.log(savedWords);
-  return savedWords;
+  const simplifySavedWords = savedWords.map((word) => {
+    return {
+      value: word.value,
+      language: word.language,
+      mainDefinition: word.definitions[0].meaning,
+      pronunciationSymbol: word.pronunciations.length
+        ? word.pronunciations[0].symbol
+        : null,
+      pronunciationAudio: word.pronunciations.length
+        ? word.pronunciations[0].audio
+        : null,
+    } as WordDetailSimplifyJSON;
+  });
+
+  return simplifySavedWords;
 };
 
 export const rearrangeSavedWords = async (wordIds: string[]) => {

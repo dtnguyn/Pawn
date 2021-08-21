@@ -33,13 +33,13 @@ router.get("/daily", (req, res) => __awaiter(this, void 0, void 0, function* () 
         return res.send(new ApiResponse_1.default(false, error.message, null));
     }
 }));
-router.get("/definition", (req, res) => __awaiter(this, void 0, void 0, function* () {
+router.get("/detail", (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         const language = req.query.language;
         const word = req.query.word;
         if (!word || !language)
             throw new Error("Please provide the word and definition language");
-        const definition = yield WordController_1.getDefinition(word, language);
+        const definition = yield WordController_1.getWordDetail(word, language);
         if (!definition)
             throw new Error("Couldn't find definition for the word provided!");
         return res.send(new ApiResponse_1.default(true, "", definition));

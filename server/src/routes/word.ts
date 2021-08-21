@@ -2,9 +2,9 @@ import { Request, Response, Router } from "express";
 import ApiResponse from "../utils/ApiResponse";
 import {
   getDailyRandomWords,
-  getDefinition,
   getSavedWords,
   getWordAutoCompletes,
+  getWordDetail,
   rearrangeDefinition,
   rearrangeSavedWords,
   toggleSaveWord,
@@ -26,7 +26,6 @@ router.get("/daily", async (req, res) => {
       return res.send(
         new ApiResponse(false, "Please provide the target language!", null)
       );
-
     const words = await getDailyRandomWords(dailyWordCount, language);
 
     return res.send(new ApiResponse(true, "", words));
@@ -35,7 +34,7 @@ router.get("/daily", async (req, res) => {
   }
 });
 
-router.get("/definition", async (req, res) => {
+router.get("/detail", async (req, res) => {
   try {
     const language = req.query.language as string;
     const word = req.query.word as string;
@@ -43,7 +42,7 @@ router.get("/definition", async (req, res) => {
     if (!word || !language)
       throw new Error("Please provide the word and definition language");
 
-    const definition = await getDefinition(word, language);
+    const definition = await getWordDetail(word, language);
     if (!definition)
       throw new Error("Couldn't find definition for the word provided!");
     return res.send(new ApiResponse(true, "", definition));

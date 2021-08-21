@@ -11,18 +11,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const all_the_german_words_1 = __importDefault(require("all-the-german-words"));
 const an_array_of_english_words_1 = __importDefault(require("an-array-of-english-words"));
 const an_array_of_french_words_1 = __importDefault(require("an-array-of-french-words"));
 const an_array_of_spanish_words_1 = __importDefault(require("an-array-of-spanish-words"));
-const all_the_german_words_1 = __importDefault(require("all-the-german-words"));
-const getRandomNumber_1 = require("../utils/getRandomNumber");
 const superagent_1 = __importDefault(require("superagent"));
 const typeorm_1 = require("typeorm");
-const Word_1 = require("../entity/Word");
-const SavedWord_1 = require("../entity/SavedWord");
-const Pronunciation_1 = require("../entity/Pronunciation");
 const Definition_1 = require("../entity/Definition");
 const Language_1 = require("../entity/Language");
+const Pronunciation_1 = require("../entity/Pronunciation");
+const SavedWord_1 = require("../entity/SavedWord");
+const Word_1 = require("../entity/Word");
+const getRandomNumber_1 = require("../utils/getRandomNumber");
 exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, void 0, function* () {
     const results = [];
     switch (language) {
@@ -33,9 +33,9 @@ exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, v
                 const num = getRandomNumber_1.getRandomNumber(0, 274936);
                 const word = an_array_of_english_words_1.default[num];
                 if (!arr.includes(word)) {
-                    const def = yield exports.getDefinition(word, language);
-                    if (def) {
-                        results.push(def);
+                    const detail = yield exports.getWordDetailSimplify(word, language);
+                    if (detail) {
+                        results.push(detail);
                         arr.push(word);
                         i++;
                     }
@@ -51,9 +51,9 @@ exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, v
                 const num = getRandomNumber_1.getRandomNumber(0, 1680837);
                 const word = all_the_german_words_1.default[num];
                 if (!arr.includes(word)) {
-                    const def = yield exports.getDefinition(word, language);
-                    if (def) {
-                        results.push(def);
+                    const detail = yield exports.getWordDetailSimplify(word, language);
+                    if (detail) {
+                        results.push(detail);
                         arr.push(word);
                         i++;
                     }
@@ -68,9 +68,9 @@ exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, v
                 const num = getRandomNumber_1.getRandomNumber(0, 336523);
                 const word = an_array_of_french_words_1.default[num];
                 if (!arr.includes(word)) {
-                    const def = yield exports.getDefinition(word, language);
-                    if (def) {
-                        results.push(def);
+                    const detail = yield exports.getWordDetailSimplify(word, language);
+                    if (detail) {
+                        results.push(detail);
                         arr.push(word);
                         i++;
                     }
@@ -85,9 +85,9 @@ exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, v
                 const num = getRandomNumber_1.getRandomNumber(0, 636597);
                 const word = an_array_of_spanish_words_1.default[num];
                 if (!arr.includes(word)) {
-                    const def = yield exports.getDefinition(word, language);
-                    if (def) {
-                        results.push(def);
+                    const detail = yield exports.getWordDetailSimplify(word, language);
+                    if (detail) {
+                        results.push(detail);
                         arr.push(word);
                         i++;
                     }
@@ -101,22 +101,22 @@ exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, v
     }
     return results;
 });
-exports.getDefinition = (word, language) => __awaiter(this, void 0, void 0, function* () {
+exports.getWordDetail = (word, language) => __awaiter(this, void 0, void 0, function* () {
     const res = yield superagent_1.default
         .get(`https://api.dictionaryapi.dev/api/v2/entries/${language}/${word}`)
         .catch(() => {
         return null;
     });
     if (res && res.body && res.body[0]) {
-        const def = res.body[0];
+        const detail = res.body[0];
         const word = {
-            value: def.word,
+            value: detail.word,
             language,
             pronunciations: [],
             definitions: [],
         };
-        if (def.phonetics.length) {
-            for (const phonetic of def.phonetics) {
+        if (detail.phonetics.length) {
+            for (const phonetic of detail.phonetics) {
                 if (phonetic.audio && phonetic.text) {
                     const pron = {
                         audio: phonetic.audio,
@@ -128,8 +128,8 @@ exports.getDefinition = (word, language) => __awaiter(this, void 0, void 0, func
         }
         else
             return null;
-        if (def.meanings.length) {
-            for (const meaning of def.meanings) {
+        if (detail.meanings.length) {
+            for (const meaning of detail.meanings) {
                 for (const definition of meaning.definitions) {
                     if (definition.definition) {
                         const defValue = {
@@ -149,6 +149,25 @@ exports.getDefinition = (word, language) => __awaiter(this, void 0, void 0, func
     else
         return null;
 });
+exports.getWordDetailSimplify = (word, language) => __awaiter(this, void 0, void 0, function* () {
+    const detail = yield exports.getWordDetail(word, language);
+    if (detail && detail.definitions.length) {
+        const word = {
+            value: detail.value,
+            language: detail.language,
+            mainDefinition: detail.definitions[0].meaning,
+            pronunciationSymbol: detail.pronunciations.length
+                ? detail.pronunciations[0].symbol
+                : null,
+            pronunciationAudio: detail.pronunciations.length
+                ? detail.pronunciations[0].audio
+                : null,
+        };
+        return word;
+    }
+    else
+        return null;
+});
 exports.getWordAutoCompletes = (language, text) => __awaiter(this, void 0, void 0, function* () {
     const wordRepo = typeorm_1.getRepository(Word_1.Word);
     const autoCompletes = yield wordRepo
@@ -157,7 +176,15 @@ exports.getWordAutoCompletes = (language, text) => __awaiter(this, void 0, void 
         .andWhere("word.language = :language", { language })
         .limit(10)
         .getMany();
-    return autoCompletes;
+    return autoCompletes.map((word) => {
+        return {
+            value: word.value,
+            language,
+            mainDefinition: "",
+            pronunciationSymbol: null,
+            pronunciationAudio: null,
+        };
+    });
 });
 exports.toggleSaveWord = (word, language, userId) => __awaiter(this, void 0, void 0, function* () {
     const savedWordRepo = typeorm_1.getRepository(SavedWord_1.SavedWord);
@@ -173,9 +200,8 @@ exports.toggleSaveWord = (word, language, userId) => __awaiter(this, void 0, voi
         });
     }
     else {
-        const def = yield exports.getDefinition(word, language);
-        console.log("Definition: ", def);
-        if (def) {
+        const detail = yield exports.getWordDetail(word, language);
+        if (detail) {
             const queryRunner = typeorm_1.getConnection().createQueryRunner();
             yield queryRunner.connect();
             yield queryRunner.startTransaction();
@@ -189,15 +215,17 @@ exports.toggleSaveWord = (word, language, userId) => __awaiter(this, void 0, voi
                     position: length + 1,
                 });
                 yield manager.save(SavedWord_1.SavedWord, savedWordDb);
-                for (const pron of def.pronunciations) {
+                for (const pron of detail.pronunciations) {
                     yield manager.insert(Pronunciation_1.Pronunciation, {
                         savedWordId: savedWordDb.id,
                         symbol: pron.symbol,
                         audio: pron.audio,
                     });
                 }
-                for (let i = 0; i < def.definitions.length; i++) {
-                    const definition = def.definitions[i];
+                if (detail.definitions.length == 0)
+                    throw new Error("No definition found!");
+                for (let i = 0; i < detail.definitions.length; i++) {
+                    const definition = detail.definitions[i];
                     yield manager.insert(Definition_1.Definition, {
                         savedWordId: savedWordDb.id,
                         meaning: definition.meaning,
@@ -231,8 +259,20 @@ exports.getSavedWords = (userId, language) => __awaiter(this, void 0, void 0, fu
         .andWhere("savedWord.language = :language", { language })
         .orderBy("savedWord.position", "ASC")
         .getMany();
-    console.log(savedWords);
-    return savedWords;
+    const simplifySavedWords = savedWords.map((word) => {
+        return {
+            value: word.value,
+            language: word.language,
+            mainDefinition: word.definitions[0].meaning,
+            pronunciationSymbol: word.pronunciations.length
+                ? word.pronunciations[0].symbol
+                : null,
+            pronunciationAudio: word.pronunciations.length
+                ? word.pronunciations[0].audio
+                : null,
+        };
+    });
+    return simplifySavedWords;
 });
 exports.rearrangeSavedWords = (wordIds) => __awaiter(this, void 0, void 0, function* () {
     const savedWordRepo = typeorm_1.getRepository(SavedWord_1.SavedWord);

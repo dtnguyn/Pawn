@@ -54,10 +54,6 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "savedWords", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => SavedWord_1.SavedWord, (word) => word.user),
-    __metadata("design:type", Array)
-], User.prototype, "dailyWords", void 0);
-__decorate([
     typeorm_1.OneToMany(() => UserRefreshToken_1.UserRefreshToken, (token) => token.user),
     __metadata("design:type", Array)
 ], User.prototype, "refreshTokens", void 0);

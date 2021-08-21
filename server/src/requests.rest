@@ -59,7 +59,7 @@ GET http://localhost:4000/word/daily?language=en_US
 
 
 ###
-GET http://localhost:4000/word/definition?word=imperative&language=en_US
+GET http://localhost:4000/word/detail?word=imperative&language=en_US
 
 
 

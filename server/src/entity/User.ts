@@ -49,9 +49,6 @@ export class User {
   @OneToMany(() => SavedWord, (word) => word.user)
   savedWords: SavedWord[];
 
-  @OneToMany(() => SavedWord, (word) => word.user)
-  dailyWords: DailyWord[];
-
   @OneToMany(() => UserRefreshToken, (token) => token.user)
   refreshTokens: UserRefreshToken[];
 

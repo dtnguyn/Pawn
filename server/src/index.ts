@@ -31,7 +31,6 @@ createConnection({
   entities: [
     Word,
     SavedWord,
-    DailyWord,
     User,
     UserRefreshToken,
     Topic,

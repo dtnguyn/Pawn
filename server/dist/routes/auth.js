@@ -27,6 +27,7 @@ const passport_google_oauth20_1 = require("passport-google-oauth20");
 const middlewares_1 = require("../utils/middlewares");
 const UserController_1 = require("../controllers/UserController");
 const ApiResponse_1 = __importDefault(require("../utils/ApiResponse"));
+const CustomError_1 = __importDefault(require("../utils/CustomError"));
 dotenv_1.default.config();
 const router = express_1.Router();
 router.use(express_1.default.json());
@@ -70,7 +71,12 @@ router.get("/verify/code", (req, res) => __awaiter(this, void 0, void 0, functio
         res.send(new ApiResponse_1.default(true, "", code));
     }
     catch (error) {
-        res.send(new ApiResponse_1.default(false, error.message, null));
+        if (error instanceof CustomError_1.default) {
+            res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
     }
 }));
 router.post("/verify/code", (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -81,7 +87,12 @@ router.post("/verify/code", (req, res) => __awaiter(this, void 0, void 0, functi
         res.send(new ApiResponse_1.default(true, "", code));
     }
     catch (error) {
-        res.send(new ApiResponse_1.default(false, error.message, null));
+        if (error instanceof CustomError_1.default) {
+            res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
     }
 }));
 router.post("/register", (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -92,27 +103,32 @@ router.post("/register", (req, res) => __awaiter(this, void 0, void 0, function*
         const avatar = req.body.avatar;
         const native = req.body.nativeLanguage;
         if (!username || !email || !password || !native)
-            throw new Error("Please provide the required information");
+            throw new CustomError_1.default("Please provide the required information");
         const hashPW = bcrypt_1.default.hashSync(password, parseInt(process.env.SALT_ROUNDS));
         yield UserController_1.createUser(username, native, email, hashPW, avatar);
         return res.send(new ApiResponse_1.default(true, "", null));
     }
     catch (error) {
-        return res.send(new ApiResponse_1.default(false, error.message, null));
+        if (error instanceof CustomError_1.default) {
+            return res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            return res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
     }
 }));
 router.post("/login", (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         if (!req.body.usernameOrEmail)
-            throw new Error("Please provide username or email!");
+            throw new CustomError_1.default("Please provide username or email!");
         if (!req.body.password)
-            throw new Error("Please provide password");
+            throw new CustomError_1.default("Please provide password");
         const user = yield UserController_1.getOneUser(req.body.usernameOrEmail);
         if (!user)
-            throw new Error("No user found with the given username or password!");
+            throw new CustomError_1.default("No user found with the given username or password!");
         const result = yield bcrypt_1.default.compare(req.body.password, user.password);
         if (!result)
-            throw new Error("Invalid credentials!");
+            throw new CustomError_1.default("Invalid credentials!");
         const accessToken = jsonwebtoken_1.default.sign({ user }, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: process.env.TOKEN_EXPIRATION,
         });
@@ -121,7 +137,12 @@ router.post("/login", (req, res) => __awaiter(this, void 0, void 0, function* ()
         return res.send(new ApiResponse_1.default(true, "", { accessToken, refreshToken }));
     }
     catch (error) {
-        return res.send(new ApiResponse_1.default(false, error.message, null));
+        if (error instanceof CustomError_1.default) {
+            return res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            return res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
     }
 }));
 router.delete("/logout", (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -131,7 +152,12 @@ router.delete("/logout", (req, res) => __awaiter(this, void 0, void 0, function*
         return res.send(new ApiResponse_1.default(true, "", null));
     }
     catch (error) {
-        return res.send(new ApiResponse_1.default(false, error.message, null));
+        if (error instanceof CustomError_1.default) {
+            return res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            return res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
     }
 }));
 router.patch("/password", (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -144,16 +170,21 @@ router.patch("/password", (req, res) => __awaiter(this, void 0, void 0, function
         return res.send(new ApiResponse_1.default(true, "", null));
     }
     catch (error) {
-        return res.send(new ApiResponse_1.default(false, error.message, null));
+        if (error instanceof CustomError_1.default) {
+            return res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            return res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
     }
 }));
 router.post("/token", (req, res) => {
     try {
         const refreshToken = req.body.token;
         if (refreshToken == null)
-            throw new Error("Unauthorized");
+            throw new CustomError_1.default("Unauthorized");
         if (!UserController_1.findOneRefreshToken(refreshToken))
-            throw new Error("Forbidden");
+            throw new CustomError_1.default("Forbidden");
         jsonwebtoken_1.default.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
             if (err)
                 throw err;
@@ -166,7 +197,12 @@ router.post("/token", (req, res) => {
         });
     }
     catch (error) {
-        return res.send(new ApiResponse_1.default(false, error.message, null));
+        if (error instanceof CustomError_1.default) {
+            res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
     }
 });
 router.get("/google", passport_1.default.authenticate("google", { scope: ["profile", "email"] }));

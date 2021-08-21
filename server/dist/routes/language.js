@@ -15,6 +15,7 @@ const express_1 = require("express");
 const LanguageController_1 = require("../controllers/LanguageController");
 const ApiResponse_1 = __importDefault(require("../utils/ApiResponse"));
 const middlewares_1 = require("../utils/middlewares");
+const CustomError_1 = __importDefault(require("../utils/CustomError"));
 const router = express_1.Router();
 router.get("/", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
@@ -23,7 +24,12 @@ router.get("/", middlewares_1.checkAuthentication, (req, res) => __awaiter(this,
         res.send(new ApiResponse_1.default(true, "", languages));
     }
     catch (error) {
-        res.send(new ApiResponse_1.default(false, error.message, null));
+        if (error instanceof CustomError_1.default) {
+            res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
     }
 }));
 router.post("/save", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -34,7 +40,12 @@ router.post("/save", middlewares_1.checkAuthentication, (req, res) => __awaiter(
         res.send(new ApiResponse_1.default(true, "", null));
     }
     catch (error) {
-        res.send(new ApiResponse_1.default(false, error.message, null));
+        if (error instanceof CustomError_1.default) {
+            res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
     }
 }));
 exports.default = router;

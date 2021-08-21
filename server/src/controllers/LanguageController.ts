@@ -1,6 +1,7 @@
 import { Language } from "../entity/Language";
 import { User } from "../entity/User";
 import { getRepository } from "typeorm";
+import CustomError from "../utils/CustomError";
 
 export const chooseLanguages = async (
   languageSymbols: string[],
@@ -14,7 +15,7 @@ export const chooseLanguages = async (
     .where("user.id = :userId", { userId })
     .getOne();
 
-  if (!user) throw new Error("User not found!");
+  if (!user) throw new CustomError("User not found!");
   console.log(user);
   user.learningLanguages = [];
   for (const languageSymbol of languageSymbols) {

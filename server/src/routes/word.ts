@@ -10,6 +10,7 @@ import {
   toggleSaveWord,
 } from "../controllers/WordController";
 import { checkAuthentication } from "../utils/middlewares";
+import CustomError from "../utils/CustomError";
 
 const router = Router();
 
@@ -30,7 +31,11 @@ router.get("/daily", async (req, res) => {
 
     return res.send(new ApiResponse(true, "", words));
   } catch (error) {
-    return res.send(new ApiResponse(false, error.message, null));
+    if (error instanceof CustomError) {
+      return res.send(new ApiResponse(false, error.message, null));
+    } else {
+      return res.send(new ApiResponse(false, "Something went wrong", null));
+    }
   }
 });
 
@@ -40,14 +45,18 @@ router.get("/detail", async (req, res) => {
     const word = req.query.word as string;
 
     if (!word || !language)
-      throw new Error("Please provide the word and definition language");
+      throw new CustomError("Please provide the word and definition language");
 
     const definition = await getWordDetail(word, language);
     if (!definition)
-      throw new Error("Couldn't find definition for the word provided!");
+      throw new CustomError("Couldn't find definition for the word provided!");
     return res.send(new ApiResponse(true, "", definition));
   } catch (error) {
-    return res.send(new ApiResponse(false, error.message, null));
+    if (error instanceof CustomError) {
+      return res.send(new ApiResponse(false, error.message, null));
+    } else {
+      return res.send(new ApiResponse(false, "Something went wrong", null));
+    }
   }
 });
 
@@ -57,11 +66,15 @@ router.get("/autocomplete", async (req, res) => {
     const language = req.query.language as string;
 
     if (!text || !language)
-      throw new Error("Please provide text and language!");
+      throw new CustomError("Please provide text and language!");
     const results = await getWordAutoCompletes(language, text);
     return res.send(new ApiResponse(true, "", results));
   } catch (error) {
-    return res.send(new ApiResponse(false, error.message, null));
+    if (error instanceof CustomError) {
+      return res.send(new ApiResponse(false, error.message, null));
+    } else {
+      return res.send(new ApiResponse(false, "Something went wrong", null));
+    }
   }
 });
 
@@ -72,7 +85,11 @@ router.get("/save", checkAuthentication, async (req, res) => {
     const savedWords = await getSavedWords(userId, language);
     return res.send(new ApiResponse(true, "", savedWords));
   } catch (error) {
-    return res.send(new ApiResponse(false, error.message, null));
+    if (error instanceof CustomError) {
+      return res.send(new ApiResponse(false, error.message, null));
+    } else {
+      return res.send(new ApiResponse(false, "Something went wrong", null));
+    }
   }
 });
 
@@ -85,7 +102,11 @@ router.post("/save", checkAuthentication, async (req, res) => {
     await toggleSaveWord(word, language, userId);
     return res.send(new ApiResponse(true, "", null));
   } catch (error) {
-    return res.send(new ApiResponse(false, error.message, null));
+    if (error instanceof CustomError) {
+      return res.send(new ApiResponse(false, error.message, null));
+    } else {
+      return res.send(new ApiResponse(false, "Something went wrong", null));
+    }
   }
 });
 
@@ -95,14 +116,17 @@ router.patch("/rearrange", checkAuthentication, async (req, res) => {
     const wordIds = req.body.wordIds as string[];
 
     if (!wordIds || !wordIds.length)
-      throw new Error("Please provide a list of saved words!");
+      throw new CustomError("Please provide a list of saved words!");
 
     await rearrangeSavedWords(wordIds);
 
     return res.send(new ApiResponse(true, "", null));
   } catch (error) {
-    console.log(error);
-    return res.send(new ApiResponse(false, error.message, null));
+    if (error instanceof CustomError) {
+      return res.send(new ApiResponse(false, error.message, null));
+    } else {
+      return res.send(new ApiResponse(false, "Something went wrong", null));
+    }
   }
 });
 
@@ -111,13 +135,17 @@ router.patch("/definition/rearrange", checkAuthentication, async (req, res) => {
     const definitionIds = req.body.definitionIds as string[];
 
     if (!definitionIds || !definitionIds.length)
-      throw new Error("Please provide a list of definitions!");
+      throw new CustomError("Please provide a list of definitions!");
 
     await rearrangeDefinition(definitionIds);
 
     return res.send(new ApiResponse(true, "", null));
   } catch (error) {
-    return res.send(new ApiResponse(false, error.message, null));
+    if (error instanceof CustomError) {
+      return res.send(new ApiResponse(false, error.message, null));
+    } else {
+      return res.send(new ApiResponse(false, "Something went wrong", null));
+    }
   }
 });
 

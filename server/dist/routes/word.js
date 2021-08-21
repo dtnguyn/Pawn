@@ -15,6 +15,7 @@ const express_1 = require("express");
 const ApiResponse_1 = __importDefault(require("../utils/ApiResponse"));
 const WordController_1 = require("../controllers/WordController");
 const middlewares_1 = require("../utils/middlewares");
+const CustomError_1 = __importDefault(require("../utils/CustomError"));
 const router = express_1.Router();
 router.get("/daily", (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
@@ -30,7 +31,12 @@ router.get("/daily", (req, res) => __awaiter(this, void 0, void 0, function* () 
         return res.send(new ApiResponse_1.default(true, "", words));
     }
     catch (error) {
-        return res.send(new ApiResponse_1.default(false, error.message, null));
+        if (error instanceof CustomError_1.default) {
+            return res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            return res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
     }
 }));
 router.get("/detail", (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -38,14 +44,19 @@ router.get("/detail", (req, res) => __awaiter(this, void 0, void 0, function* ()
         const language = req.query.language;
         const word = req.query.word;
         if (!word || !language)
-            throw new Error("Please provide the word and definition language");
+            throw new CustomError_1.default("Please provide the word and definition language");
         const definition = yield WordController_1.getWordDetail(word, language);
         if (!definition)
-            throw new Error("Couldn't find definition for the word provided!");
+            throw new CustomError_1.default("Couldn't find definition for the word provided!");
         return res.send(new ApiResponse_1.default(true, "", definition));
     }
     catch (error) {
-        return res.send(new ApiResponse_1.default(false, error.message, null));
+        if (error instanceof CustomError_1.default) {
+            return res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            return res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
     }
 }));
 router.get("/autocomplete", (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -53,12 +64,17 @@ router.get("/autocomplete", (req, res) => __awaiter(this, void 0, void 0, functi
         const text = req.query.text;
         const language = req.query.language;
         if (!text || !language)
-            throw new Error("Please provide text and language!");
+            throw new CustomError_1.default("Please provide text and language!");
         const results = yield WordController_1.getWordAutoCompletes(language, text);
         return res.send(new ApiResponse_1.default(true, "", results));
     }
     catch (error) {
-        return res.send(new ApiResponse_1.default(false, error.message, null));
+        if (error instanceof CustomError_1.default) {
+            return res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            return res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
     }
 }));
 router.get("/save", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -69,7 +85,12 @@ router.get("/save", middlewares_1.checkAuthentication, (req, res) => __awaiter(t
         return res.send(new ApiResponse_1.default(true, "", savedWords));
     }
     catch (error) {
-        return res.send(new ApiResponse_1.default(false, error.message, null));
+        if (error instanceof CustomError_1.default) {
+            return res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            return res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
     }
 }));
 router.post("/save", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -81,32 +102,46 @@ router.post("/save", middlewares_1.checkAuthentication, (req, res) => __awaiter(
         return res.send(new ApiResponse_1.default(true, "", null));
     }
     catch (error) {
-        return res.send(new ApiResponse_1.default(false, error.message, null));
+        if (error instanceof CustomError_1.default) {
+            return res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            return res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
     }
 }));
 router.patch("/rearrange", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         const wordIds = req.body.wordIds;
         if (!wordIds || !wordIds.length)
-            throw new Error("Please provide a list of saved words!");
+            throw new CustomError_1.default("Please provide a list of saved words!");
         yield WordController_1.rearrangeSavedWords(wordIds);
         return res.send(new ApiResponse_1.default(true, "", null));
     }
     catch (error) {
-        console.log(error);
-        return res.send(new ApiResponse_1.default(false, error.message, null));
+        if (error instanceof CustomError_1.default) {
+            return res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            return res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
     }
 }));
 router.patch("/definition/rearrange", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         const definitionIds = req.body.definitionIds;
         if (!definitionIds || !definitionIds.length)
-            throw new Error("Please provide a list of definitions!");
+            throw new CustomError_1.default("Please provide a list of definitions!");
         yield WordController_1.rearrangeDefinition(definitionIds);
         return res.send(new ApiResponse_1.default(true, "", null));
     }
     catch (error) {
-        return res.send(new ApiResponse_1.default(false, error.message, null));
+        if (error instanceof CustomError_1.default) {
+            return res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            return res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
     }
 }));
 exports.default = router;

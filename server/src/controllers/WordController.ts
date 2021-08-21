@@ -2,6 +2,7 @@ import deWords from "all-the-german-words";
 import enWords from "an-array-of-english-words";
 import frWords from "an-array-of-french-words";
 import esWords from "an-array-of-spanish-words";
+import CustomError from "../utils/CustomError";
 import superagent from "superagent";
 import { getConnection, getRepository } from "typeorm";
 import { Definition } from "../entity/Definition";
@@ -89,7 +90,7 @@ export const getDailyRandomWords = async (
       break;
     }
     default: {
-      throw new Error("Please provide supported language!");
+      throw new CustomError("Please provide supported language!");
     }
   }
 
@@ -231,7 +232,7 @@ export const toggleSaveWord = async (
         }
 
         if (detail.definitions.length == 0)
-          throw new Error("No definition found!");
+          throw new CustomError("No definition found!");
         for (let i = 0; i < detail.definitions.length; i++) {
           const definition = detail.definitions[i];
           await manager.insert(Definition, {
@@ -249,7 +250,7 @@ export const toggleSaveWord = async (
 
         throw error;
       }
-    } else throw new Error("Not found definition");
+    } else throw new CustomError("Not found definition");
   }
 };
 

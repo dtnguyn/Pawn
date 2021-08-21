@@ -16,6 +16,7 @@ const typeorm_1 = require("typeorm");
 const User_1 = require("../entity/User");
 const VerificationCode_1 = require("../entity/VerificationCode");
 const nodemailer_1 = __importDefault(require("nodemailer"));
+const CustomError_1 = __importDefault(require("../utils/CustomError"));
 function createUser(username, nativeLanguageId, email, password, avatar) {
     return __awaiter(this, void 0, void 0, function* () {
         const userRepo = typeorm_1.getRepository(User_1.User);
@@ -116,7 +117,7 @@ exports.sendVerificationCode = (email) => __awaiter(this, void 0, void 0, functi
         return code;
     }
     else {
-        throw new Error("Please provide a valid email!");
+        throw new CustomError_1.default("Please provide a valid email!");
     }
 });
 exports.deleteRefreshToken = (refreshToken) => __awaiter(this, void 0, void 0, function* () {
@@ -124,7 +125,7 @@ exports.deleteRefreshToken = (refreshToken) => __awaiter(this, void 0, void 0, f
         yield typeorm_1.getRepository(UserRefreshToken_1.UserRefreshToken).delete({ token: refreshToken });
     }
     catch (error) {
-        throw new Error("Unable to logout!");
+        throw new CustomError_1.default("Unable to logout!");
     }
 });
 exports.changePassword = (email, code, hashPW) => __awaiter(this, void 0, void 0, function* () {
@@ -133,6 +134,6 @@ exports.changePassword = (email, code, hashPW) => __awaiter(this, void 0, void 0
         yield userRepo.update({ email }, { password: hashPW });
     }
     else
-        throw new Error("Invalid verification code!");
+        throw new CustomError_1.default("Invalid verification code!");
 });
 //# sourceMappingURL=UserController.js.map

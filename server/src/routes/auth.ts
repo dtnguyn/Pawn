@@ -21,6 +21,7 @@ import {
   verifyCode,
 } from "../controllers/UserController";
 import ApiResponse from "../utils/ApiResponse";
+import CustomError from "../utils/CustomError";
 dotenv.config();
 
 const router = Router();
@@ -85,7 +86,11 @@ router.get("/verify/code", async (req, res) => {
 
     res.send(new ApiResponse(true, "", code));
   } catch (error) {
-    res.send(new ApiResponse(false, error.message, null));
+    if (error instanceof CustomError) {
+      res.send(new ApiResponse(false, error.message, null));
+    } else {
+      res.send(new ApiResponse(false, "Something went wrong", null));
+    }
   }
 });
 
@@ -98,7 +103,11 @@ router.post("/verify/code", async (req, res) => {
 
     res.send(new ApiResponse(true, "", code));
   } catch (error) {
-    res.send(new ApiResponse(false, error.message, null));
+    if (error instanceof CustomError) {
+      res.send(new ApiResponse(false, error.message, null));
+    } else {
+      res.send(new ApiResponse(false, "Something went wrong", null));
+    }
   }
 });
 
@@ -112,7 +121,7 @@ router.post("/register", async (req, res) => {
 
     //Check user input
     if (!username || !email || !password || !native)
-      throw new Error("Please provide the required information");
+      throw new CustomError("Please provide the required information");
 
     //Create hash password
     const hashPW = bcrypt.hashSync(
@@ -125,7 +134,11 @@ router.post("/register", async (req, res) => {
 
     return res.send(new ApiResponse(true, "", null));
   } catch (error) {
-    return res.send(new ApiResponse(false, error.message, null));
+    if (error instanceof CustomError) {
+      return res.send(new ApiResponse(false, error.message, null));
+    } else {
+      return res.send(new ApiResponse(false, "Something went wrong", null));
+    }
   }
 });
 
@@ -134,17 +147,19 @@ router.post("/login", async (req, res) => {
   try {
     //Check user input
     if (!req.body.usernameOrEmail)
-      throw new Error("Please provide username or email!");
-    if (!req.body.password) throw new Error("Please provide password");
+      throw new CustomError("Please provide username or email!");
+    if (!req.body.password) throw new CustomError("Please provide password");
 
     //Check if user is registered
     const user = await getOneUser(req.body.usernameOrEmail);
     if (!user)
-      throw new Error("No user found with the given username or password!");
+      throw new CustomError(
+        "No user found with the given username or password!"
+      );
 
     //Check password
     const result = await bcrypt.compare(req.body.password, user.password);
-    if (!result) throw new Error("Invalid credentials!");
+    if (!result) throw new CustomError("Invalid credentials!");
 
     //Create new tokens and save to database
     const accessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET!, {
@@ -156,7 +171,11 @@ router.post("/login", async (req, res) => {
     //Send response
     return res.send(new ApiResponse(true, "", { accessToken, refreshToken }));
   } catch (error) {
-    return res.send(new ApiResponse(false, error.message, null));
+    if (error instanceof CustomError) {
+      return res.send(new ApiResponse(false, error.message, null));
+    } else {
+      return res.send(new ApiResponse(false, "Something went wrong", null));
+    }
   }
 });
 
@@ -168,7 +187,11 @@ router.delete("/logout", async (req, res) => {
 
     return res.send(new ApiResponse(true, "", null));
   } catch (error) {
-    return res.send(new ApiResponse(false, error.message, null));
+    if (error instanceof CustomError) {
+      return res.send(new ApiResponse(false, error.message, null));
+    } else {
+      return res.send(new ApiResponse(false, "Something went wrong", null));
+    }
   }
 });
 
@@ -185,7 +208,11 @@ router.patch("/password", async (req, res) => {
 
     return res.send(new ApiResponse(true, "", null));
   } catch (error) {
-    return res.send(new ApiResponse(false, error.message, null));
+    if (error instanceof CustomError) {
+      return res.send(new ApiResponse(false, error.message, null));
+    } else {
+      return res.send(new ApiResponse(false, "Something went wrong", null));
+    }
   }
 });
 
@@ -194,10 +221,10 @@ router.post("/token", (req, res) => {
     const refreshToken = req.body.token;
 
     //Verify user input
-    if (refreshToken == null) throw new Error("Unauthorized");
+    if (refreshToken == null) throw new CustomError("Unauthorized");
 
     //Check if the refresh token is stored in the database
-    if (!findOneRefreshToken(refreshToken)) throw new Error("Forbidden");
+    if (!findOneRefreshToken(refreshToken)) throw new CustomError("Forbidden");
 
     // Verify the refresh token
     jwt.verify(
@@ -220,7 +247,11 @@ router.post("/token", (req, res) => {
       }
     );
   } catch (error) {
-    return res.send(new ApiResponse(false, error.message, null));
+    if (error instanceof CustomError) {
+      res.send(new ApiResponse(false, error.message, null));
+    } else {
+      res.send(new ApiResponse(false, "Something went wrong", null));
+    }
   }
 });
 

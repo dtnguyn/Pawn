@@ -15,6 +15,7 @@ const all_the_german_words_1 = __importDefault(require("all-the-german-words"));
 const an_array_of_english_words_1 = __importDefault(require("an-array-of-english-words"));
 const an_array_of_french_words_1 = __importDefault(require("an-array-of-french-words"));
 const an_array_of_spanish_words_1 = __importDefault(require("an-array-of-spanish-words"));
+const CustomError_1 = __importDefault(require("../utils/CustomError"));
 const superagent_1 = __importDefault(require("superagent"));
 const typeorm_1 = require("typeorm");
 const Definition_1 = require("../entity/Definition");
@@ -96,7 +97,7 @@ exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, v
             break;
         }
         default: {
-            throw new Error("Please provide supported language!");
+            throw new CustomError_1.default("Please provide supported language!");
         }
     }
     return results;
@@ -223,7 +224,7 @@ exports.toggleSaveWord = (word, language, userId) => __awaiter(this, void 0, voi
                     });
                 }
                 if (detail.definitions.length == 0)
-                    throw new Error("No definition found!");
+                    throw new CustomError_1.default("No definition found!");
                 for (let i = 0; i < detail.definitions.length; i++) {
                     const definition = detail.definitions[i];
                     yield manager.insert(Definition_1.Definition, {
@@ -243,7 +244,7 @@ exports.toggleSaveWord = (word, language, userId) => __awaiter(this, void 0, voi
             }
         }
         else
-            throw new Error("Not found definition");
+            throw new CustomError_1.default("Not found definition");
     }
 });
 exports.getSavedWords = (userId, language) => __awaiter(this, void 0, void 0, function* () {

@@ -19,9 +19,9 @@ object DailyWordMapper {
             value = word.value,
             language = word.language,
             display = true,
-            pronunciationAudio = if (word.pronunciations.isNotEmpty()) word.pronunciations[0].audio else null,
-            pronunciationSymbol = if (word.pronunciations.isNotEmpty()) word.pronunciations[0].symbol else null,
-            mainDefinition = if (word.definitions.isNotEmpty()) word.definitions[0].meaning else "",
+            pronunciationAudio = word.pronunciationAudio,
+            pronunciationSymbol = word.pronunciationSymbol,
+            mainDefinition = word.mainDefinition,
             createdDate = SimpleDateFormat("yyyy.MM.dd").format(Date())
         )
     }
@@ -30,8 +30,9 @@ object DailyWordMapper {
         return Word(
             value = word.value,
             language = word.language,
-            pronunciations = listOf(Pronunciation(audio = word.pronunciationAudio, symbol = word.pronunciationSymbol)),
-            definitions = listOf(Definition(meaning = word.mainDefinition, example = "", partOfSpeech = "")),
+            mainDefinition = word.mainDefinition,
+            pronunciationSymbol = word.pronunciationSymbol,
+            pronunciationAudio = word.pronunciationAudio
         )
     }
 

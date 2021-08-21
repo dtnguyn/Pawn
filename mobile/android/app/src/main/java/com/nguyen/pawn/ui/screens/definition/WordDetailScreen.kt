@@ -165,8 +165,9 @@ fun WordDetailScreen(
                                         Word(
                                             value = it.value,
                                             language = it.language,
-                                            definitions = it.definitions,
-                                            pronunciations = it.pronunciations,
+                                            mainDefinition = if (it.definitions.isNotEmpty()) it.definitions.first().meaning else "",
+                                            pronunciationAudio = if (it.pronunciations.isNotEmpty()) it.pronunciations.first().audio else null,
+                                            pronunciationSymbol = if (it.pronunciations.isNotEmpty()) it.pronunciations.first().symbol else null
                                         ),
                                         DataStoreUtils.getAccessTokenFromDataStore(context),
                                         it.language
@@ -176,8 +177,8 @@ fun WordDetailScreen(
                         }
                     }
                 }
-                if(loading){
-                    items(3) {index ->
+                if (loading) {
+                    items(3) { index ->
                         Card(
                             shape = RoundedCornerShape(15.dp),
                             elevation = 4.dp,
@@ -192,20 +193,55 @@ fun WordDetailScreen(
                             Column(
                                 Modifier.padding(15.dp)
                             ) {
-                                ShimmerAnimation(modifier = Modifier.width(200.dp).height(30.dp), shape = RoundedCornerShape(30.dp))
+                                ShimmerAnimation(
+                                    modifier = Modifier
+                                        .width(200.dp)
+                                        .height(30.dp),
+                                    shape = RoundedCornerShape(30.dp)
+                                )
                                 Spacer(modifier = Modifier.padding(2.dp))
-                                ShimmerAnimation(modifier = Modifier.width(130.dp).height(30.dp), shape = RoundedCornerShape(30.dp))
+                                ShimmerAnimation(
+                                    modifier = Modifier
+                                        .width(130.dp)
+                                        .height(30.dp),
+                                    shape = RoundedCornerShape(30.dp)
+                                )
                                 Spacer(modifier = Modifier.padding(10.dp))
-                                ShimmerAnimation(modifier = Modifier.fillMaxWidth().height(50.dp), shape = RoundedCornerShape(30.dp))
+                                ShimmerAnimation(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(50.dp),
+                                    shape = RoundedCornerShape(30.dp)
+                                )
                                 Spacer(modifier = Modifier.padding(2.dp))
 
-                                ShimmerAnimation(modifier = Modifier.width(150.dp).height(50.dp), shape = RoundedCornerShape(30.dp))
+                                ShimmerAnimation(
+                                    modifier = Modifier
+                                        .width(150.dp)
+                                        .height(50.dp),
+                                    shape = RoundedCornerShape(30.dp)
+                                )
                                 Spacer(modifier = Modifier.padding(10.dp))
-                                ShimmerAnimation(modifier = Modifier.width(200.dp).height(30.dp), shape = RoundedCornerShape(30.dp))
+                                ShimmerAnimation(
+                                    modifier = Modifier
+                                        .width(200.dp)
+                                        .height(30.dp),
+                                    shape = RoundedCornerShape(30.dp)
+                                )
                                 Spacer(modifier = Modifier.padding(5.dp))
-                                ShimmerAnimation(modifier = Modifier.fillMaxWidth().height(30.dp), shape = RoundedCornerShape(30.dp))
+                                ShimmerAnimation(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(30.dp),
+                                    shape = RoundedCornerShape(30.dp)
+                                )
                                 Spacer(modifier = Modifier.padding(2.dp))
-                                ShimmerAnimation(modifier = Modifier.width(150.dp).height(30.dp), shape = RoundedCornerShape(30.dp))
+                                ShimmerAnimation(
+                                    modifier = Modifier
+                                        .width(150.dp)
+                                        .height(30.dp),
+                                    shape = RoundedCornerShape(30.dp)
+                                )
                             }
                         }
                     }

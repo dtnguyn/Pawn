@@ -561,14 +561,18 @@ fun HomeScreen(
                                 savedWords()?.let { savedWords ->
                                     items(savedWords.size) { index ->
                                         val word = savedWords[index]
-                                        SavedWordItem(
-                                            word = word.value,
-                                            pronunciation = if (word.pronunciations.isNotEmpty()) word.pronunciations.first().symbol else null,
-                                            index = index,
-                                            onClick = {
-                                                navController.navigate("${PawnScreens.WordDetail.route}/${savedWords[index].value}/${currentPickedLanguage?.id}")
-                                            }
-                                        )
+                                        Box(Modifier.padding(horizontal = 30.dp)) {
+                                            SavedWordItem(
+                                                word = word.value,
+                                                pronunciationSymbol = word.pronunciationSymbol,
+                                                pronunciationAudio = word.pronunciationAudio,
+                                                index = index,
+                                                onClick = {
+                                                    navController.navigate("${PawnScreens.WordDetail.route}/${savedWords[index].value}/${currentPickedLanguage?.id}")
+                                                }
+                                            )
+                                        }
+
                                     }
                                 }
                             }

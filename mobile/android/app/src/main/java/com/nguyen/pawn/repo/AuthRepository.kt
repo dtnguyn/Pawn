@@ -1,5 +1,6 @@
 package com.nguyen.pawn.repo
 
+import android.util.Log
 import com.nguyen.pawn.api.model.*
 import com.nguyen.pawn.model.Token
 import com.nguyen.pawn.model.User
@@ -72,6 +73,7 @@ class AuthRepository
                         contentType(ContentType.Application.Json)
                         body = LoginRequestBody(emailOrUsername, password)
                     }
+                Log.d(TAG, "login response $loginResponse")
                 if (loginResponse.status) token = loginResponse.data
                 else throw CustomAppException(loginResponse.message)
                 token

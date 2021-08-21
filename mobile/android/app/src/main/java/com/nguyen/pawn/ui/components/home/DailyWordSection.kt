@@ -67,7 +67,6 @@ fun DailyWordSection(
                     isLoading = isLoading,
                     word = "",
                     definition = "",
-                    pronunciation = "",
                     onClick = {}
                 )
             } else {
@@ -78,8 +77,8 @@ fun DailyWordSection(
                     DailyWordCard(
                         isLoading = isLoading,
                         word = words[page].value,
-                        definition = words[page].definitions[0].meaning,
-                        pronunciation = words[page].pronunciations[0].symbol,
+                        definition = words[page].mainDefinition,
+                        pronunciationSymbol = words[page].pronunciationSymbol,
                         onClick = {
                             onDailyWordClick(words[page].value)
                         }
@@ -136,7 +135,6 @@ fun DailyWordSection(
                 isLoading = true,
                 word = "",
                 definition = "",
-                pronunciation = "",
                 onClick = {}
             )
         }

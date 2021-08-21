@@ -24,7 +24,8 @@ fun DailyWordCard(
     isLoading: Boolean,
     word: String,
     definition: String,
-    pronunciation: String?,
+    pronunciationSymbol: String? = null,
+    pronunciationAudio: String? = null,
     onClick: () -> Unit
 ) {
 
@@ -63,7 +64,7 @@ fun DailyWordCard(
                         Column {
                             Text(text = word, style = Typography.h1, color = Color.White)
                             Text(
-                                text = pronunciation ?: "",
+                                text = pronunciationSymbol ?: "",
                                 style = Typography.body2,
                                 color = Color.White
                             )

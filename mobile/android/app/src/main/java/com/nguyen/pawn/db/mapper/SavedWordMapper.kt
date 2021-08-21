@@ -21,9 +21,9 @@ object SavedWordMapper {
             id = UUID.randomUUID().toString(),
             value = word.value,
             language = word.language,
-            pronunciationAudio = if (word.pronunciations.isNotEmpty()) word.pronunciations[0].audio else null,
-            pronunciationSymbol = if (word.pronunciations.isNotEmpty()) word.pronunciations[0].symbol else null,
-            mainDefinition = if (word.definitions.isNotEmpty()) word.definitions[0].meaning else "",
+            pronunciationAudio = word.pronunciationAudio,
+            pronunciationSymbol = word.pronunciationSymbol,
+            mainDefinition = word.mainDefinition,
             createdDate = SimpleDateFormat("yyyy.MM.dd").format(Date())
         )
     }
@@ -32,8 +32,9 @@ object SavedWordMapper {
         return Word(
             value = word.value,
             language = word.language,
-            pronunciations = listOf(Pronunciation(audio = word.pronunciationAudio, symbol = word.pronunciationSymbol)),
-            definitions = listOf(Definition(meaning = word.mainDefinition, example = "", partOfSpeech = "")),
+            mainDefinition = word.mainDefinition,
+            pronunciationAudio = word.pronunciationAudio,
+            pronunciationSymbol = word.pronunciationSymbol
         )
     }
 

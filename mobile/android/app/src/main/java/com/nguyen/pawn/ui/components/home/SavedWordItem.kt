@@ -18,32 +18,29 @@ import com.nguyen.pawn.util.UtilFunctions.generateColor
 
 @ExperimentalAnimationApi
 @Composable
-fun SavedWordItem(word: String, pronunciation: String?, index: Int, onClick: () -> Unit) {
+fun SavedWordItem(word: String, pronunciationSymbol: String? = null, pronunciationAudio: String? = null, index: Int, onClick: () -> Unit) {
 
-    AnimatedVisibility(
-        visible = true,
-        enter = slideInVertically(initialOffsetY = { 400 }) + expandVertically(expandFrom = Alignment.Top) + fadeIn(initialAlpha = 0.3f),
-        exit = slideOutVertically(targetOffsetY = { 400 }) + shrinkVertically() + fadeOut(),
-
+    Card(
+        shape = RoundedCornerShape(15.dp),
+        modifier = Modifier
+            .padding(vertical = 15.dp)
+            .fillMaxWidth()
+            .height(70.dp)
+            .clip(RoundedCornerShape(15.dp))
+            .clickable { onClick() },
+        backgroundColor = generateColor(index + 1)
     ) {
-        Card(
-            shape = RoundedCornerShape(15.dp),
-            modifier = Modifier
-                .padding(horizontal = 30.dp, vertical = 15.dp)
-                .fillMaxWidth()
-                .height(70.dp)
-                .clip(RoundedCornerShape(15.dp))
-                .clickable { onClick() },
-            backgroundColor = generateColor(index + 1)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+            if(pronunciationAudio.isNullOrBlank()){
+                Text(text = word, style = Typography.h4)
+            } else {
                 Column {
                     Text(text = word, style = Typography.body1)
-                    Text(text = pronunciation ?: "", style = Typography.body2)
+                    Text(text = pronunciationSymbol ?: "", style = Typography.body2)
                 }
 
                 RoundButton(backgroundColor = Color.White, size = 45.dp, icon = R.drawable.speaker) {
@@ -52,6 +49,5 @@ fun SavedWordItem(word: String, pronunciation: String?, index: Int, onClick: () 
             }
         }
     }
-
 }
 

@@ -24,6 +24,7 @@ import com.nguyen.pawn.ui.screens.auth.ChangePasswordScreen
 import com.nguyen.pawn.ui.screens.auth.VerifyCodeScreen
 import com.nguyen.pawn.ui.screens.definition.WordDetailViewModel
 import com.nguyen.pawn.ui.screens.home.HomeViewModel
+import com.nguyen.pawn.ui.screens.search.SearchViewModel
 import com.nguyen.pawn.ui.theme.PawnTheme
 import io.ktor.utils.io.concurrent.*
 
@@ -37,6 +38,7 @@ fun PawnApp(
     authViewModel: AuthViewModel,
     homeViewModel: HomeViewModel,
     wordDetailViewModel: WordDetailViewModel,
+    searchViewModel: SearchViewModel,
     sharedViewModel: SharedViewModel
 ) {
 
@@ -93,7 +95,7 @@ fun PawnApp(
                     )
                 }
                 composable(PawnScreens.Feeds.route) { FeedScreen() }
-                composable(PawnScreens.Search.route) { SearchScreen() }
+                composable(PawnScreens.Search.route) { SearchScreen(searchViewModel, sharedViewModel, navController) }
                 composable("${PawnScreens.WordDetail.route}/{wordValue}/{language}") {
                     WordDetailScreen(
                         navController = navController,

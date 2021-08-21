@@ -11,6 +11,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.nguyen.pawn.ui.screens.auth.AuthViewModel
 import com.nguyen.pawn.ui.screens.definition.WordDetailViewModel
 import com.nguyen.pawn.ui.screens.home.HomeViewModel
+import com.nguyen.pawn.ui.screens.search.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @ExperimentalPagerApi
@@ -21,6 +22,7 @@ class MainActivity : ComponentActivity() {
     private val homeViewModel: HomeViewModel by viewModels()
     private val authViewModel: AuthViewModel by viewModels()
     private val sharedViewModel: SharedViewModel by viewModels()
+    private val searchViewModel: SearchViewModel by viewModels()
     private val wordDetailViewModel: WordDetailViewModel by viewModels()
 
     @ExperimentalFoundationApi
@@ -32,6 +34,7 @@ class MainActivity : ComponentActivity() {
                 authViewModel = authViewModel,
                 homeViewModel = homeViewModel,
                 sharedViewModel = sharedViewModel,
+                searchViewModel = searchViewModel,
                 wordDetailViewModel = wordDetailViewModel
             )
         }

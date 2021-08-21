@@ -146,4 +146,23 @@ class WordRepository
         )
     }
 
+    fun getAutoCompleteWords(search: String, language: String): Flow<UIState<List<Word>>>{
+        var autoCompleteWords: List<Word>? = null
+        return mainGetNetworkBoundResource(
+            query = {
+                flow { emit(autoCompleteWords) }
+            },
+            fetch = {
+                Log.d(TAG, "Fetching word detail")
+                val response: ApiResponse<List<Word>> = apiClient.get("${apiURL}/word/autocomplete?text=${search}&language=${language}")
+                Log.d(TAG, "auto complete words response $response")
+                if(response.status) response.data
+                else throw CustomAppException(response.message)
+            },
+            saveFetchResult = {
+                autoCompleteWords = it
+            }
+        )
+    }
+
 }

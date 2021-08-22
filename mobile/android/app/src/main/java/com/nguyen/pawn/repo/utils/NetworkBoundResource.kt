@@ -26,7 +26,11 @@ inline fun <DomainType> mainGetNetworkBoundResource(
 
             if(shouldFetch(cacheData)){
                 saveFetchResult(fetch())
-                emitAll(query().map { UIState.Loaded<DomainType>(it) })
+
+                emitAll(query().map {
+//                    Log.d(tag, "query word detail: ${it}")
+                    UIState.Loaded<DomainType>(it) }
+                )
             }
         } catch(error: CustomAppException){
             Log.d(tag, "CustomAppException: ${error.message}")

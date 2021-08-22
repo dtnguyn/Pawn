@@ -1,5 +1,6 @@
 package com.nguyen.pawn.ui.screens.definition
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -12,6 +13,9 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+
+private const val TAG = "WordDetailViewModel"
 
 @HiltViewModel
 class WordDetailViewModel
@@ -29,6 +33,7 @@ class WordDetailViewModel
                 return@launch
             }
             wordRepo.getWordDetail(wordValue, language).collectLatest {
+                Log.d(TAG, "getWordDetail ${it.value}" )
                 _wordDetailUIState.value = it
             }
         }

@@ -8,6 +8,7 @@ import com.nguyen.pawn.api.model.ToggleSavedWordRequestBody
 import com.nguyen.pawn.db.PawnDatabase
 import com.nguyen.pawn.db.mapper.DailyWordMapper
 import com.nguyen.pawn.db.mapper.SavedWordMapper
+import com.nguyen.pawn.db.mapper.WordDetailMapper
 import com.nguyen.pawn.model.Definition
 import com.nguyen.pawn.model.Word
 import com.nguyen.pawn.model.WordDetail
@@ -128,20 +129,34 @@ class WordRepository
     }
 
     fun getWordDetail(wordValue: String, language: String): Flow<UIState<WordDetail>>{
-        var wordDetail: WordDetail? = null
         return mainGetNetworkBoundResource(
             query = {
-                flow { emit(wordDetail) }
+                Log.d(TAG, "Fetch query $wordValue | $language")
+                db.wordDetailDao().getOne(wordValue, language).map {wordDetailCache ->
+                    wordDetailCache?.let {
+                        WordDetailMapper.mapToNetworkEntity(it)
+                    }
+                }
             },
             fetch = {
                 Log.d(TAG, "Fetching word detail")
                 val response: ApiResponse<WordDetail> = apiClient.get("${apiURL}/word/detail?word=${wordValue}&language=${language}")
                 Log.d(TAG, "word detail response $response")
+                Log.d(TAG, "Fetch fetch ${response.data.value}")
+
                 if(response.status) response.data
                 else throw CustomAppException(response.message)
             },
-            saveFetchResult = {
-                wordDetail = it
+            saveFetchResult = {wordDetail ->
+                Log.d(TAG, "Fetch save result ${wordDetail?.value} | ${wordDetail?.language}")
+                wordDetail?.let {
+                    db.wordDetailDao().clear(wordValue, language)
+                    db.wordDetailDao().insertOne(WordDetailMapper.mapToCacheEntity(it))
+                }
+            },
+            shouldFetch = {
+                Log.d(TAG, "Fetch shouldfetch ${it?.value} | ${it?.language}")
+                true
             }
         )
     }

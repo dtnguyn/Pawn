@@ -7,6 +7,7 @@ import com.nguyen.pawn.db.PawnDatabase.Companion.DATABASE_NAME
 import com.nguyen.pawn.db.dao.DailyWordCacheDao
 import com.nguyen.pawn.db.dao.LanguageCacheDao
 import com.nguyen.pawn.db.dao.SavedWordCacheDao
+import com.nguyen.pawn.db.dao.WordDetailCacheDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -49,5 +50,11 @@ object RoomModule {
     @Provides
     fun provideSavedWordCacheDao(database: PawnDatabase): SavedWordCacheDao {
         return database.savedWordDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideWordDetailCacheDao(database: PawnDatabase): WordDetailCacheDao {
+        return database.wordDetailDao()
     }
 }

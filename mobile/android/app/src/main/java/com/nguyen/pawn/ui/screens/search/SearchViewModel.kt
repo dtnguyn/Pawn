@@ -21,8 +21,10 @@ class SearchViewModel
 ): ViewModel() {
 
     private val _autoCompleteWordsUIState: MutableState<UIState<List<Word>>> = mutableStateOf(UIState.Initial(listOf()))
-     val autoCompleteWordsUIState: State<UIState<List<Word>>> = _autoCompleteWordsUIState
+    val autoCompleteWordsUIState: State<UIState<List<Word>>> = _autoCompleteWordsUIState
 
+    val searchValue: MutableState<String> = mutableStateOf("")
+    var lastSearchLanguage = ""
 
     fun searchWords(search: String, targetLanguage: String?){
         if(targetLanguage == null) {

@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.nguyen.pawn.ui.theme.Blue
 import com.nguyen.pawn.ui.theme.LightGrey
 import com.nguyen.pawn.ui.theme.ShimmerColorShades
 
@@ -64,16 +65,10 @@ fun ShimmerAnimation(
         end = Offset(translateAnim, translateAnim)
     )
 
-    Box(Modifier.background(LightGrey, shape)) {
-        Card(
-            shape = shape,
-            modifier = modifier.background(brush, shape),
-            backgroundColor = Color.Transparent,
-            content = {}
-        )
-    }
-
-
+    Box(
+        modifier = modifier.background(brush, shape),
+        content = {}
+    )
 }
 
 

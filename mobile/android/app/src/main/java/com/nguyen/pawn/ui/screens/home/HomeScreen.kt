@@ -37,6 +37,7 @@ import com.nguyen.pawn.ui.theme.*
 import com.nguyen.pawn.util.DataStoreUtils
 import com.nguyen.pawn.util.DataStoreUtils.getAccessTokenFromDataStore
 import com.nguyen.pawn.util.DataStoreUtils.getRefreshTokenFromDataStore
+import com.nguyen.pawn.util.DataStoreUtils.getUserFromDataStore
 import com.nguyen.pawn.util.SupportedLanguage
 import com.nguyen.pawn.util.UIState
 import com.nguyen.pawn.util.UtilFunctions.convertHeightToDp
@@ -126,8 +127,9 @@ fun HomeScreen(
             getRefreshTokenFromDataStore(context)
         )
 
+        user = getUserFromDataStore(context)
+
         if (pickedLanguages == null) {
-            Log.d(TAG, "GET picked languages")
             sharedViewModel.getPickedLanguages(getAccessTokenFromDataStore(context))
         }
 
@@ -151,14 +153,16 @@ fun HomeScreen(
                     sharedViewModel.getPickedLanguages(getAccessTokenFromDataStore(context))
                 }
 
-                DataStoreUtils.saveAccessTokenToAuthDataStore(context, authStatusUIState.value?.token?.accessToken)
-                DataStoreUtils.saveRefreshTokenToAuthDataStore(context, authStatusUIState.value?.token?.refreshToken)
+                authStatusUIState.value?.user?.let {
+                    dailyWordCount = it.dailyWordCount
+                    DataStoreUtils.saveTokenToDataStore(context, authStatusUIState.value!!.token)
+                    DataStoreUtils.saveUserToDataStore(context, it)
+                }
+
+
 
                 Log.d("TAG", "test this2 ${authStatusUIState.value}")
-                user = authStatusUIState.value?.user
-                user?.let {
-                    dailyWordCount = it.dailyWordCount
-                }
+
             }
         }
     }
@@ -172,13 +176,15 @@ fun HomeScreen(
             is UIState.Initial -> {
             }
             is UIState.Error -> {
-
+                pickedLanguages = pickedLanguagesUIState.value
+                showAddLanguageMenu = false
             }
             is UIState.Loading -> {
                 Log.d("TAG", "pickedLanguages loading")
             }
 
             is UIState.Loaded -> {
+                Log.d(TAG, "picked languages result ${pickedLanguagesUIState.value}")
                 if (pickedLanguagesUIState.value != null) {
                     pickedLanguages = pickedLanguagesUIState.value
                     showAddLanguageMenu = pickedLanguages?.isEmpty()

@@ -14,11 +14,13 @@ inline fun <DomainType> mainGetNetworkBoundResource(
     crossinline shouldFetch: (DomainType?) -> Boolean = { true },
     tag: String = "NetworkBoundResource",
 ): Flow<UIState<DomainType>> {
+    var cacheData: DomainType? = null
+
     return flow {
         try {
             emit(UIState.Loading())
 
-            val cacheData = query().first()
+            cacheData = query().first()
 
             if(cacheData != null){
                 Log.d(tag, "query word detail 1: ${cacheData}")
@@ -35,13 +37,13 @@ inline fun <DomainType> mainGetNetworkBoundResource(
             }
         } catch(error: CustomAppException){
             Log.d(tag, "CustomAppException: ${error.message}")
-            emit(UIState.Error<DomainType>(error.message))
+            emit(UIState.Error<DomainType>(error.message, cacheData))
         } catch (error: ClientRequestException) {
             Log.d(tag, "ClientRequestException: ${error.message}")
-            emit(UIState.Error<DomainType>("Something went wrong!"))
+            emit(UIState.Error<DomainType>("Something went wrong!", cacheData))
         } catch (error: ConnectException) {
             Log.d(tag, "ConnectException: ${error.message}")
-            emit(UIState.Error<DomainType>("Something went wrong with connection!"))
+            emit(UIState.Error<DomainType>("Something went wrong with connection!", cacheData))
         }
 
     }

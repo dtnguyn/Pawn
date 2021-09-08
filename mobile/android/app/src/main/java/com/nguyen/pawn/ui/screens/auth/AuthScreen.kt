@@ -22,6 +22,7 @@ import com.nguyen.pawn.util.AuthTab
 import com.nguyen.pawn.util.UtilFunctions.convertHeightToDp
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
+import com.nguyen.pawn.model.AuthStatus
 import com.nguyen.pawn.model.Token
 import com.nguyen.pawn.ui.SharedViewModel
 import com.nguyen.pawn.ui.components.CustomDialog
@@ -33,6 +34,8 @@ import com.nguyen.pawn.util.Constants.allLanguages
 import com.nguyen.pawn.util.DataStoreUtils
 import com.nguyen.pawn.util.DataStoreUtils.getAccessTokenFromDataStore
 import com.nguyen.pawn.util.DataStoreUtils.getRefreshTokenFromDataStore
+import com.nguyen.pawn.util.DataStoreUtils.saveTokenToDataStore
+import com.nguyen.pawn.util.DataStoreUtils.saveUserToDataStore
 import com.nguyen.pawn.util.UIState
 import kotlinx.coroutines.launch
 
@@ -40,13 +43,18 @@ private const val TAG = "AuthScreen"
 
 @ExperimentalMaterialApi
 @Composable
-fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, navController: NavController) {
+fun AuthScreen(
+    authViewModel: AuthViewModel,
+    sharedViewModel: SharedViewModel,
+    navController: NavController
+) {
 
 
     /**   ---STATES---   */
 
     /** States from AuthViewModel */
     val tokenUIState: UIState<Token> by authViewModel.tokenUIState
+    val authStatusUIState: UIState<AuthStatus> by sharedViewModel.authStatusUIState
 
     /** Local ui states */
     var errorMsg by remember { mutableStateOf("") }
@@ -73,18 +81,20 @@ fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, n
     val context = LocalContext.current
 
 
-
     /**   ---OBSERVERS---   */
 
     /** Initialize the token with the token
      * value stored in DataStore */
     LaunchedEffect(null) {
-        authViewModel.initializeToken(getAccessTokenFromDataStore(context), getRefreshTokenFromDataStore(context))
+        authViewModel.initializeToken(
+            getAccessTokenFromDataStore(context),
+            getRefreshTokenFromDataStore(context)
+        )
     }
 
     /** React to changes of [tokenUIState]*/
     LaunchedEffect(tokenUIState) {
-        when(tokenUIState){
+        when (tokenUIState) {
             is UIState.Initial -> {
                 // Do nothing
             }
@@ -100,16 +110,46 @@ fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, n
             is UIState.Loaded -> {
                 // If the token is not null then go back home
                 isLoading = false
-                DataStoreUtils.saveAccessTokenToAuthDataStore(context, tokenUIState.value?.accessToken)
-                DataStoreUtils.saveRefreshTokenToAuthDataStore(context, tokenUIState.value?.refreshToken)
-                tokenUIState.value?.accessToken?.let {
+                tokenUIState.value?.let {
+                    sharedViewModel.checkAuthStatus(it.accessToken, it.accessToken)
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(authStatusUIState) {
+        when (authStatusUIState) {
+            is UIState.Initial -> {
+
+            }
+            is UIState.Loading -> {
+
+            }
+            is UIState.Error -> {
+
+            }
+            is UIState.Loaded -> {
+//                DataStoreUtils.saveAccessTokenToAuthDataStore(
+//                    context,
+//                    tokenUIState.value?.accessToken
+//                )
+//                DataStoreUtils.saveRefreshTokenToAuthDataStore(
+//                    context,
+//                    tokenUIState.value?.refreshToken
+//                )
+
+                authStatusUIState.value?.user?.let {user ->
+                    saveTokenToDataStore(context, authStatusUIState.value!!.token)
+                    saveUserToDataStore(context, user)
                     navController.navigate("home") {
                         popUpTo("home") { inclusive = true }
                     }
                 }
             }
+
         }
     }
+
     /**   ---HELPER FUNCTIONS---   */
 
     /** Expand or collapse the bottom sheet view */
@@ -122,7 +162,6 @@ fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, n
             }
         }
     }
-
 
 
     /**   ---COMPOSE UI---   */
@@ -286,7 +325,7 @@ fun AuthScreen(authViewModel: AuthViewModel, sharedViewModel: SharedViewModel, n
                 onDismiss = { coroutineScope.launch { authViewModel.clearError() } }
             )
         }
-        if (isLoading){
+        if (isLoading) {
             // Show loading animation
         }
     }

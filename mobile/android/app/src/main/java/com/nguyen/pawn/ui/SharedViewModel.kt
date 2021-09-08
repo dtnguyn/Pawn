@@ -20,6 +20,8 @@ import javax.inject.Inject
 /** This viewModel contains states that
  * shared between different screens */
 
+private const val TAG = "SharedViewModel"
+
 @HiltViewModel
 class SharedViewModel
 @Inject constructor(
@@ -121,8 +123,14 @@ class SharedViewModel
     /** Get the current picked languages either
      *  from network or room database */
     fun getPickedLanguages(accessToken: String?) {
+        if(accessToken == null){
+            _pickedLanguagesUIState.value = UIState.Loaded(listOf())
+            return
+        }
+
         viewModelScope.launch {
             languageRepo.getLearningLanguages(accessToken).collectLatest {
+                Log.d(TAG, "getLearningLanguages result ${it.value}")
                 _pickedLanguagesUIState.value = it
                 if(it is UIState.Loaded && it.value != null){
                     val languages = it.value

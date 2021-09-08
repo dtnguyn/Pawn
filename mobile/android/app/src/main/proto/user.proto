@@ -9,7 +9,7 @@ message UserDs {
   string username = 3;
   string email = 4;
   string avatar = 5;
-  string dailyWordCount = 6;
+  int32 dailyWordCount = 6;
   bool notificationEnabled = 7;
   string nativeLanguageId = 8;
 }

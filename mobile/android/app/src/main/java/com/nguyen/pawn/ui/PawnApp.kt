@@ -1,5 +1,6 @@
 package com.nguyen.pawn.ui
 
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.height
@@ -55,11 +56,11 @@ fun PawnApp(
     )
 
     val context = LocalContext.current
-    val once = true
-    LaunchedEffect(once) {
+    LaunchedEffect(true) {
+        Log.d("PawnApp", "pawn user ${DataStoreUtils.getUserFromDataStore(context)}")
         sharedViewModel.initializeAuthStatus(
             AuthStatus(
-                user = null,
+                user = DataStoreUtils.getUserFromDataStore(context),
                 token = Token(
                     DataStoreUtils.getAccessTokenFromDataStore(context),
                     DataStoreUtils.getRefreshTokenFromDataStore(context)

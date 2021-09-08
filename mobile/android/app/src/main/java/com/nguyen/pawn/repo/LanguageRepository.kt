@@ -83,7 +83,8 @@ class LanguageRepository
                     database.languageDao().clearAll()
                     database.languageDao().insertMany(LanguageMapper.mapToCacheEntityList(it))
                 }
-            }
+            },
+            tag= "getLearningLanguages"
         )
 
     }

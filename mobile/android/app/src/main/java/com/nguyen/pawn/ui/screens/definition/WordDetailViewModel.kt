@@ -32,7 +32,7 @@ class WordDetailViewModel
                 _wordDetailUIState.value = UIState.Error("No word found!")
                 return@launch
             }
-            wordRepo.getWordDetail(wordValue, language).collectLatest {
+            wordRepo.getWordDetail(wordValue, language).collect {
                 Log.d(TAG, "getWordDetail ${it.value}" )
                 _wordDetailUIState.value = it
             }

@@ -21,6 +21,7 @@ inline fun <DomainType> mainGetNetworkBoundResource(
             val cacheData = query().first()
 
             if(cacheData != null){
+                Log.d(tag, "query word detail 1: ${cacheData}")
                 emit(UIState.Loaded<DomainType>(cacheData))
             }
 
@@ -28,7 +29,7 @@ inline fun <DomainType> mainGetNetworkBoundResource(
                 saveFetchResult(fetch())
 
                 emitAll(query().map {
-//                    Log.d(tag, "query word detail: ${it}")
+                    Log.d(tag, "query word detail 2: ${it}")
                     UIState.Loaded<DomainType>(it) }
                 )
             }

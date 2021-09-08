@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
@@ -16,6 +18,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.nguyen.pawn.R
+import com.nguyen.pawn.model.AuthStatus
+import com.nguyen.pawn.model.Token
 import com.nguyen.pawn.model.WordDetail
 import com.nguyen.pawn.ui.navigation.PawnScreens
 import com.nguyen.pawn.ui.screens.*
@@ -26,6 +30,7 @@ import com.nguyen.pawn.ui.screens.definition.WordDetailViewModel
 import com.nguyen.pawn.ui.screens.home.HomeViewModel
 import com.nguyen.pawn.ui.screens.search.SearchViewModel
 import com.nguyen.pawn.ui.theme.PawnTheme
+import com.nguyen.pawn.util.DataStoreUtils
 import io.ktor.utils.io.concurrent.*
 
 
@@ -48,6 +53,20 @@ fun PawnApp(
         PawnScreens.Search,
         PawnScreens.Feeds,
     )
+
+    val context = LocalContext.current
+    val once = true
+    LaunchedEffect(once) {
+        sharedViewModel.initializeAuthStatus(
+            AuthStatus(
+                user = null,
+                token = Token(
+                    DataStoreUtils.getAccessTokenFromDataStore(context),
+                    DataStoreUtils.getRefreshTokenFromDataStore(context)
+                )
+            )
+        )
+    }
 
     PawnTheme {
         Scaffold(
@@ -95,7 +114,13 @@ fun PawnApp(
                     )
                 }
                 composable(PawnScreens.Feeds.route) { FeedScreen() }
-                composable(PawnScreens.Search.route) { SearchScreen(searchViewModel, sharedViewModel, navController) }
+                composable(PawnScreens.Search.route) {
+                    SearchScreen(
+                        searchViewModel,
+                        sharedViewModel,
+                        navController
+                    )
+                }
                 composable("${PawnScreens.WordDetail.route}/{wordValue}/{language}") {
                     WordDetailScreen(
                         navController = navController,

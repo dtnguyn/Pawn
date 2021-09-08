@@ -131,7 +131,6 @@ class WordRepository
     fun getWordDetail(wordValue: String, language: String): Flow<UIState<WordDetail>>{
         return mainGetNetworkBoundResource(
             query = {
-                Log.d(TAG, "Fetch query $wordValue | $language")
                 db.wordDetailDao().getOne(wordValue, language).map {wordDetailCache ->
                     wordDetailCache?.let {
                         WordDetailMapper.mapToNetworkEntity(it)
@@ -139,25 +138,21 @@ class WordRepository
                 }
             },
             fetch = {
-                Log.d(TAG, "Fetching word detail")
                 val response: ApiResponse<WordDetail> = apiClient.get("${apiURL}/word/detail?word=${wordValue}&language=${language}")
-                Log.d(TAG, "word detail response $response")
-                Log.d(TAG, "Fetch fetch ${response.data.value}")
 
                 if(response.status) response.data
                 else throw CustomAppException(response.message)
             },
             saveFetchResult = {wordDetail ->
-                Log.d(TAG, "Fetch save result ${wordDetail?.value} | ${wordDetail?.language}")
                 wordDetail?.let {
                     db.wordDetailDao().clear(wordValue, language)
                     db.wordDetailDao().insertOne(WordDetailMapper.mapToCacheEntity(it))
                 }
             },
             shouldFetch = {
-                Log.d(TAG, "Fetch shouldfetch ${it?.value} | ${it?.language}")
-                true
-            }
+                it == null
+            },
+
         )
     }
 

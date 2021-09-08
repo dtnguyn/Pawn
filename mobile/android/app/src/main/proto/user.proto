@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option java_package = "com.nguyen.pawn";
+option java_multiple_files = true;
+
+message UserDs {
+  string id = 1;
+  string oauthId = 2;
+  string username = 3;
+  string email = 4;
+  string avatar = 5;
+  string dailyWordCount = 6;
+  bool notificationEnabled = 7;
+  string nativeLanguageId = 8;
+}

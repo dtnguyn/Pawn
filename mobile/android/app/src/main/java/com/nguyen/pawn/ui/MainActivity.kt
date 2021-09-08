@@ -8,11 +8,15 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.nguyen.pawn.model.AuthStatus
+import com.nguyen.pawn.model.Token
 import com.nguyen.pawn.ui.screens.auth.AuthViewModel
 import com.nguyen.pawn.ui.screens.definition.WordDetailViewModel
 import com.nguyen.pawn.ui.screens.home.HomeViewModel
 import com.nguyen.pawn.ui.screens.search.SearchViewModel
+import com.nguyen.pawn.util.DataStoreUtils
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.*
 
 @ExperimentalPagerApi
 @ExperimentalMaterialApi
@@ -29,6 +33,7 @@ class MainActivity : ComponentActivity() {
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             PawnApp(
                 authViewModel = authViewModel,
@@ -38,6 +43,9 @@ class MainActivity : ComponentActivity() {
                 wordDetailViewModel = wordDetailViewModel
             )
         }
+
+
+
     }
 }
 

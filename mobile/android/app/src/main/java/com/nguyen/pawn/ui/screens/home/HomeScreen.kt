@@ -21,6 +21,7 @@ import androidx.navigation.NavController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
 import com.nguyen.pawn.R
+import com.nguyen.pawn.model.AuthStatus
 import com.nguyen.pawn.model.Language
 import com.nguyen.pawn.model.User
 import com.nguyen.pawn.model.Word
@@ -33,6 +34,7 @@ import com.nguyen.pawn.ui.components.home.ChooseLanguageSection
 import com.nguyen.pawn.ui.navigation.PawnScreens
 import com.nguyen.pawn.ui.screens.home.HomeViewModel
 import com.nguyen.pawn.ui.theme.*
+import com.nguyen.pawn.util.DataStoreUtils
 import com.nguyen.pawn.util.DataStoreUtils.getAccessTokenFromDataStore
 import com.nguyen.pawn.util.DataStoreUtils.getRefreshTokenFromDataStore
 import com.nguyen.pawn.util.SupportedLanguage
@@ -73,8 +75,8 @@ fun HomeScreen(
     var pickedLanguages by remember { mutableStateOf(pickedLanguagesUIState.value) }
     var showAddLanguageMenu by remember { mutableStateOf(pickedLanguagesUIState.value?.isEmpty()) }
 
-    val userUIState: UIState<User> by sharedViewModel.userUIState
-    var user by remember { mutableStateOf(userUIState.value) }
+    val authStatusUIState: UIState<AuthStatus> by sharedViewModel.authStatusUIState
+    var user by remember { mutableStateOf(authStatusUIState.value?.user) }
 
     val currentPickedLanguage: Language? by sharedViewModel.currentPickedLanguage
 
@@ -118,8 +120,8 @@ fun HomeScreen(
 
     /** Initialize the user and get the current
      * picked learning languages */
-    LaunchedEffect(null) {
-        sharedViewModel.getUser(
+    LaunchedEffect(true) {
+        sharedViewModel.checkAuthStatus(
             getAccessTokenFromDataStore(context),
             getRefreshTokenFromDataStore(context)
         )
@@ -131,10 +133,10 @@ fun HomeScreen(
 
     }
 
-    LaunchedEffect(userUIState) {
-        when (userUIState) {
+    LaunchedEffect(authStatusUIState) {
+        when (authStatusUIState) {
             is UIState.Initial -> {
-                isLoadingUser = true
+
             }
             is UIState.Error -> {
                 isLoadingUser = false
@@ -144,13 +146,18 @@ fun HomeScreen(
             }
             is UIState.Loaded -> {
                 isLoadingUser = false
-                if (user == null && userUIState.value != null) {
+                if (user == null && authStatusUIState.value?.user != null) {
                     // When user login
                     sharedViewModel.getPickedLanguages(getAccessTokenFromDataStore(context))
                 }
-                user = userUIState.value
-                userUIState.value?.let { user ->
-                    dailyWordCount = user.dailyWordCount
+
+                DataStoreUtils.saveAccessTokenToAuthDataStore(context, authStatusUIState.value?.token?.accessToken)
+                DataStoreUtils.saveRefreshTokenToAuthDataStore(context, authStatusUIState.value?.token?.refreshToken)
+
+                Log.d("TAG", "test this2 ${authStatusUIState.value}")
+                user = authStatusUIState.value?.user
+                user?.let {
+                    dailyWordCount = it.dailyWordCount
                 }
             }
         }

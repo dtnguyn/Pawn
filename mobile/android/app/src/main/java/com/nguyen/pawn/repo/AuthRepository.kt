@@ -2,6 +2,7 @@ package com.nguyen.pawn.repo
 
 import android.util.Log
 import com.nguyen.pawn.api.model.*
+import com.nguyen.pawn.model.AuthStatus
 import com.nguyen.pawn.model.Token
 import com.nguyen.pawn.model.User
 import com.nguyen.pawn.repo.utils.mainGetNetworkBoundResource
@@ -105,11 +106,12 @@ class AuthRepository
 
     }
 
-    suspend fun checkAuthStatus(accessToken: String?): Flow<UIState<User>> {
+    suspend fun checkAuthStatus(accessToken: String?, refreshToken: String?): Flow<UIState<AuthStatus>> {
         var currentUser: User? = null
+        var currentToken = Token(accessToken, refreshToken)
         return mainGetNetworkBoundResource(
             query = {
-                flow { emit(currentUser) }
+                flow { emit(AuthStatus(currentToken, currentUser)) }
             },
             fetch = {
                 val response: ApiResponse<User?> = apiClient.get("${Constants.apiURL}/auth/") {
@@ -117,9 +119,33 @@ class AuthRepository
                         append(HttpHeaders.Authorization, "Bearer $accessToken")
                     }
                 }
-                if(response.status) currentUser = response.data
+                Log.d(TAG, "refreshTokenResponse1: $response")
+                if(response.status) {
+                    if(response.data == null){
+                        val refreshTokenResponse: ApiResponse<Token?> = apiClient.post("${Constants.apiURL}/auth/token") {
+                            contentType(ContentType.Application.Json)
+                            body = RefreshTokenRequestBody(token = refreshToken)
+                        }
+                        Log.d(TAG, "refreshTokenResponse2: $refreshTokenResponse")
+                        if(refreshTokenResponse.status){
+                            val retryResponse: ApiResponse<User?> = apiClient.get("${Constants.apiURL}/auth/") {
+                                headers {
+                                    append(HttpHeaders.Authorization, "Bearer ${refreshTokenResponse.data?.accessToken}")
+                                }
+                            }
+                            Log.d(TAG, "refreshTokenResponse3: $retryResponse")
+
+                            if(retryResponse.status){
+                                currentUser = retryResponse.data
+                                currentToken = refreshTokenResponse.data!!
+                            } else throw CustomAppException(retryResponse.message)
+                        } else throw CustomAppException(refreshTokenResponse.message)
+                    } else {
+                        currentUser = response.data
+                    }
+                }
                 else throw CustomAppException(response.message)
-                currentUser
+                AuthStatus(currentToken, currentUser)
             },
             saveFetchResult = {},
             tag = TAG

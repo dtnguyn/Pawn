@@ -12,6 +12,6 @@ object Constants {
 
     val allLanguages = listOf("vie", "eng")
 
-    const val apiURL = "http://192.168.0.237:4000"
+    const val apiURL = "http://192.168.0.169:4000"
 
 }

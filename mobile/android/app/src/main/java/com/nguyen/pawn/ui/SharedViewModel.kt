@@ -6,9 +6,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nguyen.pawn.model.Language
-import com.nguyen.pawn.model.User
-import com.nguyen.pawn.model.Word
+import com.nguyen.pawn.model.*
 import com.nguyen.pawn.repo.AuthRepository
 import com.nguyen.pawn.repo.LanguageRepository
 import com.nguyen.pawn.repo.WordRepository
@@ -27,14 +25,14 @@ class SharedViewModel
 @Inject constructor(
     private val authRepo: AuthRepository,
     private val wordRepo: WordRepository,
-    private val languageRepo: LanguageRepository
+    private val languageRepo: LanguageRepository,
 ) : ViewModel() {
 
     /** ---STATES--- */
 
     /** This is the current user (null when no user is logged in) */
-    private val _userUIState: MutableState<UIState<User>> = mutableStateOf(UIState.Initial(null))
-    val userUIState: State<UIState<User>> = _userUIState
+    private val _authStatusUIState: MutableState<UIState<AuthStatus>> = mutableStateOf(UIState.Initial(AuthStatus(Token(null, null), null)))
+    val authStatusUIState: State<UIState<AuthStatus>> = _authStatusUIState
 
     /** The current language that the app is on */
     private val _currentPickedLanguage: MutableState<Language?> = mutableStateOf(null)
@@ -74,16 +72,21 @@ class SharedViewModel
 
     /** Auth intents*/
 
+    fun initializeAuthStatus(initialAuthStatus: AuthStatus){
+        _authStatusUIState.value = UIState.Loaded(initialAuthStatus)
+        Log.d("TAG", "test this1 ${initialAuthStatus}")
+    }
+
     /** Get the current user using token, set
      *  the current user null if not logged in */
-    fun getUser(accessToken: String?, refreshToken: String?) {
-        if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) {
-            _userUIState.value = UIState.Loaded(null)
-            return
-        }
+    fun checkAuthStatus(accessToken: String?, refreshToken: String?) {
+//        if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) {
+//            _authStatusUIState.value = UIState.Loaded(AuthStatus(Token(accessToken, refreshToken), null))
+//            return
+//        }
         viewModelScope.launch {
-            authRepo.checkAuthStatus(accessToken).collectLatest {
-                _userUIState.value = it
+            authRepo.checkAuthStatus(accessToken, refreshToken).collectLatest {userState ->
+                _authStatusUIState.value = userState
             }
         }
     }
@@ -95,12 +98,12 @@ class SharedViewModel
             if (refreshToken != null) {
                 authRepo.logout(refreshToken).collectLatest {
                     if (it is UIState.Error) {
-                        _userUIState.value = UIState.Error(it.errorMsg ?: "")
+                        _authStatusUIState.value = UIState.Error(it.errorMsg ?: "")
                     } else if (it is UIState.Loaded) {
-                        _userUIState.value = UIState.Loaded(null)
+                        _authStatusUIState.value = UIState.Loaded(null)
                     }
                 }
-            } else _userUIState.value = UIState.Loaded(null)
+            } else _authStatusUIState.value = UIState.Loaded(null)
 
         }
     }

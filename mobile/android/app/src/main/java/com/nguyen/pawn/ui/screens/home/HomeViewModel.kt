@@ -66,8 +66,8 @@ class HomeViewModel
                                 _dailyFrWordsUIState.value = it
                             }
                         }
-
                     }
+
                     SupportedLanguage.GERMANY.id -> {
                         if(_dailyDeWordsUIState.value.value == null) {
                             wordRepo.getRandomDailyWord(dailyWordCount, languageId).collectLatest {

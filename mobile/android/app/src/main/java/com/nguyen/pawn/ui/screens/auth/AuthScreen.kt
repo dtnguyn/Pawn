@@ -1,5 +1,6 @@
 package com.nguyen.pawn.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -129,18 +130,10 @@ fun AuthScreen(
 
             }
             is UIState.Loaded -> {
-//                DataStoreUtils.saveAccessTokenToAuthDataStore(
-//                    context,
-//                    tokenUIState.value?.accessToken
-//                )
-//                DataStoreUtils.saveRefreshTokenToAuthDataStore(
-//                    context,
-//                    tokenUIState.value?.refreshToken
-//                )
-
                 authStatusUIState.value?.user?.let {user ->
                     saveTokenToDataStore(context, authStatusUIState.value!!.token)
                     saveUserToDataStore(context, user)
+                    sharedViewModel.resetPickedLanguages()
                     navController.navigate("home") {
                         popUpTo("home") { inclusive = true }
                     }

@@ -60,6 +60,8 @@ fun HomeScreen(
     /**   ---STATES---   */
 
     /** States from viewModel */
+
+
     val dailyEnWordsUIState: UIState<List<Word>> by homeViewModel.dailyEnWordsUIState
     var dailyEnWords by remember { mutableStateOf(dailyEnWordsUIState.value) }
 
@@ -74,7 +76,7 @@ fun HomeScreen(
 
     val pickedLanguagesUIState: UIState<List<Language>> by sharedViewModel.pickedLanguagesUIState
     var pickedLanguages by remember { mutableStateOf(pickedLanguagesUIState.value) }
-    var showAddLanguageMenu by remember { mutableStateOf(pickedLanguagesUIState.value?.isEmpty()) }
+    val showAddLanguageMenu: Boolean? by homeViewModel.showAddLanguagesMenu
 
     val authStatusUIState: UIState<AuthStatus> by sharedViewModel.authStatusUIState
     var user by remember { mutableStateOf(authStatusUIState.value?.user) }
@@ -122,15 +124,12 @@ fun HomeScreen(
     /** Initialize the user and get the current
      * picked learning languages */
     LaunchedEffect(true) {
-        sharedViewModel.checkAuthStatus(
-            getAccessTokenFromDataStore(context),
-            getRefreshTokenFromDataStore(context)
-        )
 
-        user = getUserFromDataStore(context)
-
-        if (pickedLanguages == null) {
-            sharedViewModel.getPickedLanguages(getAccessTokenFromDataStore(context))
+        if(authStatusUIState !is UIState.Loaded){
+            sharedViewModel.checkAuthStatus(
+                getAccessTokenFromDataStore(context),
+                getRefreshTokenFromDataStore(context)
+            )
         }
 
     }
@@ -138,30 +137,35 @@ fun HomeScreen(
     LaunchedEffect(authStatusUIState) {
         when (authStatusUIState) {
             is UIState.Initial -> {
-
+                Log.d(TAG, "authStatusUIState Initial")
             }
             is UIState.Error -> {
+                Log.d(TAG, "authStatusUIState Error ${authStatusUIState.errorMsg}")
                 isLoadingUser = false
             }
             is UIState.Loading -> {
+                Log.d(TAG, "authStatusUIState Loading")
                 isLoadingUser = true
             }
             is UIState.Loaded -> {
+                Log.d(TAG, "authStatusUIState Loaded ${authStatusUIState.value}")
                 isLoadingUser = false
-                if (user == null && authStatusUIState.value?.user != null) {
-                    // When user login
-                    sharedViewModel.getPickedLanguages(getAccessTokenFromDataStore(context))
-                }
 
                 authStatusUIState.value?.user?.let {
+                    //Update daily word count state
                     dailyWordCount = it.dailyWordCount
+                    user = it
+
+                    // Store the state to DataStore
                     DataStoreUtils.saveTokenToDataStore(context, authStatusUIState.value!!.token)
                     DataStoreUtils.saveUserToDataStore(context, it)
                 }
 
-
-
-                Log.d("TAG", "test this2 ${authStatusUIState.value}")
+                // Only get the picked learning languages from network when initial load
+                if((pickedLanguagesUIState !is UIState.Loaded)){
+                    Log.d(TAG, "Getting here")
+                    sharedViewModel.getPickedLanguages(authStatusUIState.value?.token?.accessToken)
+                }
 
             }
         }
@@ -176,18 +180,19 @@ fun HomeScreen(
             is UIState.Initial -> {
             }
             is UIState.Error -> {
-                pickedLanguages = pickedLanguagesUIState.value
-                showAddLanguageMenu = false
+//                pickedLanguages = pickedLanguagesUIState.value
+//                homeViewModel.se
             }
             is UIState.Loading -> {
                 Log.d("TAG", "pickedLanguages loading")
             }
 
             is UIState.Loaded -> {
-                Log.d(TAG, "picked languages result ${pickedLanguagesUIState.value}")
-                if (pickedLanguagesUIState.value != null) {
-                    pickedLanguages = pickedLanguagesUIState.value
-                    showAddLanguageMenu = pickedLanguages?.isEmpty()
+                Log.d(TAG, "picked languages loaded ${pickedLanguagesUIState.value}")
+                pickedLanguagesUIState.value?.let {languages ->
+                    // Update UI
+                    pickedLanguages = languages
+                    homeViewModel.setAddLanguagesMenu(languages.isEmpty())
                 }
             }
         }
@@ -462,7 +467,7 @@ fun HomeScreen(
                         if (showAddLanguageMenu == true) {
                             ChooseLanguageSection(pickedLanguages = pickedLanguages!!) {
                                 coroutineScope.launch {
-                                    showAddLanguageMenu = false
+                                    homeViewModel.setAddLanguagesMenu(false)
                                     sharedViewModel.savePickedLanguages(
                                         it,
                                         getAccessTokenFromDataStore(context)
@@ -511,7 +516,7 @@ fun HomeScreen(
                                             size = 38.dp,
                                             icon = R.drawable.add_32_black
                                         ) {
-                                            showAddLanguageMenu = true
+                                            homeViewModel.setAddLanguagesMenu(true)
                                         }
                                     }
                                 }

@@ -38,6 +38,7 @@ class LanguageRepository
 
         return mainPostNetworkBoundResource(
             submit = {
+                Log.d(TAG, "Here1")
                 val languagesString = languages.map { language ->
                     language.id
                 }
@@ -48,16 +49,18 @@ class LanguageRepository
                         append(HttpHeaders.Authorization, "Bearer $accessToken")
                     }
                 }
+                Log.d(TAG, "Here2")
                 languages
             },
             shouldSave = {
                 true
             },
             saveSubmitResult = {
-                Log.d(TAG, "saving to cache")
+                Log.d(TAG, "saving to cache ${it?.size}")
                 database.languageDao().clearAll()
                 database.languageDao().insertMany(LanguageMapper.mapToCacheEntityList(languages))
-            }
+            },
+            defaultResponse = languages
         )
     }
 

@@ -120,6 +120,10 @@ class SharedViewModel
         pickedLanguageMap[language.id] = pickedLanguageMap[language.id] != true
     }
 
+    fun resetPickedLanguages() {
+        _pickedLanguagesUIState.value = UIState.Initial(listOf())
+    }
+
     /** Get the current picked languages either
      *  from network or room database */
     fun getPickedLanguages(accessToken: String?) {

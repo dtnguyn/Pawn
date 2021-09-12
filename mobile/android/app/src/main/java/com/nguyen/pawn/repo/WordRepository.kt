@@ -152,6 +152,7 @@ class WordRepository
             shouldFetch = {
                 it == null
             },
+            tag = "getWordDetailTag"
 
         )
     }

@@ -54,7 +54,7 @@ object DataStoreUtils{
 
     suspend fun getUserFromDataStore(context: Context): User?{
         return context.userDataStore.data.map { user ->
-            if(user == null) null
+            if(user.id.isEmpty()) null
             else {
                 User(
                     id = user.id,

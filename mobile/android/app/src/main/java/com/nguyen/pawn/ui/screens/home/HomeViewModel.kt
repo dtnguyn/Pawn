@@ -38,6 +38,8 @@ class HomeViewModel
     private val _dailyDeWordsUIState: MutableState<UIState<List<Word>>> = mutableStateOf(UIState.Initial(null))
     val dailyDeWordsUIState: State<UIState<List<Word>>> = _dailyDeWordsUIState
 
+    private val _showAddLanguagesMenu: MutableState<Boolean?> = mutableStateOf(null)
+    val showAddLanguagesMenu: State<Boolean?> = _showAddLanguagesMenu
 
 
 
@@ -85,6 +87,9 @@ class HomeViewModel
 //        } as ArrayList<Word>
     }
 
+    fun setAddLanguagesMenu(open: Boolean){
+        _showAddLanguagesMenu.value = open
+    }
 
 
 

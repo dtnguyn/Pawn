@@ -23,7 +23,7 @@ inline fun <DomainType> mainGetNetworkBoundResource(
             cacheData = query().first()
 
             if(cacheData != null){
-                Log.d(tag, "query word detail 1: ${cacheData}")
+                Log.d(tag, "emit 1: ${cacheData}")
                 emit(UIState.Loaded<DomainType>(cacheData))
             }
 
@@ -31,7 +31,7 @@ inline fun <DomainType> mainGetNetworkBoundResource(
                 saveFetchResult(fetch())
 
                 emitAll(query().map {
-                    Log.d(tag, "query word detail 2: ${it}")
+                    Log.d(tag, "emit 2: ${it}")
                     UIState.Loaded<DomainType>(it) }
                 )
             }
@@ -52,13 +52,16 @@ inline fun <DomainType> mainGetNetworkBoundResource(
 
 inline fun <ResponseType> mainPostNetworkBoundResource(
     crossinline submit: suspend () -> ResponseType?,
-    crossinline shouldSave: suspend (response: ResponseType?) -> Boolean,
+    crossinline shouldSave: suspend (ResponseType?) -> Boolean,
     crossinline saveSubmitResult: suspend (ResponseType?) -> Unit,
+    defaultResponse: ResponseType? = null
 ): Flow<UIState<ResponseType>> {
     return flow {
         try {
             emit(UIState.Loading())
+
             val response = submit()
+
             if(shouldSave(response)){
                 saveSubmitResult(response)
             }
@@ -70,7 +73,12 @@ inline fun <ResponseType> mainPostNetworkBoundResource(
         } catch (error: ClientRequestException) {
             emit(UIState.Error<ResponseType>("Something went wrong!"))
         } catch (error: ConnectException) {
-            emit(UIState.Error<ResponseType>("Something went wrong with connection!"))
+            if(shouldSave(null)){
+                saveSubmitResult(defaultResponse)
+                emit(UIState.Loaded(defaultResponse))
+            } else {
+                emit(UIState.Error<ResponseType>("Something went wrong with connection!"))
+            }
         }
 
     }

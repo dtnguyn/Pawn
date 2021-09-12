@@ -59,48 +59,47 @@ fun HomeScreen(
 
     /**   ---STATES---   */
 
-    /** States from viewModel */
-
-
-    val dailyEnWordsUIState: UIState<List<Word>> by homeViewModel.dailyEnWordsUIState
-    var dailyEnWords by remember { mutableStateOf(dailyEnWordsUIState.value) }
-
-    val dailyEsWordsUIState: UIState<List<Word>> by homeViewModel.dailyEsWordsUIState
-    var dailyEsWords by remember { mutableStateOf(dailyEsWordsUIState.value) }
-
-    val dailyFrWordsUIState: UIState<List<Word>> by homeViewModel.dailyFrWordsUIState
-    var dailyFrWords by remember { mutableStateOf(dailyFrWordsUIState.value) }
-
-    val dailyDeWordsUIState: UIState<List<Word>> by homeViewModel.dailyDeWordsUIState
-    var dailyDeWords by remember { mutableStateOf(dailyDeWordsUIState.value) }
-
-    val pickedLanguagesUIState: UIState<List<Language>> by sharedViewModel.pickedLanguagesUIState
-    var pickedLanguages by remember { mutableStateOf(pickedLanguagesUIState.value) }
-    val showAddLanguageMenu: Boolean? by homeViewModel.showAddLanguagesMenu
+    /** Main states */
 
     val authStatusUIState: UIState<AuthStatus> by sharedViewModel.authStatusUIState
     var user by remember { mutableStateOf(authStatusUIState.value?.user) }
 
+    // Daily word count from user settings
+    var dailyWordCount by remember { mutableStateOf(if(user == null) 3 else user?.dailyWordCount) }
+    // User's picked learning languages
+    val pickedLanguagesUIState: UIState<List<Language>> by sharedViewModel.pickedLanguagesUIState
+    var pickedLanguages by remember { mutableStateOf(pickedLanguagesUIState.value) }
+
+    // Boolean flag to control when to open language menu
+    val showAddLanguageMenu: Boolean? by homeViewModel.showAddLanguagesMenu
+    // Keep the state of the current chosen picked learning languages
     val currentPickedLanguage: Language? by sharedViewModel.currentPickedLanguage
 
+    // Daily words
+    val dailyEnWordsUIState: UIState<List<Word>> by homeViewModel.dailyEnWordsUIState
+    var dailyEnWords by remember { mutableStateOf(dailyEnWordsUIState.value) }
+    val dailyEsWordsUIState: UIState<List<Word>> by homeViewModel.dailyEsWordsUIState
+    var dailyEsWords by remember { mutableStateOf(dailyEsWordsUIState.value) }
+    val dailyFrWordsUIState: UIState<List<Word>> by homeViewModel.dailyFrWordsUIState
+    var dailyFrWords by remember { mutableStateOf(dailyFrWordsUIState.value) }
+    val dailyDeWordsUIState: UIState<List<Word>> by homeViewModel.dailyDeWordsUIState
+    var dailyDeWords by remember { mutableStateOf(dailyDeWordsUIState.value) }
+
+    // Saved words
     val savedEnWordsUIState: UIState<List<Word>> by sharedViewModel.savedEnWordsUIState
     var savedEnWords by remember { mutableStateOf(savedEnWordsUIState.value) }
-
     val savedEsWordsUIState: UIState<List<Word>> by sharedViewModel.savedEsWordsUIState
     var savedEsWords by remember { mutableStateOf(savedEsWordsUIState.value) }
-
     val savedFrWordsUIState: UIState<List<Word>> by sharedViewModel.savedFrWordsUIState
     var savedFrWords by remember { mutableStateOf(savedFrWordsUIState.value) }
-
     val savedDeWordsUIState: UIState<List<Word>> by sharedViewModel.savedDeWordsUIState
     var savedDeWords by remember { mutableStateOf(savedDeWordsUIState.value) }
 
 
     /** Error states */
     var errorMsg by remember { mutableStateOf("") }
-    var dailyWordCount by remember { mutableStateOf(3) }
 
-    /** Local ui states */
+    /** Loading states */
     var isLoadingPickedLanguage by remember { mutableStateOf(true) }
     var isLoadingUser by remember { mutableStateOf(true) }
     var isLoadingDailyWords by remember { mutableStateOf(true) }
@@ -180,15 +179,12 @@ fun HomeScreen(
             is UIState.Initial -> {
             }
             is UIState.Error -> {
-//                pickedLanguages = pickedLanguagesUIState.value
-//                homeViewModel.se
+
             }
             is UIState.Loading -> {
-                Log.d("TAG", "pickedLanguages loading")
             }
 
             is UIState.Loaded -> {
-                Log.d(TAG, "picked languages loaded ${pickedLanguagesUIState.value}")
                 pickedLanguagesUIState.value?.let {languages ->
                     // Update UI
                     pickedLanguages = languages
@@ -203,6 +199,7 @@ fun HomeScreen(
     LaunchedEffect(currentPickedLanguage) {
         if (currentPickedLanguage != null) {
             isLoadingDailyWords = false
+
             homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, currentPickedLanguage!!.id)
             sharedViewModel.getSavedWords(
                 getAccessTokenFromDataStore(context),

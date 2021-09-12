@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nguyen.pawn.model.Definition
 import com.nguyen.pawn.ui.theme.Typography
-import com.nguyen.pawn.util.UtilFunctions.generateColor
+import com.nguyen.pawn.util.UtilFunctions.generateRandomPastelColor
 
 @Composable
 fun DefinitionItem(index: Int, definition: Definition) {
@@ -21,7 +21,7 @@ fun DefinitionItem(index: Int, definition: Definition) {
     Card(
         shape = RoundedCornerShape(15.dp),
         elevation = 4.dp,
-        backgroundColor = generateColor(index),
+        backgroundColor = generateRandomPastelColor(definition.meaning),
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)

@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.nguyen.pawn.R
 import com.nguyen.pawn.ui.theme.*
-import com.nguyen.pawn.util.UtilFunctions.generateColor
+import com.nguyen.pawn.util.UtilFunctions.generateRandomPastelColor
 
 @ExperimentalAnimationApi
 @Composable
@@ -28,7 +28,7 @@ fun SavedWordItem(word: String, pronunciationSymbol: String? = null, pronunciati
             .height(70.dp)
             .clip(RoundedCornerShape(15.dp))
             .clickable { onClick() },
-        backgroundColor = generateColor(index + 1)
+        backgroundColor = generateRandomPastelColor(word)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

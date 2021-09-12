@@ -14,6 +14,7 @@ import com.nguyen.pawn.model.WordDetail
 import com.nguyen.pawn.ui.theme.ReallyRed
 import com.nguyen.pawn.ui.theme.Typography
 import com.nguyen.pawn.util.ShimmerAnimation
+import com.nguyen.pawn.util.UtilFunctions
 
 @Composable
 fun WordCollapseSection(wordDetail: WordDetail?, loading: Boolean){

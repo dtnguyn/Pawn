@@ -2,19 +2,23 @@ package com.nguyen.pawn.util
 
 import android.util.DisplayMetrics
 import androidx.compose.ui.graphics.Color
-import com.nguyen.pawn.ui.theme.LightGreen
-import com.nguyen.pawn.ui.theme.LightOrange
-import com.nguyen.pawn.ui.theme.LightRed
-import com.nguyen.pawn.ui.theme.Neon
+import com.nguyen.pawn.ui.theme.*
 
 object UtilFunctions {
 
-    fun generateColor(index: Int): Color {
-        return when {
-            index % 4 == 0 -> LightGreen
-            index % 3 == 0 -> LightOrange
-            index % 2 == 0 -> Neon
-            else -> LightRed
+    private val pastelMap = HashMap<String, Color>()
+    private var currentPastelIndex = 0
+
+    fun generateRandomPastelColor(word: String = ""): Color {
+        if(word.isEmpty()) return PastelColors[(PastelColors.indices).random()]
+        return if(pastelMap[word] != null){
+            pastelMap[word]!!
+        } else {
+            val color = PastelColors[currentPastelIndex]
+            currentPastelIndex++
+            if(currentPastelIndex >= PastelColors.size) currentPastelIndex = 0
+            pastelMap[word] = color
+            color
         }
     }
 

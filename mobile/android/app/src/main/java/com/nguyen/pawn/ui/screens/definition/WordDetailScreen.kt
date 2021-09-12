@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.nguyen.pawn.R
-import com.nguyen.pawn.model.Definition
 import com.nguyen.pawn.model.WordDetail
 import com.nguyen.pawn.ui.components.RoundButton
 import com.nguyen.pawn.ui.components.RoundedSquareButton
@@ -32,10 +31,7 @@ import com.nguyen.pawn.ui.theme.*
 import com.nguyen.pawn.util.UIState
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.sp
-import com.nguyen.pawn.model.Language
 import com.nguyen.pawn.model.Word
 import com.nguyen.pawn.ui.SharedViewModel
 import com.nguyen.pawn.util.DataStoreUtils
@@ -182,7 +178,7 @@ fun WordDetailScreen(
                         Card(
                             shape = RoundedCornerShape(15.dp),
                             elevation = 4.dp,
-                            backgroundColor = UtilFunctions.generateColor(index),
+                            backgroundColor = UtilFunctions.generateRandomPastelColor(),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(Color.White)

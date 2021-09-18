@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { getOneUser } from "../controllers/UserController";
 import ApiResponse from "./ApiResponse";
-import jwt from "jsonwebtoken";
+import jwt, { TokenExpiredError } from "jsonwebtoken";
 
 export const checkAuthentication = (
   req: Request,
@@ -19,7 +19,13 @@ export const checkAuthentication = (
       process.env.ACCESS_TOKEN_SECRET!,
       async (err: any, decoded: any) => {
         if (err) {
-          res.send(new ApiResponse(false, "Something went wrong!", null));
+          console.log("Check authentication error: ", err.message);
+          if (err instanceof TokenExpiredError) {
+            (req as any).user = null;
+            next();
+          } else {
+            res.send(new ApiResponse(false, "Something went wrong!", null));
+          }
         } else {
           (req as any).user = await getOneUser(decoded.user.email);
           next();

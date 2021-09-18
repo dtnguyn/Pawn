@@ -256,10 +256,8 @@ export const toggleSaveWord = async (
 
 export const getSavedWords = async (userId: string, language: string) => {
   const savedWordRepo = getRepository(SavedWord);
-  console.log("Getting saved words... ");
   const savedWords = await savedWordRepo
     .createQueryBuilder("savedWord")
-    // .leftJoinAndSelect("savedWord.word", "word")
     .leftJoinAndSelect("savedWord.pronunciations", "pronunciations")
     .leftJoinAndSelect("savedWord.definitions", "definitions")
     .orderBy("definitions.position", "ASC")

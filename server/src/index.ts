@@ -19,6 +19,7 @@ import word from "./routes/word";
 import language from "./routes/language";
 import { importAllWords } from "./controllers/WordController";
 import { DailyWord } from "./entity/DailyWord";
+import feed from "./routes/feed";
 
 createConnection({
   type: "postgres",
@@ -51,6 +52,7 @@ createConnection({
     app.use("/auth", auth);
     app.use("/word", word);
     app.use("/language", language);
+    app.use("/feed", feed);
 
     // await importAllWords();
     // console.log(await getRepository(User).delete({ email: "test@test.com" }));

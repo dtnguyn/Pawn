@@ -23,3 +23,15 @@ export type DefinitionJSON = {
   partOfSpeech: string;
   example: string;
 };
+
+export type FeedJSON = {
+  id: string;
+  type: string;
+  title: string;
+  thumbnail: string | null;
+  author: string | null;
+  topic: string | null;
+  language: string;
+  description: string;
+  publishedDate: string | null;
+};

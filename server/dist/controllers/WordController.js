@@ -249,7 +249,6 @@ exports.toggleSaveWord = (word, language, userId) => __awaiter(this, void 0, voi
 });
 exports.getSavedWords = (userId, language) => __awaiter(this, void 0, void 0, function* () {
     const savedWordRepo = typeorm_1.getRepository(SavedWord_1.SavedWord);
-    console.log("Getting saved words... ");
     const savedWords = yield savedWordRepo
         .createQueryBuilder("savedWord")
         .leftJoinAndSelect("savedWord.pronunciations", "pronunciations")

@@ -61,7 +61,7 @@ router.get("/", middlewares_1.checkAuthentication, (req, res) => {
         res.send(new ApiResponse_1.default(true, "", user));
     }
     else {
-        res.send(new ApiResponse_1.default(false, "Not logged in!", null));
+        res.send(new ApiResponse_1.default(true, "Not logged in!", null));
     }
 });
 router.get("/verify/code", (req, res) => __awaiter(this, void 0, void 0, function* () {

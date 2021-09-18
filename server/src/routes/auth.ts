@@ -74,7 +74,7 @@ router.get("/", checkAuthentication, (req, res) => {
   if (user) {
     res.send(new ApiResponse(true, "", user));
   } else {
-    res.send(new ApiResponse(false, "Not logged in!", null));
+    res.send(new ApiResponse(true, "Not logged in!", null));
   }
 });
 

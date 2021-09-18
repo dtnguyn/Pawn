@@ -30,6 +30,7 @@ const Word_1 = require("./entity/Word");
 const auth_1 = __importDefault(require("./routes/auth"));
 const word_1 = __importDefault(require("./routes/word"));
 const language_1 = __importDefault(require("./routes/language"));
+const feed_1 = __importDefault(require("./routes/feed"));
 typeorm_1.createConnection({
     type: "postgres",
     host: "localhost",
@@ -60,6 +61,7 @@ typeorm_1.createConnection({
     app.use("/auth", auth_1.default);
     app.use("/word", word_1.default);
     app.use("/language", language_1.default);
+    app.use("/feed", feed_1.default);
     app.listen(4000, () => {
         console.log("Server is running on port 4000");
     });

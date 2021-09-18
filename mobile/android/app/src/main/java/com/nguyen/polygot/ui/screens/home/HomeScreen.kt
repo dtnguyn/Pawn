@@ -30,7 +30,7 @@ import com.nguyen.polygot.ui.components.HomeAppBar
 import com.nguyen.polygot.ui.components.RoundButton
 import com.nguyen.polygot.ui.components.SavedWordItem
 import com.nguyen.polygot.ui.components.home.ChooseLanguageSection
-import com.nguyen.polygot.ui.navigation.PawnScreens
+import com.nguyen.polygot.ui.navigation.PolygotScreens
 import com.nguyen.polygot.ui.screens.home.HomeViewModel
 import com.nguyen.polygot.ui.theme.*
 import com.nguyen.polygot.util.DataStoreUtils
@@ -522,7 +522,7 @@ fun HomeScreen(
                                         navController = navController,
                                         words = dailyWords() ?: listOf(),
                                         onDailyWordClick = {
-                                            navController.navigate("${PawnScreens.WordDetail.route}/${it}/${currentPickedLanguage?.id}")
+                                            navController.navigate("${PolygotScreens.WordDetail.route}/${it}/${currentPickedLanguage?.id}")
                                         },
                                         onToggleSaveWord = {
                                             coroutineScope.launch {
@@ -581,7 +581,7 @@ fun HomeScreen(
                                                 pronunciationAudio = word.pronunciationAudio,
                                                 index = index,
                                                 onClick = {
-                                                    navController.navigate("${PawnScreens.WordDetail.route}/${savedWords[index].value}/${currentPickedLanguage?.id}")
+                                                    navController.navigate("${PolygotScreens.WordDetail.route}/${savedWords[index].value}/${currentPickedLanguage?.id}")
                                                 }
                                             )
                                         }

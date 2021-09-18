@@ -21,7 +21,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.nguyen.polygot.R
 import com.nguyen.polygot.model.AuthStatus
 import com.nguyen.polygot.model.Token
-import com.nguyen.polygot.ui.navigation.PawnScreens
+import com.nguyen.polygot.ui.navigation.PolygotScreens
 import com.nguyen.polygot.ui.screens.*
 import com.nguyen.polygot.ui.screens.auth.AuthViewModel
 import com.nguyen.polygot.ui.screens.auth.ChangePasswordScreen
@@ -48,9 +48,9 @@ fun PawnApp(
 
     val navController = rememberNavController()
     val items = listOf(
-        PawnScreens.Home,
-        PawnScreens.Search,
-        PawnScreens.Feeds,
+        PolygotScreens.Home,
+        PolygotScreens.Search,
+        PolygotScreens.Feeds,
     )
 
     val context = LocalContext.current
@@ -104,23 +104,23 @@ fun PawnApp(
             }
         ) {
 
-            NavHost(navController, startDestination = PawnScreens.Home.route) {
-                composable(PawnScreens.Home.route) {
+            NavHost(navController, startDestination = PolygotScreens.Home.route) {
+                composable(PolygotScreens.Home.route) {
                     HomeScreen(
                         homeViewModel = homeViewModel,
                         sharedViewModel = sharedViewModel,
                         navController = navController
                     )
                 }
-                composable(PawnScreens.Feeds.route) { FeedScreen() }
-                composable(PawnScreens.Search.route) {
+                composable(PolygotScreens.Feeds.route) { FeedScreen() }
+                composable(PolygotScreens.Search.route) {
                     SearchScreen(
                         searchViewModel,
                         sharedViewModel,
                         navController
                     )
                 }
-                composable("${PawnScreens.WordDetail.route}/{wordValue}/{language}") {
+                composable("${PolygotScreens.WordDetail.route}/{wordValue}/{language}") {
                     WordDetailScreen(
                         navController = navController,
                         viewModel = wordDetailViewModel,
@@ -129,15 +129,15 @@ fun PawnApp(
                         language = it.arguments?.getString("language")
                     )
                 }
-                composable(PawnScreens.Auth.route) {
+                composable(PolygotScreens.Auth.route) {
                     AuthScreen(
                         authViewModel = authViewModel,
                         sharedViewModel = sharedViewModel,
                         navController = navController
                     )
                 }
-                composable(PawnScreens.ChangePassword.route) { ChangePasswordScreen(navController = navController) }
-                composable(PawnScreens.VerifyCode.route) { VerifyCodeScreen(navController = navController) }
+                composable(PolygotScreens.ChangePassword.route) { ChangePasswordScreen(navController = navController) }
+                composable(PolygotScreens.VerifyCode.route) { VerifyCodeScreen(navController = navController) }
             }
         }
     }

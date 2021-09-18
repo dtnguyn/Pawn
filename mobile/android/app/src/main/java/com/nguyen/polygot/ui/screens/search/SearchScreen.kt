@@ -21,7 +21,7 @@ import androidx.navigation.NavController
 import com.nguyen.polygot.model.Language
 import com.nguyen.polygot.ui.SharedViewModel
 import com.nguyen.polygot.ui.components.SavedWordItem
-import com.nguyen.polygot.ui.navigation.PawnScreens
+import com.nguyen.polygot.ui.navigation.PolygotScreens
 import com.nguyen.polygot.ui.screens.search.SearchViewModel
 import com.nguyen.polygot.ui.theme.*
 import com.nguyen.polygot.util.ShimmerAnimation
@@ -200,7 +200,7 @@ fun SearchScreen(
                                     word = word.value,
                                     index = index,
                                     onClick = {
-                                        navController.navigate("${PawnScreens.WordDetail.route}/${words[index].value}/${currentPickedLanguage?.id}")
+                                        navController.navigate("${PolygotScreens.WordDetail.route}/${words[index].value}/${currentPickedLanguage?.id}")
                                     }
                                 )
                             }

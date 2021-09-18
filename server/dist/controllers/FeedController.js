@@ -29,7 +29,8 @@ const getNews = (queryValues, language) => __awaiter(this, void 0, void 0, funct
             queryString += query + " OR ";
     });
     const result = yield superagent_1.default
-        .get(`https://free-news.p.rapidapi.com/v1/search?q=${queryString}&lang=en`)
+        .get(`https://free-news.p.rapidapi.com/v1/search`)
+        .query({ q: queryString, lang: language.substring(0, 2) })
         .set("x-rapidapi-host", "free-news.p.rapidapi.com")
         .set("x-rapidapi-key", process.env.NEWS_API_KEY);
     const articles = result.body.articles;

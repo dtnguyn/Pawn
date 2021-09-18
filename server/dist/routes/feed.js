@@ -14,7 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const express_1 = require("express");
-const CustomError_1 = __importDefault(require("src/utils/CustomError"));
+const CustomError_1 = __importDefault(require("../utils/CustomError"));
 const FeedController_1 = require("../controllers/FeedController");
 const WordController_1 = require("../controllers/WordController");
 const ApiResponse_1 = __importDefault(require("../utils/ApiResponse"));
@@ -27,6 +27,9 @@ router.get("/", middlewares_1.checkAuthentication, (req, res) => __awaiter(this,
             throw new CustomError_1.default("Please login first!");
         }
         const language = req.query.language;
+        if (!language) {
+            throw new CustomError_1.default("Please provide target language!");
+        }
         const words = yield WordController_1.getSavedWords(userId, language);
         const feeds = yield FeedController_1.getFeeds(words, language);
         res.send(new ApiResponse_1.default(true, "", feeds));

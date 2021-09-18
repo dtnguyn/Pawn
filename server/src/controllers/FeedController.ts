@@ -25,7 +25,8 @@ const getNews = async (queryValues: string[], language: string) => {
   });
 
   const result = await superagent
-    .get(`https://free-news.p.rapidapi.com/v1/search?q=${queryString}&lang=en`)
+    .get(`https://free-news.p.rapidapi.com/v1/search`)
+    .query({ q: queryString, lang: language.substring(0, 2) })
     .set("x-rapidapi-host", "free-news.p.rapidapi.com")
     .set("x-rapidapi-key", process.env.NEWS_API_KEY as string);
 

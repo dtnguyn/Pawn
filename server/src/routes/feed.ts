@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import { Router } from "express";
-import CustomError from "src/utils/CustomError";
+import CustomError from "../utils/CustomError";
 import { getFeeds } from "../controllers/FeedController";
 import { getSavedWords } from "../controllers/WordController";
 import { User } from "../entity/User";
@@ -17,6 +17,10 @@ router.get("/", checkAuthentication, async (req, res) => {
       throw new CustomError("Please login first!");
     }
     const language = req.query.language as string;
+
+    if (!language) {
+      throw new CustomError("Please provide target language!");
+    }
 
     const words = await getSavedWords(userId, language);
     const feeds = await getFeeds(words, language);

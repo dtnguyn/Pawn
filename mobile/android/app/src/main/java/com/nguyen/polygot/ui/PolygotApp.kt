@@ -112,7 +112,7 @@ fun PawnApp(
                         navController = navController
                     )
                 }
-                composable(PolygotScreens.Feeds.route) { FeedScreen() }
+                composable(PolygotScreens.Feeds.route) { FeedScreen(sharedViewModel = sharedViewModel) }
                 composable(PolygotScreens.Search.route) {
                     SearchScreen(
                         searchViewModel,

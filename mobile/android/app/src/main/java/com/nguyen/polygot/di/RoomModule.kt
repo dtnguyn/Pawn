@@ -2,12 +2,9 @@ package com.nguyen.polygot.di
 
 import android.content.Context
 import androidx.room.Room
-import com.nguyen.polygot.db.PawnDatabase
-import com.nguyen.polygot.db.PawnDatabase.Companion.DATABASE_NAME
-import com.nguyen.polygot.db.dao.DailyWordCacheDao
-import com.nguyen.polygot.db.dao.LanguageCacheDao
-import com.nguyen.polygot.db.dao.SavedWordCacheDao
-import com.nguyen.polygot.db.dao.WordDetailCacheDao
+import com.nguyen.polygot.db.PolygotDatabase
+import com.nguyen.polygot.db.PolygotDatabase.Companion.DATABASE_NAME
+import com.nguyen.polygot.db.dao.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,11 +18,11 @@ object RoomModule {
 
     @Singleton
     @Provides
-    fun providePawnCacheDb(@ApplicationContext context: Context): PawnDatabase {
+    fun providePawnCacheDb(@ApplicationContext context: Context): PolygotDatabase {
         return Room
             .databaseBuilder(
                 context,
-                PawnDatabase::class.java,
+                PolygotDatabase::class.java,
                 DATABASE_NAME
             )
             .fallbackToDestructiveMigration()
@@ -36,25 +33,31 @@ object RoomModule {
 
     @Singleton
     @Provides
-    fun provideLanguageCacheDao(database: PawnDatabase): LanguageCacheDao {
+    fun provideLanguageCacheDao(database: PolygotDatabase): LanguageCacheDao {
         return database.languageDao()
     }
 
     @Singleton
     @Provides
-    fun provideDailyWordCacheDao(database: PawnDatabase): DailyWordCacheDao {
+    fun provideDailyWordCacheDao(database: PolygotDatabase): DailyWordCacheDao {
         return database.dailyWordDao()
     }
 
     @Singleton
     @Provides
-    fun provideSavedWordCacheDao(database: PawnDatabase): SavedWordCacheDao {
+    fun provideSavedWordCacheDao(database: PolygotDatabase): SavedWordCacheDao {
         return database.savedWordDao()
     }
 
     @Singleton
     @Provides
-    fun provideWordDetailCacheDao(database: PawnDatabase): WordDetailCacheDao {
+    fun provideWordDetailCacheDao(database: PolygotDatabase): WordDetailCacheDao {
         return database.wordDetailDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideFeedCacheDao(database: PolygotDatabase): FeedCacheDao {
+        return database.feedDao()
     }
 }

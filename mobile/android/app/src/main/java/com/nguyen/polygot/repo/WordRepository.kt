@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import com.nguyen.polygot.api.model.ApiResponse
 import com.nguyen.polygot.api.model.ToggleSavedWordRequestBody
-import com.nguyen.polygot.db.PawnDatabase
+import com.nguyen.polygot.db.PolygotDatabase
 import com.nguyen.polygot.db.mapper.DailyWordMapper
 import com.nguyen.polygot.db.mapper.SavedWordMapper
 import com.nguyen.polygot.db.mapper.WordDetailMapper
@@ -29,7 +29,7 @@ import kotlin.collections.ArrayList
 class WordRepository
 @Inject constructor(
     private val apiClient: HttpClient,
-    private val db: PawnDatabase
+    private val db: PolygotDatabase
 ) {
     companion object {
         private const val TAG = "WordRepo"

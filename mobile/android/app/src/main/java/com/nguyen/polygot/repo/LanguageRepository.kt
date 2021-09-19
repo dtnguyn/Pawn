@@ -3,7 +3,7 @@ package com.nguyen.polygot.repo
 import android.util.Log
 import com.nguyen.polygot.api.model.ApiResponse
 import com.nguyen.polygot.api.model.PickLearningLanguagesRequestBody
-import com.nguyen.polygot.db.PawnDatabase
+import com.nguyen.polygot.db.PolygotDatabase
 import com.nguyen.polygot.db.mapper.LanguageMapper
 //import com.nguyen.pawn.db.PawnDatabase
 //import com.nguyen.pawn.db.entity.LanguageCacheEntity
@@ -22,7 +22,7 @@ import javax.inject.Inject
 class LanguageRepository
 @Inject constructor(
     private val apiClient: HttpClient,
-    private val database: PawnDatabase
+    private val database: PolygotDatabase
 ){
     companion object{
         private const val TAG = "LanguageRepo"

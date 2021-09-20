@@ -43,7 +43,7 @@ const getNews = (queryValues, language) => __awaiter(this, void 0, void 0, funct
                     title: article.title,
                     author: article.author,
                     topic: article.topic,
-                    language: article.language,
+                    language: language,
                     description: article.summary,
                     thumbnail: article.media,
                     publishedDate: article.published_date,
@@ -81,8 +81,8 @@ const getVideos = (queryValues, language) => __awaiter(this, void 0, void 0, fun
                     type: "video",
                     title: video.snippet.title,
                     author: video.snippet.channelTitle,
-                    thumbnail: video.snippet.thumbnails.high
-                        ? video.snippet.thumbnails.high
+                    thumbnail: video.snippet.thumbnails.high.url
+                        ? video.snippet.thumbnails.high.url
                         : null,
                     topic: null,
                     language: language,

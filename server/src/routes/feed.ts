@@ -21,14 +21,17 @@ router.get("/", checkAuthentication, async (req, res) => {
     if (!language) {
       throw new CustomError("Please provide target language!");
     }
-
     const words = await getSavedWords(userId, language);
+
     const feeds = await getFeeds(words, language);
+    console.log("feeds length ", feeds.length)
+
     res.send(new ApiResponse(true, "", feeds));
   } catch (error) {
     if (error instanceof CustomError) {
       res.send(new ApiResponse(false, error.message, null));
     } else {
+      console.log("get feed error ", error.message)
       res.send(new ApiResponse(false, "Something went wrong", null));
     }
   }

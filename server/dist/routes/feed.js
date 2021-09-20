@@ -32,6 +32,7 @@ router.get("/", middlewares_1.checkAuthentication, (req, res) => __awaiter(this,
         }
         const words = yield WordController_1.getSavedWords(userId, language);
         const feeds = yield FeedController_1.getFeeds(words, language);
+        console.log("feeds length ", feeds.length);
         res.send(new ApiResponse_1.default(true, "", feeds));
     }
     catch (error) {
@@ -39,6 +40,7 @@ router.get("/", middlewares_1.checkAuthentication, (req, res) => __awaiter(this,
             res.send(new ApiResponse_1.default(false, error.message, null));
         }
         else {
+            console.log("get feed error ", error.message);
             res.send(new ApiResponse_1.default(false, "Something went wrong", null));
         }
     }

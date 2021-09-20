@@ -10,6 +10,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.nguyen.polygot.ui.screens.auth.AuthViewModel
 import com.nguyen.polygot.ui.screens.definition.WordDetailViewModel
+import com.nguyen.polygot.ui.screens.feeds.FeedViewModel
 import com.nguyen.polygot.ui.screens.home.HomeViewModel
 import com.nguyen.polygot.ui.screens.search.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,6 +25,7 @@ class MainActivity : ComponentActivity() {
     private val sharedViewModel: SharedViewModel by viewModels()
     private val searchViewModel: SearchViewModel by viewModels()
     private val wordDetailViewModel: WordDetailViewModel by viewModels()
+    private val feedViewModel: FeedViewModel by viewModels()
 
     @ExperimentalFoundationApi
     @ExperimentalAnimationApi
@@ -31,12 +33,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            PawnApp(
+            PolygotApp(
                 authViewModel = authViewModel,
                 homeViewModel = homeViewModel,
                 sharedViewModel = sharedViewModel,
                 searchViewModel = searchViewModel,
-                wordDetailViewModel = wordDetailViewModel
+                wordDetailViewModel = wordDetailViewModel,
+                feedViewModel = feedViewModel
             )
         }
 

@@ -23,7 +23,7 @@ abstract class PolygotDatabase: RoomDatabase() {
 
 
     companion object {
-        const val DATABASE_NAME: String = "pawn_cache_db"
+        const val DATABASE_NAME: String = "polygot_cache_db"
     }
 
 }

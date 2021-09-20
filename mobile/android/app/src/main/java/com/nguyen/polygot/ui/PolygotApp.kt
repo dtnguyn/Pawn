@@ -27,6 +27,7 @@ import com.nguyen.polygot.ui.screens.auth.AuthViewModel
 import com.nguyen.polygot.ui.screens.auth.ChangePasswordScreen
 import com.nguyen.polygot.ui.screens.auth.VerifyCodeScreen
 import com.nguyen.polygot.ui.screens.definition.WordDetailViewModel
+import com.nguyen.polygot.ui.screens.feeds.FeedViewModel
 import com.nguyen.polygot.ui.screens.home.HomeViewModel
 import com.nguyen.polygot.ui.screens.search.SearchViewModel
 import com.nguyen.polygot.ui.theme.PawnTheme
@@ -38,12 +39,13 @@ import com.nguyen.polygot.util.DataStoreUtils
 @ExperimentalAnimationApi
 @ExperimentalFoundationApi
 @Composable
-fun PawnApp(
+fun PolygotApp(
     authViewModel: AuthViewModel,
     homeViewModel: HomeViewModel,
     wordDetailViewModel: WordDetailViewModel,
     searchViewModel: SearchViewModel,
-    sharedViewModel: SharedViewModel
+    sharedViewModel: SharedViewModel,
+    feedViewModel: FeedViewModel
 ) {
 
     val navController = rememberNavController()
@@ -112,7 +114,12 @@ fun PawnApp(
                         navController = navController
                     )
                 }
-                composable(PolygotScreens.Feeds.route) { FeedScreen(sharedViewModel = sharedViewModel) }
+                composable(PolygotScreens.Feeds.route) {
+                    FeedScreen(
+                        sharedViewModel = sharedViewModel,
+                        feedViewModel = feedViewModel
+                    )
+                }
                 composable(PolygotScreens.Search.route) {
                     SearchScreen(
                         searchViewModel,

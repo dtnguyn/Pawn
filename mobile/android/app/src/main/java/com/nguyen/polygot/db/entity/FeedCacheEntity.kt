@@ -33,10 +33,10 @@ class FeedCacheEntity(
     @ColumnInfo(name = "description")
     val description: String,
 
-    @ColumnInfo(name = "description")
+    @ColumnInfo(name = "publishedDate")
     val publishedDate: String?,
 
-    @ColumnInfo(name = "description")
+    @ColumnInfo(name = "cacheDate")
     val cacheDate: String,
 
     )

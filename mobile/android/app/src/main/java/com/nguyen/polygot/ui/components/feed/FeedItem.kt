@@ -16,12 +16,13 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.nguyen.polygot.R
+import com.nguyen.polygot.model.Feed
 import com.nguyen.polygot.ui.theme.Typography
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
-fun FeedItem() {
+fun FeedItem(feed: Feed) {
     Card(
         shape = RoundedCornerShape(15.dp),
         modifier = Modifier.padding(vertical = 10.dp)
@@ -37,13 +38,13 @@ fun FeedItem() {
                 )
                 Text(text = "News", style = Typography.subtitle1)
             }
-            Text(text = "This is just a test title for the news, nothing is special about this text. Please ignore please!", style = Typography.h5)
-            Text(text = "This is the upload time", style = Typography.subtitle2)
+            Text(text = feed.title, style = Typography.h5)
+            Text(text = feed.publishedDate ?: "", style = Typography.subtitle2)
             
             Spacer(modifier = Modifier.padding(5.dp))
             
             GlideImage(
-                imageModel = "https://img.huffingtonpost.com/asset/614105e226000087ed540ced.jpeg?cache=brjsyv3qis&ops=1778_1000%22",
+                imageModel = feed.thumbnail ?: "",
                 // Crop, Fit, Inside, FillHeight, FillWidth, None
                 contentScale = ContentScale.Fit,
                 // shows an image with a circular revealed animation.

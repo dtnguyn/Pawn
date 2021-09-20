@@ -52,8 +52,8 @@ class LanguageRepository
             },
             saveSubmitResult = {
                 Log.d(TAG, "saving to cache ${it?.size}")
-                database.languageDao().clearAll()
-                database.languageDao().insertMany(LanguageMapper.mapToCacheEntityList(languages))
+//                database.languageDao().clearAll()
+//                database.languageDao().insertMany(LanguageMapper.mapToCacheEntityList(languages))
             },
             defaultResponse = languages
         )

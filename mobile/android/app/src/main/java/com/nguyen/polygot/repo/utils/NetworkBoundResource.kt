@@ -54,7 +54,7 @@ inline fun <DomainType> mainGetNetworkBoundResource(
 inline fun <ResponseType> mainPostNetworkBoundResource(
     crossinline submit: suspend () -> ResponseType?,
     crossinline shouldSave: suspend (ResponseType?) -> Boolean,
-    crossinline saveSubmitResult: suspend (ResponseType?) -> Unit,
+    crossinline saveSubmitResult:  (ResponseType?) -> Unit,
     defaultResponse: ResponseType? = null
 ): Flow<UIState<ResponseType>> {
     return flow {

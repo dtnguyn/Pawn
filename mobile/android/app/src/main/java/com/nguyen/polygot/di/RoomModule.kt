@@ -55,9 +55,9 @@ object RoomModule {
         return database.wordDetailDao()
     }
 
-    @Singleton
-    @Provides
-    fun provideFeedCacheDao(database: PolygotDatabase): FeedCacheDao {
-        return database.feedDao()
-    }
+//    @Singleton
+//    @Provides
+//    fun provideFeedCacheDao(database: PolygotDatabase): FeedCacheDao {
+//        return database.feedDao()
+//    }
 }

@@ -36,7 +36,7 @@ const getNews = (queryValues, language) => __awaiter(this, void 0, void 0, funct
     const articles = result.body.articles;
     if (articles) {
         const newsFeeds = articles.map((article) => {
-            if (article._id && article.title && article.summary) {
+            if (article._id && article.title && article.summary && article.link) {
                 return {
                     id: article._id,
                     type: "news",
@@ -44,6 +44,7 @@ const getNews = (queryValues, language) => __awaiter(this, void 0, void 0, funct
                     author: article.author,
                     topic: article.topic,
                     language: language,
+                    url: article.link,
                     description: article.summary,
                     thumbnail: article.media,
                     publishedDate: article.published_date,
@@ -85,6 +86,7 @@ const getVideos = (queryValues, language) => __awaiter(this, void 0, void 0, fun
                         ? video.snippet.thumbnails.high.url
                         : null,
                     topic: null,
+                    url: `https://youtu.be/${video.id.videoId}`,
                     language: language,
                     description: video.snippet.description,
                     publishedDate: video.snippet.publishedAt.toString(),

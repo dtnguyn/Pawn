@@ -34,8 +34,7 @@ const getNews = async (queryValues: string[], language: string) => {
 
   if (articles) {
     const newsFeeds = articles.map((article) => {
-      if (article._id && article.title && article.summary) {
-        
+      if (article._id && article.title && article.summary && article.link) {
         return {
           id: article._id,
           type: "news",
@@ -43,6 +42,7 @@ const getNews = async (queryValues: string[], language: string) => {
           author: article.author,
           topic: article.topic,
           language: language,
+          url: article.link,
           description: article.summary,
           thumbnail: article.media,
           publishedDate: article.published_date,
@@ -84,6 +84,7 @@ const getVideos = async (queryValues: string[], language: string) => {
             ? video.snippet.thumbnails.high.url
             : null,
           topic: null,
+          url: `https://youtu.be/${video.id.videoId}`,
           language: language,
           description: video.snippet.description,
           publishedDate: video.snippet.publishedAt.toString(),

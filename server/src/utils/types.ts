@@ -32,6 +32,7 @@ export type FeedJSON = {
   author: string | null;
   topic: string | null;
   language: string;
+  url: string;
   description: string;
   publishedDate: string | null;
 };

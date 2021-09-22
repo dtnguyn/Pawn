@@ -41,7 +41,7 @@ fun FeedItem(feed: Feed) {
                 }
                 Text(text = feed.title, style = Typography.h5)
                 Spacer(modifier = Modifier.padding(2.dp))
-                Text(text = feed.publishedDate ?: "", style = Typography.subtitle2)
+                Text(text = feed.publishedDate?.substring(0, 10) ?: "", style = Typography.subtitle2)
 
                 Spacer(modifier = Modifier.padding(5.dp))
 
@@ -110,7 +110,7 @@ fun FeedItem(feed: Feed) {
                 Text(text = feed.title, style = Typography.h5)
                 Spacer(modifier = Modifier.padding(2.dp))
 
-                Text(text = feed.publishedDate ?: "", style = Typography.subtitle2)
+                Text(text = feed.publishedDate?.substring(0, 10)  ?: "", style = Typography.subtitle2)
 
                 Spacer(modifier = Modifier.padding(5.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {

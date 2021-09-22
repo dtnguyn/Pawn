@@ -78,7 +78,7 @@ fun FeedScreen(
             .fillMaxHeight(),
         backgroundColor = Color.White
     ) {
-        LazyColumn {
+        LazyColumn(Modifier.padding(bottom = 60.dp)) {
             item {
 
                 Row(

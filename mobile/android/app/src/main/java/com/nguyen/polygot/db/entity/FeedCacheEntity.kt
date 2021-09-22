@@ -21,6 +21,9 @@ class FeedCacheEntity(
     @ColumnInfo(name = "title")
     val title: String,
 
+    @ColumnInfo(name = "url")
+    val url: String,
+
     @ColumnInfo(name = "thumbnail")
     val thumbnail: String?,
 

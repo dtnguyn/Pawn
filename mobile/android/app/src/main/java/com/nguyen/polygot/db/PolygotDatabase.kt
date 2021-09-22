@@ -9,7 +9,7 @@ import com.nguyen.polygot.db.utils.Converters
 
 @Database(
     entities = [LanguageCacheEntity::class, DailyWordCacheEntity::class, SavedWordCacheEntity::class, WordDetailCacheEntity::class, FeedCacheEntity::class],
-    version = 5
+    version = 6
 )
 @TypeConverters(Converters::class)
 abstract class PolygotDatabase: RoomDatabase() {

@@ -18,6 +18,7 @@ object FeedMapper {
             thumbnail = feed.thumbnail,
             author = feed.author,
             topic = feed.topic,
+            url = feed.url,
             type = feed.type,
             publishedDate = feed.publishedDate,
             cacheDate = SimpleDateFormat("yyyy.MM.dd").format(Date())
@@ -32,6 +33,7 @@ object FeedMapper {
             description = feed.description,
             thumbnail = feed.thumbnail,
             author = feed.author,
+            url = feed.url,
             topic = feed.topic,
             type = feed.type,
             publishedDate = feed.publishedDate,

@@ -35,7 +35,7 @@ class FeedRepository
     fun getFeeds(accessToken: String, language: String): Flow<UIState<List<Feed>>> {
         return mainGetNetworkBoundResource(
             query = {
-                database.feedDao().getMany("en").map {
+                database.feedDao().getMany(language).map {
                     FeedMapper.mapToListNetworkEntity(it)
                 }
             },

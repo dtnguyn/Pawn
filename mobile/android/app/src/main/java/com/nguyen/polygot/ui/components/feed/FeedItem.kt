@@ -10,7 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
@@ -52,10 +54,10 @@ fun FeedItem(feed: Feed) {
                     // shows an image with a circular revealed animation.
                     circularReveal = CircularReveal(duration = 250),
                     // shows a placeholder ImageBitmap when loading.
-                    placeHolder = ImageBitmap.imageResource(R.drawable.fire),
+                    placeHolder = ImageBitmap.imageResource(id = R.drawable.cat_loading_icon),
                     // shows an error ImageBitmap when the request failed.
-                    error = ImageBitmap.imageResource(R.drawable.error),
-                    modifier = Modifier.clip(RoundedCornerShape(15.dp))
+                    error = ImageBitmap.imageResource(R.drawable.image_loading_error),
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(15.dp))
                 )
 
                 Spacer(modifier = Modifier.padding(5.dp))
@@ -83,18 +85,19 @@ fun FeedItem(feed: Feed) {
                 }
                 Spacer(modifier = Modifier.padding(5.dp))
 
-                Box(contentAlignment = Alignment.Center) {
+                Box(contentAlignment = Alignment.Center,) {
                     GlideImage(
                         imageModel = feed.thumbnail ?: "",
+                        alignment = Alignment.Center,
                         // Crop, Fit, Inside, FillHeight, FillWidth, None
                         contentScale = ContentScale.FillWidth,
                         // shows an image with a circular revealed animation.
                         circularReveal = CircularReveal(duration = 250),
                         // shows a placeholder ImageBitmap when loading.
-                        placeHolder = ImageBitmap.imageResource(R.drawable.fire),
+                        placeHolder = ImageBitmap.imageResource(id = R.drawable.cat_loading_icon),
                         // shows an error ImageBitmap when the request failed.
-                        error = ImageBitmap.imageResource(R.drawable.error),
-                        modifier = Modifier.clip(RoundedCornerShape(15.dp))
+                        error = ImageBitmap.imageResource(id = R.drawable.image_loading_error),
+                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(15.dp))
                     )
                     Image(
                         painter = painterResource(id = R.drawable.play_icon),

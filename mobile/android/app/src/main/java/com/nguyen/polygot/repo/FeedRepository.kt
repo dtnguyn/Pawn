@@ -36,7 +36,11 @@ class FeedRepository
         return mainGetNetworkBoundResource(
             query = {
                 database.feedDao().getMany(language).map {
-                    FeedMapper.mapToListNetworkEntity(it)
+                    if (it.isEmpty()) {
+                        null
+                    } else {
+                        FeedMapper.mapToListNetworkEntity(it)
+                    }
                 }
             },
             shouldFetch = {

@@ -23,6 +23,7 @@ import com.nguyen.polygot.model.Language
 import com.nguyen.polygot.ui.SharedViewModel
 import com.nguyen.polygot.ui.components.RoundButton
 import com.nguyen.polygot.ui.components.feed.FeedItem
+import com.nguyen.polygot.ui.components.feed.LoadingFeedItem
 import com.nguyen.polygot.ui.screens.feeds.FeedViewModel
 import com.nguyen.polygot.ui.theme.DarkBlue
 import com.nguyen.polygot.ui.theme.LightGrey
@@ -43,6 +44,8 @@ fun FeedScreen(
     val context = LocalContext.current
     val currentPickedLanguage: Language? by sharedViewModel.currentPickedLanguage
 
+    var isLoading by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(currentPickedLanguage){
         currentPickedLanguage?.id?.let {
@@ -58,15 +61,18 @@ fun FeedScreen(
 
             is UIState.Loading -> {
                 Log.d("FeedScreen", "loading")
+                isLoading = true
             }
 
             is UIState.Error -> {
                 Log.d("FeedScreen", "error ${feedsUIState.errorMsg}")
+                isLoading = false
             }
 
             is UIState.Loaded -> {
                 Log.d("FeedScreen", "loaded: ${feedsUIState.value?.size}")
                 feeds = feedsUIState.value
+                isLoading = false
             }
         }
     }
@@ -150,8 +156,8 @@ fun FeedScreen(
             }
 
 
-            feeds?.let{
-                items(it.size) { index ->
+            if(isLoading){
+                items(5) { index ->
                     Box(
                         Modifier
                             .background(
@@ -163,7 +169,25 @@ fun FeedScreen(
                             )
                             .padding(horizontal = 20.dp)
                     ) {
-                        FeedItem(it[index])
+                        LoadingFeedItem()
+                    }
+                }
+            } else {
+                feeds?.let{
+                    items(it.size) { index ->
+                        Box(
+                            Modifier
+                                .background(
+                                    LightGrey,
+                                    RoundedCornerShape(
+                                        topStart = if (index == 0) 30.dp else 0.dp,
+                                        topEnd = if (index == 0) 30.dp else 0.dp
+                                    )
+                                )
+                                .padding(horizontal = 20.dp)
+                        ) {
+                            FeedItem(it[index])
+                        }
                     }
                 }
             }

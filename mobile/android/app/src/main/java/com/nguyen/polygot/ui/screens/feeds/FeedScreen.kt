@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -16,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nguyen.polygot.R
 import com.nguyen.polygot.model.Feed
@@ -39,22 +39,22 @@ fun FeedScreen(
     feedViewModel: FeedViewModel
 ) {
 
-    val feedsUIState: UIState<List<Feed>> by feedViewModel.feed
-    var feeds by remember { mutableStateOf(feedsUIState.value) }
+    val feedUIState: UIState<List<Feed>> by feedViewModel.feedItems
+    var feedItems by remember { mutableStateOf(feedUIState.value) }
     val context = LocalContext.current
     val currentPickedLanguage: Language? by sharedViewModel.currentPickedLanguage
 
     var isLoading by remember { mutableStateOf(false) }
 
 
-    LaunchedEffect(currentPickedLanguage){
+    LaunchedEffect(currentPickedLanguage) {
         currentPickedLanguage?.id?.let {
             feedViewModel.getFeeds(DataStoreUtils.getAccessTokenFromDataStore(context), it)
         }
     }
 
-    LaunchedEffect(feedsUIState){
-        when(feedsUIState){
+    LaunchedEffect(feedUIState) {
+        when (feedUIState) {
             is UIState.Initial -> {
                 Log.d("FeedScreen", "initial")
             }
@@ -65,13 +65,13 @@ fun FeedScreen(
             }
 
             is UIState.Error -> {
-                Log.d("FeedScreen", "error ${feedsUIState.errorMsg}")
+                Log.d("FeedScreen", "error ${feedUIState.errorMsg}")
                 isLoading = false
             }
 
             is UIState.Loaded -> {
-                Log.d("FeedScreen", "loaded: ${feedsUIState.value?.size}")
-                feeds = feedsUIState.value
+                Log.d("FeedScreen", "loaded: ${feedUIState.value?.size}")
+                feedItems = feedUIState.value
                 isLoading = false
             }
         }
@@ -92,7 +92,7 @@ fun FeedScreen(
                         .padding(vertical = 20.dp, horizontal = 20.dp)
                 ) {
                     Column(Modifier.weight(3f)) {
-                        Text(text = "Your feeds", style = Typography.h3)
+                        Text(text = "Your feed", style = Typography.h3)
                         Text(
                             text = "News and videos generated from your saved words",
                             style = Typography.body2
@@ -156,7 +156,7 @@ fun FeedScreen(
             }
 
 
-            if(isLoading){
+            if (isLoading) {
                 items(5) { index ->
                     Box(
                         Modifier
@@ -173,20 +173,73 @@ fun FeedScreen(
                     }
                 }
             } else {
-                feeds?.let{
-                    items(it.size) { index ->
-                        Box(
-                            Modifier
-                                .background(
-                                    LightGrey,
-                                    RoundedCornerShape(
-                                        topStart = if (index == 0) 30.dp else 0.dp,
-                                        topEnd = if (index == 0) 30.dp else 0.dp
+                feedItems?.let {
+                    if (it.isEmpty()) {
+                        item {
+                            Box(
+                                Modifier
+                                    .fillParentMaxWidth()
+                                    .fillParentMaxHeight(0.8f)
+                                    .background(
+                                        LightGrey,
+                                        RoundedCornerShape(
+                                            topStart = 30.dp,
+                                            topEnd = 30.dp
+                                        )
                                     )
-                                )
-                                .padding(horizontal = 20.dp)
-                        ) {
-                            FeedItem(it[index])
+                                    .padding(horizontal = 20.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(
+                                        text = "Your feed is empty right now",
+                                        style = Typography.h5,
+                                        color = Color.Gray,
+                                        textAlign = TextAlign.Center
+                                    )
+                                    Spacer(modifier = Modifier.padding(10.dp))
+                                    Spacer(modifier = Modifier.padding(10.dp))
+                                    Image(
+                                        painter = painterResource(id = R.drawable.list_icon),
+                                        contentDescription = "list_icon",
+                                        modifier = Modifier
+                                            .size(128.dp)
+                                            .padding(end = 5.dp)
+                                    )
+                                    Spacer(modifier = Modifier.padding(10.dp))
+
+                                    Text(
+                                        text = "Save more words to get more news and videos to your feed",
+                                        style = Typography.body1,
+                                        color = Color.Gray,
+                                        textAlign = TextAlign.Center
+                                    )
+
+                                    Spacer(modifier = Modifier.padding(10.dp))
+                                    Spacer(modifier = Modifier.padding(10.dp))
+                                    Spacer(modifier = Modifier.padding(10.dp))
+                                    Spacer(modifier = Modifier.padding(10.dp))
+
+
+                                }
+
+                            }
+                        }
+                    } else {
+                        items(it.size) { index ->
+                            Box(
+                                Modifier
+                                    .background(
+                                        LightGrey,
+                                        RoundedCornerShape(
+                                            topStart = if (index == 0) 30.dp else 0.dp,
+                                            topEnd = if (index == 0) 30.dp else 0.dp
+                                        )
+                                    )
+                                    .padding(horizontal = 20.dp)
+                            ) {
+                                FeedItem(it[index])
+                            }
                         }
                     }
                 }

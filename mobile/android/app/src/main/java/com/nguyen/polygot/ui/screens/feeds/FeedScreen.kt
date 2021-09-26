@@ -42,6 +42,10 @@ fun FeedScreen(
 
     val feedUIState: UIState<List<Feed>> by feedViewModel.feedItems
     var feedItems by remember { mutableStateOf(feedUIState.value) }
+
+    val topicsUIState: UIState<String> by feedViewModel.topics
+    var topics by remember { mutableStateOf(topicsUIState.value ?: "") }
+
     val context = LocalContext.current
     val currentPickedLanguage: Language? by sharedViewModel.currentPickedLanguage
     val bottomSheetScaffoldState = rememberModalBottomSheetState(
@@ -50,6 +54,30 @@ fun FeedScreen(
     val coroutineScope = rememberCoroutineScope()
 
     var isLoading by remember { mutableStateOf(false) }
+
+    LaunchedEffect(true){
+        feedViewModel.getTopics(DataStoreUtils.getAccessTokenFromDataStore(context))
+    }
+
+    LaunchedEffect(topicsUIState){
+        when(topicsUIState){
+            is UIState.Initial -> {
+
+            }
+            is UIState.Loading -> {
+                Log.d("FeedScreen", "topics loading")
+            }
+            is UIState.Error -> {
+                Log.d("FeedScreen", "topics error: ${topicsUIState.errorMsg}")
+            }
+            is UIState.Loaded -> {
+                Log.d("FeedScreen", "topics loaded: ${topicsUIState.value}")
+                if(topicsUIState.value != null){
+                    topics = topicsUIState.value!!
+                }
+            }
+        }
+    }
 
 
     LaunchedEffect(currentPickedLanguage) {
@@ -81,11 +109,29 @@ fun FeedScreen(
             }
         }
     }
+    
 
     ModalBottomSheetLayout(
         sheetShape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
         sheetContent = {
-           TopicMenu()
+            TopicMenu(
+                topics = topics,
+                onPickTopic = {
+                    feedViewModel.pickTopic(it)
+                },
+                isPicked = {
+                    feedViewModel.isTopicPicked(it)
+                },
+                onFinish = {
+                    coroutineScope.launch {
+                        feedViewModel.updateTopics(DataStoreUtils.getAccessTokenFromDataStore(context))
+                        bottomSheetScaffoldState.hide()
+                    }
+                },
+                onDismiss = {
+                    feedViewModel.dismissTopics()
+                }
+            )
         },
         sheetState = bottomSheetScaffoldState,
     ) {
@@ -129,7 +175,7 @@ fun FeedScreen(
 //                                        if(bottomSheetScaffoldState.isVisible)
 //                                            bottomSheetScaffoldState.ex()
 //                                        else bottomSheetScaffoldState.bottomSheetState.collapse()
-                                        if(bottomSheetScaffoldState.isVisible) bottomSheetScaffoldState.hide()
+                                        if (bottomSheetScaffoldState.isVisible) bottomSheetScaffoldState.hide()
                                         else bottomSheetScaffoldState.show()
                                     }
                                 }

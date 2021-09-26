@@ -3,11 +3,14 @@ package com.nguyen.polygot.repo
 import android.annotation.SuppressLint
 import android.util.Log
 import com.nguyen.polygot.api.model.ApiResponse
+import com.nguyen.polygot.api.model.RegisterRequestBody
+import com.nguyen.polygot.api.model.UpdateFeedTopicsRequestBody
 import com.nguyen.polygot.db.PolygotDatabase
 import com.nguyen.polygot.db.mapper.FeedMapper
 //import com.nguyen.polygot.db.mapper.FeedMapper
 import com.nguyen.polygot.model.Feed
 import com.nguyen.polygot.repo.utils.mainGetNetworkBoundResource
+import com.nguyen.polygot.repo.utils.mainPostNetworkBoundResource
 import com.nguyen.polygot.util.Constants
 import com.nguyen.polygot.util.CustomAppException
 import com.nguyen.polygot.util.UIState
@@ -16,6 +19,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
@@ -72,6 +76,55 @@ class FeedRepository
                     database.feedDao().insertMany(FeedMapper.mapToListCacheEntity(it))
                 }
             }
+        )
+    }
+
+
+    fun getTopics(accessToken: String): Flow<UIState<String>> {
+
+        var topics: String? = null
+        return mainGetNetworkBoundResource(
+            query = {
+                flow { emit(topics) }
+            },
+            shouldFetch = {
+               true
+            },
+            fetch = {
+                val response: ApiResponse<String> = apiClient.get("${Constants.apiURL}/feed/topics") {
+                    contentType(ContentType.Application.Json)
+                    headers {
+                        append(HttpHeaders.Authorization, "Bearer $accessToken")
+                    }
+                }
+                if (response.status) {
+                    response.data
+                } else throw CustomAppException(response.message)
+
+            },
+            saveFetchResult = {
+                topics = it ?: ""
+            }
+        )
+    }
+
+    fun updateTopics(accessToken: String, newTopics: String): Flow<UIState<String>>{
+        return mainPostNetworkBoundResource(
+            submit = {
+                val response: ApiResponse<String> = apiClient.post("${Constants.apiURL}/feed/topics") {
+                    contentType(ContentType.Application.Json)
+                    headers {
+                        append(HttpHeaders.Authorization, "Bearer $accessToken")
+                    }
+                    body = UpdateFeedTopicsRequestBody(newTopics)
+                }
+                if (response.status) {
+                    Log.d("FeedRepository", "topic response: $response")
+                    response.data
+                } else throw CustomAppException(response.message)
+            },
+            shouldSave = {false },
+            saveSubmitResult = {}
         )
     }
 

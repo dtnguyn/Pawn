@@ -46,6 +46,10 @@ __decorate([
     __metadata("design:type", Number)
 ], User.prototype, "dailyWordCount", void 0);
 __decorate([
+    typeorm_1.Column({ default: "" }),
+    __metadata("design:type", String)
+], User.prototype, "feedTopics", void 0);
+__decorate([
     typeorm_1.Column({ default: true }),
     __metadata("design:type", Boolean)
 ], User.prototype, "notificationEnabled", void 0);

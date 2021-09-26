@@ -43,6 +43,9 @@ export class User {
   @Column({ default: 3 })
   dailyWordCount: number;
 
+  @Column({ default: "" })
+  feedTopics: string;
+
   @Column({ default: true })
   notificationEnabled: boolean;
 

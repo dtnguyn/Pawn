@@ -45,5 +45,46 @@ router.get("/", middlewares_1.checkAuthentication, (req, res) => __awaiter(this,
         }
     }
 }));
+router.get("/topics", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const user = req.user;
+        if (!user.id) {
+            throw new CustomError_1.default("Please login first!");
+        }
+        res.send(new ApiResponse_1.default(true, "", user.feedTopics));
+    }
+    catch (error) {
+        if (error instanceof CustomError_1.default) {
+            res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            console.log("get feed error ", error.message);
+            res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
+    }
+}));
+router.post("/topics", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const userId = req.user.id;
+        if (!userId) {
+            throw new CustomError_1.default("Please login first!");
+        }
+        const newTopicsString = req.body.newTopics;
+        if (!newTopicsString) {
+            throw new CustomError_1.default("Invalid input for updating topics!");
+        }
+        yield FeedController_1.updateTopics(userId, newTopicsString);
+        res.send(new ApiResponse_1.default(true, "", newTopicsString));
+    }
+    catch (error) {
+        if (error instanceof CustomError_1.default) {
+            res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            console.log("get feed error ", error.message);
+            res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
+    }
+}));
 exports.default = router;
 //# sourceMappingURL=feed.js.map

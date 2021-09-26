@@ -1,5 +1,7 @@
-import { WordDetailSimplifyJSON } from "src/utils/types";
+import { User } from "../entity/User";
+import { WordDetailSimplifyJSON } from "../utils/types";
 import superagent from "superagent";
+import { getRepository } from "typeorm";
 import { FeedJSON } from "../utils/types";
 
 export const getFeeds = async (
@@ -115,3 +117,9 @@ function shuffle(array: any[]) {
 
   return array;
 }
+
+export const updateTopics = async (userId: string, newTopicString: string) => {
+  const userRepo = getRepository(User);
+
+  await userRepo.update({ id: userId }, { feedTopics: newTopicString });
+};

@@ -11,7 +11,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const User_1 = require("../entity/User");
 const superagent_1 = __importDefault(require("superagent"));
+const typeorm_1 = require("typeorm");
 exports.getFeeds = (savedWords, language) => __awaiter(this, void 0, void 0, function* () {
     const queryValues = savedWords.map((savedWord) => savedWord.value);
     const newsFeeds = yield getNews(queryValues, language);
@@ -110,4 +112,8 @@ function shuffle(array) {
     }
     return array;
 }
+exports.updateTopics = (userId, newTopicString) => __awaiter(this, void 0, void 0, function* () {
+    const userRepo = typeorm_1.getRepository(User_1.User);
+    yield userRepo.update({ id: userId }, { feedTopics: newTopicString });
+});
 //# sourceMappingURL=FeedController.js.map

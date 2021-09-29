@@ -1,17 +1,23 @@
 import { User } from "../entity/User";
-import { WordDetailSimplifyJSON } from "../utils/types";
+import {
+  FeedDetailJSON,
+  NewsDetailJSON,
+  WordDetailSimplifyJSON,
+} from "../utils/types";
 import superagent from "superagent";
 import { getRepository } from "typeorm";
 import { FeedJSON } from "../utils/types";
+import Mercury from "@postlight/mercury-parser";
 
 export const getFeeds = async (
   savedWords: WordDetailSimplifyJSON[],
-  language: string
+  language: string,
+  feedTopics: string
 ) => {
   const queryValues = savedWords.map((savedWord) => savedWord.value);
 
-  const newsFeeds = await getNews(queryValues, language);
-  const videoFeeds = await getVideos(queryValues, language);
+  const newsFeeds = await getNews(queryValues, language, feedTopics);
+  const videoFeeds = await getVideos(queryValues, language, feedTopics);
 
   const feeds = newsFeeds.concat(videoFeeds);
   shuffle(feeds);
@@ -19,7 +25,37 @@ export const getFeeds = async (
   return feeds;
 };
 
-const getNews = async (queryValues: string[], language: string) => {
+export const getFeedDetail = async (
+  id: string,
+  feedType: string,
+  feedUrl: string
+) => {
+  if (feedType === "news") {
+    const detail = await getNewsDetail(id, feedUrl);
+    return detail;
+  } else {
+    //Get video detail
+  }
+};
+
+const getNewsDetail = async (id: string, newsUrl: string) => {
+  const result = await Mercury.parse(newsUrl);
+  return {
+    id,
+    type: "news",
+    content: {
+      value: result.content
+        ? result.content
+        : "Cannot load data for this article!",
+    } as NewsDetailJSON,
+  };
+};
+
+const getNews = async (
+  queryValues: string[],
+  language: string,
+  topics: string
+) => {
   let queryString = "";
   queryValues.forEach((query, index) => {
     if (index == queryValues.length - 1) queryString += query;
@@ -56,7 +92,11 @@ const getNews = async (queryValues: string[], language: string) => {
   } else return [];
 };
 
-const getVideos = async (queryValues: string[], language: string) => {
+const getVideos = async (
+  queryValues: string[],
+  language: string,
+  topics: string
+) => {
   let queryString = "";
   queryValues.forEach((query, index) => {
     if (index == queryValues.length - 1) queryString += query;

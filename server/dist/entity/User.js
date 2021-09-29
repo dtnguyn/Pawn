@@ -13,7 +13,6 @@ const typeorm_1 = require("typeorm");
 const Language_1 = require("./Language");
 const Notification_1 = require("./Notification");
 const SavedWord_1 = require("./SavedWord");
-const Topic_1 = require("./Topic");
 const UserRefreshToken_1 = require("./UserRefreshToken");
 let User = class User {
 };
@@ -81,11 +80,6 @@ __decorate([
     typeorm_1.JoinTable(),
     __metadata("design:type", Array)
 ], User.prototype, "learningLanguages", void 0);
-__decorate([
-    typeorm_1.ManyToMany(() => Topic_1.Topic, (topic) => topic.users),
-    typeorm_1.JoinTable(),
-    __metadata("design:type", Array)
-], User.prototype, "feedTopics", void 0);
 __decorate([
     typeorm_1.CreateDateColumn(),
     __metadata("design:type", Date)

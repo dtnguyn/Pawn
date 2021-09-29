@@ -14,15 +14,36 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const User_1 = require("../entity/User");
 const superagent_1 = __importDefault(require("superagent"));
 const typeorm_1 = require("typeorm");
-exports.getFeeds = (savedWords, language) => __awaiter(this, void 0, void 0, function* () {
+const mercury_parser_1 = __importDefault(require("@postlight/mercury-parser"));
+exports.getFeeds = (savedWords, language, feedTopics) => __awaiter(this, void 0, void 0, function* () {
     const queryValues = savedWords.map((savedWord) => savedWord.value);
-    const newsFeeds = yield getNews(queryValues, language);
-    const videoFeeds = yield getVideos(queryValues, language);
+    const newsFeeds = yield getNews(queryValues, language, feedTopics);
+    const videoFeeds = yield getVideos(queryValues, language, feedTopics);
     const feeds = newsFeeds.concat(videoFeeds);
     shuffle(feeds);
     return feeds;
 });
-const getNews = (queryValues, language) => __awaiter(this, void 0, void 0, function* () {
+exports.getFeedDetail = (id, feedType, feedUrl) => __awaiter(this, void 0, void 0, function* () {
+    if (feedType === "news") {
+        const detail = yield getNewsDetail(id, feedUrl);
+        return detail;
+    }
+    else {
+    }
+});
+const getNewsDetail = (id, newsUrl) => __awaiter(this, void 0, void 0, function* () {
+    const result = yield mercury_parser_1.default.parse(newsUrl);
+    return {
+        id,
+        type: "news",
+        content: {
+            value: result.content
+                ? result.content
+                : "Cannot load data for this article!",
+        },
+    };
+});
+const getNews = (queryValues, language, topics) => __awaiter(this, void 0, void 0, function* () {
     let queryString = "";
     queryValues.forEach((query, index) => {
         if (index == queryValues.length - 1)
@@ -58,7 +79,7 @@ const getNews = (queryValues, language) => __awaiter(this, void 0, void 0, funct
     else
         return [];
 });
-const getVideos = (queryValues, language) => __awaiter(this, void 0, void 0, function* () {
+const getVideos = (queryValues, language, topics) => __awaiter(this, void 0, void 0, function* () {
     let queryString = "";
     queryValues.forEach((query, index) => {
         if (index == queryValues.length - 1)

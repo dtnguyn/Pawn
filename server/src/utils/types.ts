@@ -36,3 +36,17 @@ export type FeedJSON = {
   description: string;
   publishedDate: string | null;
 };
+
+export type FeedDetailJSON = {
+  id: string;
+  type: string;
+  content: NewsDetailJSON | VideoDetailJSON;
+};
+
+export type NewsDetailJSON = {
+  value: string;
+};
+
+export type VideoDetailJSON = {
+  value: any;
+};

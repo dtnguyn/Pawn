@@ -26,12 +26,16 @@ router.get("/", middlewares_1.checkAuthentication, (req, res) => __awaiter(this,
         if (!userId) {
             throw new CustomError_1.default("Please login first!");
         }
+        var feedTopics = req.user.feedTopics;
+        if (feedTopics == undefined || feedTopics == null) {
+            feedTopics = "";
+        }
         const language = req.query.language;
         if (!language) {
             throw new CustomError_1.default("Please provide target language!");
         }
         const words = yield WordController_1.getSavedWords(userId, language);
-        const feeds = yield FeedController_1.getFeeds(words, language);
+        const feeds = yield FeedController_1.getFeeds(words, language, feedTopics);
         console.log("feeds length ", feeds.length);
         res.send(new ApiResponse_1.default(true, "", feeds));
     }
@@ -75,6 +79,33 @@ router.post("/topics", middlewares_1.checkAuthentication, (req, res) => __awaite
         }
         yield FeedController_1.updateTopics(userId, newTopicsString);
         res.send(new ApiResponse_1.default(true, "", newTopicsString));
+    }
+    catch (error) {
+        if (error instanceof CustomError_1.default) {
+            res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            console.log("get feed error ", error.message);
+            res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
+    }
+}));
+router.get("/detail", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const feedType = req.query.type;
+        if (!feedType) {
+            throw new CustomError_1.default("Please provide feed type!");
+        }
+        const feedUrl = req.query.url;
+        if (!feedUrl) {
+            throw new CustomError_1.default("Please provide feed url!");
+        }
+        const feedId = req.query.id;
+        if (!feedUrl) {
+            throw new CustomError_1.default("Please provide feed id!");
+        }
+        const feedDetail = yield FeedController_1.getFeedDetail(feedId, feedType, feedUrl);
+        res.send(new ApiResponse_1.default(true, "", feedDetail));
     }
     catch (error) {
         if (error instanceof CustomError_1.default) {

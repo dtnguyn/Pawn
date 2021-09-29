@@ -71,10 +71,6 @@ export class User {
   @JoinTable()
   learningLanguages: Language[];
 
-  @ManyToMany(() => Topic, (topic) => topic.users)
-  @JoinTable()
-  feedTopics: Topic[];
-
   // @ManyToMany(() => GroupChat, (groupChat) => groupChat.members)
   // @JoinTable()
   // followedGroupChats: GroupChat[];

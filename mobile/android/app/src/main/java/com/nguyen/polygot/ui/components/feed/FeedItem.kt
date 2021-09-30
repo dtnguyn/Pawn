@@ -55,7 +55,7 @@ fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
                     // Crop, Fit, Inside, FillHeight, FillWidth, None
                     contentScale = ContentScale.FillWidth,
                     // shows an image with a circular revealed animation.
-                    circularReveal = CircularReveal(duration = 250),
+//                    circularReveal = CircularReveal(duration = 250),
                     // shows a placeholder ImageBitmap when loading.
                     placeHolder = ImageBitmap.imageResource(id = R.drawable.cat_loading_icon),
                     // shows an error ImageBitmap when the request failed.

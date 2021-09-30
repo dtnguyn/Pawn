@@ -311,7 +311,8 @@ fun FeedScreen(
                                 ) {
                                     FeedItem(feed = it[index], onClick = {feed ->
                                         val url = feed.url.replace("/", "<")
-                                        navController.navigate("${PolygotScreens.FeedDetail.route}/${feed.id}/news/${url}")
+                                        val thumbnail = feed.thumbnail?.replace("/", "<")
+                                        navController.navigate("${PolygotScreens.FeedDetail.route}/${feed.id}/${feed.title}/${feed.publishedDate}/${thumbnail}/news/${url}")
                                     })
                                 }
                             }

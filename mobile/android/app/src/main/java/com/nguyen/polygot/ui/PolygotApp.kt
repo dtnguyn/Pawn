@@ -149,14 +149,17 @@ fun PolygotApp(
                 }
                 composable(PolygotScreens.ChangePassword.route) { ChangePasswordScreen(navController = navController) }
                 composable(PolygotScreens.VerifyCode.route) { VerifyCodeScreen(navController = navController) }
-                composable("${PolygotScreens.FeedDetail.route}/{feedId}/{feedType}/{feedUrl}") {
+                composable("${PolygotScreens.FeedDetail.route}/{feedId}/{title}/{publishedDate}/{thumbnail}/{feedType}/{feedUrl}") {
                     FeedDetailScreen(
                         viewModel = feedDetailViewModel,
                         sharedViewModel = sharedViewModel,
                         navController = navController,
                         feedUrl = it.arguments?.getString("feedUrl"),
                         feedId = it.arguments?.getString("feedId"),
-                        feedType = it.arguments?.getString("feedType")
+                        feedType = it.arguments?.getString("feedType"),
+                        title = it.arguments?.getString("title"),
+                        publishedDate = it.arguments?.getString("publishedDate"),
+                        thumbnail = it.arguments?.getString("thumbnail"),
                     )
                 }
 

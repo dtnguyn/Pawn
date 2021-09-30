@@ -11,4 +11,5 @@ sealed class PolygotScreens(val route: String, @DrawableRes val icon: Int?) {
     object Auth : PolygotScreens("auth", null)
     object ChangePassword : PolygotScreens("password", null)
     object VerifyCode : PolygotScreens("verify", null)
+    object FeedDetail : PolygotScreens("feedDetail", null)
 }

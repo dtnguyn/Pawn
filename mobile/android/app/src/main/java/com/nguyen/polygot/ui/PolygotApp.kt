@@ -27,6 +27,8 @@ import com.nguyen.polygot.ui.screens.auth.AuthViewModel
 import com.nguyen.polygot.ui.screens.auth.ChangePasswordScreen
 import com.nguyen.polygot.ui.screens.auth.VerifyCodeScreen
 import com.nguyen.polygot.ui.screens.definition.WordDetailViewModel
+import com.nguyen.polygot.ui.screens.feedDetail.FeedDetailScreen
+import com.nguyen.polygot.ui.screens.feedDetail.FeedDetailViewModel
 import com.nguyen.polygot.ui.screens.feeds.FeedViewModel
 import com.nguyen.polygot.ui.screens.home.HomeViewModel
 import com.nguyen.polygot.ui.screens.search.SearchViewModel
@@ -45,7 +47,8 @@ fun PolygotApp(
     wordDetailViewModel: WordDetailViewModel,
     searchViewModel: SearchViewModel,
     sharedViewModel: SharedViewModel,
-    feedViewModel: FeedViewModel
+    feedViewModel: FeedViewModel,
+    feedDetailViewModel: FeedDetailViewModel,
 ) {
 
     val navController = rememberNavController()
@@ -117,7 +120,8 @@ fun PolygotApp(
                 composable(PolygotScreens.Feeds.route) {
                     FeedScreen(
                         sharedViewModel = sharedViewModel,
-                        feedViewModel = feedViewModel
+                        feedViewModel = feedViewModel,
+                        navController = navController
                     )
                 }
                 composable(PolygotScreens.Search.route) {
@@ -145,6 +149,17 @@ fun PolygotApp(
                 }
                 composable(PolygotScreens.ChangePassword.route) { ChangePasswordScreen(navController = navController) }
                 composable(PolygotScreens.VerifyCode.route) { VerifyCodeScreen(navController = navController) }
+                composable("${PolygotScreens.FeedDetail.route}/{feedId}/{feedType}/{feedUrl}") {
+                    FeedDetailScreen(
+                        viewModel = feedDetailViewModel,
+                        sharedViewModel = sharedViewModel,
+                        navController = navController,
+                        feedUrl = it.arguments?.getString("feedUrl"),
+                        feedId = it.arguments?.getString("feedId"),
+                        feedType = it.arguments?.getString("feedType")
+                    )
+                }
+
             }
         }
     }

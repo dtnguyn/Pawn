@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.nguyen.polygot.R
 import com.nguyen.polygot.model.Feed
 import com.nguyen.polygot.model.Language
@@ -26,6 +27,7 @@ import com.nguyen.polygot.ui.components.RoundButton
 import com.nguyen.polygot.ui.components.feed.FeedItem
 import com.nguyen.polygot.ui.components.feed.LoadingFeedItem
 import com.nguyen.polygot.ui.components.feed.TopicMenu
+import com.nguyen.polygot.ui.navigation.PolygotScreens
 import com.nguyen.polygot.ui.screens.feeds.FeedViewModel
 import com.nguyen.polygot.ui.theme.*
 import com.nguyen.polygot.util.DataStoreUtils
@@ -37,7 +39,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun FeedScreen(
     sharedViewModel: SharedViewModel,
-    feedViewModel: FeedViewModel
+    feedViewModel: FeedViewModel,
+    navController: NavController
 ) {
 
     val feedUIState: UIState<List<Feed>> by feedViewModel.feedItems
@@ -55,12 +58,12 @@ fun FeedScreen(
 
     var isLoading by remember { mutableStateOf(false) }
 
-    LaunchedEffect(true){
+    LaunchedEffect(true) {
         feedViewModel.getTopics(DataStoreUtils.getAccessTokenFromDataStore(context))
     }
 
-    LaunchedEffect(topicsUIState){
-        when(topicsUIState){
+    LaunchedEffect(topicsUIState) {
+        when (topicsUIState) {
             is UIState.Initial -> {
 
             }
@@ -72,7 +75,7 @@ fun FeedScreen(
             }
             is UIState.Loaded -> {
                 Log.d("FeedScreen", "topics loaded: ${topicsUIState.value}")
-                if(topicsUIState.value != null){
+                if (topicsUIState.value != null) {
                     topics = topicsUIState.value!!
                 }
             }
@@ -109,7 +112,7 @@ fun FeedScreen(
             }
         }
     }
-    
+
 
     ModalBottomSheetLayout(
         sheetShape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
@@ -124,7 +127,11 @@ fun FeedScreen(
                 },
                 onFinish = {
                     coroutineScope.launch {
-                        feedViewModel.updateTopics(DataStoreUtils.getAccessTokenFromDataStore(context))
+                        feedViewModel.updateTopics(
+                            DataStoreUtils.getAccessTokenFromDataStore(
+                                context
+                            )
+                        )
                         bottomSheetScaffoldState.hide()
                     }
                 },
@@ -302,7 +309,10 @@ fun FeedScreen(
                                         )
                                         .padding(horizontal = 20.dp)
                                 ) {
-                                    FeedItem(it[index])
+                                    FeedItem(feed = it[index], onClick = {feed ->
+                                        val url = feed.url.replace("/", "<")
+                                        navController.navigate("${PolygotScreens.FeedDetail.route}/${feed.id}/news/${url}")
+                                    })
                                 }
                             }
                         }

@@ -9,6 +9,8 @@ import com.nguyen.polygot.db.PolygotDatabase
 import com.nguyen.polygot.db.mapper.FeedMapper
 //import com.nguyen.polygot.db.mapper.FeedMapper
 import com.nguyen.polygot.model.Feed
+import com.nguyen.polygot.model.FeedDetail
+import com.nguyen.polygot.model.NewsDetail
 import com.nguyen.polygot.repo.utils.mainGetNetworkBoundResource
 import com.nguyen.polygot.repo.utils.mainPostNetworkBoundResource
 import com.nguyen.polygot.util.Constants
@@ -128,5 +130,31 @@ class FeedRepository
         )
     }
 
+
+    fun getNewsDetail(accessToken: String, id: String, url: String): Flow<UIState<FeedDetail<NewsDetail>>> {
+        var detail: FeedDetail<NewsDetail>? = null
+        return mainGetNetworkBoundResource(
+            query = {
+                flow {
+                    emit(detail)
+                }
+            },
+            fetch = {
+                val response: ApiResponse<FeedDetail<NewsDetail>> = apiClient.get("${Constants.apiURL}/feed/detail?url=${url}&id=${id}&type=news") {
+                    contentType(ContentType.Application.Json)
+                    headers {
+                        append(HttpHeaders.Authorization, "Bearer $accessToken")
+                    }
+                }
+                if (response.status) {
+                    Log.d(TAG, "getNewsDetail: ${response.data}")
+                    response.data
+                } else throw CustomAppException(response.message)
+            },
+            saveFetchResult = {
+                detail = it
+            }
+        )
+    }
 
 }

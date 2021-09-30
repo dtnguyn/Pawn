@@ -2,6 +2,7 @@ package com.nguyen.polygot.ui.components.feed
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -24,10 +25,12 @@ import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
-fun FeedItem(feed: Feed) {
+fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
     Card(
         shape = RoundedCornerShape(15.dp),
-        modifier = Modifier.padding(vertical = 10.dp)
+        modifier = Modifier.padding(vertical = 10.dp).clickable {
+            onClick(feed)
+        }
     ) {
         Column(modifier = Modifier.padding(10.dp)) {
             if(feed.type == "news"){

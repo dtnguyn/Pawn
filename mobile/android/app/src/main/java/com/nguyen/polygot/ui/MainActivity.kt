@@ -10,6 +10,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.nguyen.polygot.ui.screens.auth.AuthViewModel
 import com.nguyen.polygot.ui.screens.definition.WordDetailViewModel
+import com.nguyen.polygot.ui.screens.feedDetail.FeedDetailViewModel
 import com.nguyen.polygot.ui.screens.feeds.FeedViewModel
 import com.nguyen.polygot.ui.screens.home.HomeViewModel
 import com.nguyen.polygot.ui.screens.search.SearchViewModel
@@ -26,6 +27,7 @@ class MainActivity : ComponentActivity() {
     private val searchViewModel: SearchViewModel by viewModels()
     private val wordDetailViewModel: WordDetailViewModel by viewModels()
     private val feedViewModel: FeedViewModel by viewModels()
+    private val feedDetailViewModel: FeedDetailViewModel by viewModels()
 
     @ExperimentalFoundationApi
     @ExperimentalAnimationApi
@@ -39,7 +41,8 @@ class MainActivity : ComponentActivity() {
                 sharedViewModel = sharedViewModel,
                 searchViewModel = searchViewModel,
                 wordDetailViewModel = wordDetailViewModel,
-                feedViewModel = feedViewModel
+                feedViewModel = feedViewModel,
+                feedDetailViewModel = feedDetailViewModel
             )
         }
 

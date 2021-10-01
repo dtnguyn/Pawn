@@ -24,6 +24,7 @@ import com.nguyen.polygot.ui.SharedViewModel
 import com.nguyen.polygot.ui.components.HtmlText
 import com.nguyen.polygot.ui.theme.Typography
 import com.nguyen.polygot.util.DataStoreUtils
+import com.nguyen.polygot.util.ShimmerAnimation
 import com.nguyen.polygot.util.UIState
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
@@ -46,6 +47,8 @@ fun NewsDetailScreen(
     val newsDetailUIState: UIState<FeedDetail<NewsDetail>> by viewModel.newsDetailUIState
     var newsDetail by remember { mutableStateOf(newsDetailUIState.value) }
 
+    var loading by remember { mutableStateOf(false) }
+
     LaunchedEffect(true) {
         viewModel.getNewsDetail(DataStoreUtils.getAccessTokenFromDataStore(context), newsId, newsUrl)
     }
@@ -56,14 +59,15 @@ fun NewsDetailScreen(
 
             }
             is UIState.Loading -> {
-
+                loading = true
 
             }
             is UIState.Error -> {
-
+                loading = false
 
             }
             is UIState.Loaded -> {
+                loading = false
                 newsDetail = newsDetailUIState.value
             }
 
@@ -79,10 +83,13 @@ fun NewsDetailScreen(
     ) {
         LazyColumn(modifier = Modifier.padding(horizontal = 8.dp)) {
 
+
+
+
             item{
                 Spacer(modifier = Modifier.padding(10.dp))
 
-                Text(text = title, style = Typography.h5)
+                Text(text = title, style = Typography.h3)
                 Spacer(modifier = Modifier.padding(2.dp))
                 Text(text = publishedDate?.substring(0, 10) ?: "", style = Typography.subtitle2)
                 Log.d("NewsDetailScreen", "url: ${newsUrl}")
@@ -104,13 +111,75 @@ fun NewsDetailScreen(
                         .clip(RoundedCornerShape(15.dp))
                 )
 
-                Spacer(modifier = Modifier.padding(5.dp))
+                Spacer(modifier = Modifier.padding(10.dp))
 
-                newsDetail?.content?.value?.let{
-                    HtmlText(html = it, modifier = Modifier
+                if(loading){
+                    ShimmerAnimation(modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight())
+                        .height(30.dp), shape = RoundedCornerShape(40.dp))
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .height(30.dp), shape = RoundedCornerShape(40.dp))
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(modifier = Modifier
+                        .fillMaxWidth(0.93f)
+                        .height(30.dp), shape = RoundedCornerShape(40.dp))
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(modifier = Modifier
+                        .fillMaxWidth(0.98f)
+                        .height(30.dp), shape = RoundedCornerShape(40.dp))
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(modifier = Modifier
+                        .fillMaxWidth(0.3f)
+                        .height(30.dp), shape = RoundedCornerShape(40.dp))
+                    Spacer(modifier = Modifier.padding(7.dp))
+
+                    ShimmerAnimation(modifier = Modifier
+                        .fillMaxWidth(0.95f)
+                        .height(30.dp), shape = RoundedCornerShape(40.dp))
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .height(30.dp), shape = RoundedCornerShape(40.dp))
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(modifier = Modifier
+                        .fillMaxWidth(0.93f)
+                        .height(30.dp), shape = RoundedCornerShape(40.dp))
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(modifier = Modifier
+                        .fillMaxWidth(0.87f)
+                        .height(30.dp), shape = RoundedCornerShape(40.dp))
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(modifier = Modifier
+                        .fillMaxWidth(0.97f)
+                        .height(30.dp), shape = RoundedCornerShape(40.dp))
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(modifier = Modifier
+                        .fillMaxWidth(0.91f)
+                        .height(30.dp), shape = RoundedCornerShape(40.dp))
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(30.dp), shape = RoundedCornerShape(40.dp))
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(modifier = Modifier
+                        .fillMaxWidth(0.96f)
+                        .height(30.dp), shape = RoundedCornerShape(40.dp))
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .height(30.dp), shape = RoundedCornerShape(40.dp))
+                    Spacer(modifier = Modifier.padding(3.dp))
+                } else {
+                    newsDetail?.content?.value?.let{
+                        HtmlText(html = it, modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight())
+                    }
                 }
+
+
             }
 
 

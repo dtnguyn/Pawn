@@ -28,12 +28,16 @@ import com.skydoves.landscapist.glide.GlideImage
 fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
     Card(
         shape = RoundedCornerShape(15.dp),
-        modifier = Modifier.padding(vertical = 10.dp).clickable {
-            onClick(feed)
-        }
+        modifier = Modifier
+            .padding(vertical = 10.dp)
+            .clip(RoundedCornerShape(15.dp))
+
+            .clickable {
+                onClick(feed)
+            }
     ) {
         Column(modifier = Modifier.padding(10.dp)) {
-            if(feed.type == "news"){
+            if (feed.type == "news") {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Image(
                         painter = painterResource(id = R.drawable.news_icon),
@@ -46,7 +50,10 @@ fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
                 }
                 Text(text = feed.title, style = Typography.h5)
                 Spacer(modifier = Modifier.padding(2.dp))
-                Text(text = feed.publishedDate?.substring(0, 10) ?: "", style = Typography.subtitle2)
+                Text(
+                    text = feed.publishedDate?.substring(0, 10) ?: "",
+                    style = Typography.subtitle2
+                )
 
                 Spacer(modifier = Modifier.padding(5.dp))
 
@@ -60,7 +67,9 @@ fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
                     placeHolder = ImageBitmap.imageResource(id = R.drawable.cat_loading_icon),
                     // shows an error ImageBitmap when the request failed.
                     error = ImageBitmap.imageResource(R.drawable.image_loading_error),
-                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(15.dp))
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(15.dp))
                 )
 
                 Spacer(modifier = Modifier.padding(5.dp))
@@ -88,7 +97,7 @@ fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
                 }
                 Spacer(modifier = Modifier.padding(5.dp))
 
-                Box(contentAlignment = Alignment.Center,) {
+                Box(contentAlignment = Alignment.Center) {
                     GlideImage(
                         imageModel = feed.thumbnail ?: "",
                         alignment = Alignment.Center,
@@ -100,7 +109,9 @@ fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
                         placeHolder = ImageBitmap.imageResource(id = R.drawable.cat_loading_icon),
                         // shows an error ImageBitmap when the request failed.
                         error = ImageBitmap.imageResource(id = R.drawable.image_loading_error),
-                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(15.dp))
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(15.dp))
                     )
                     Image(
                         painter = painterResource(id = R.drawable.play_icon),
@@ -116,7 +127,10 @@ fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
                 Text(text = feed.title, style = Typography.h5)
                 Spacer(modifier = Modifier.padding(2.dp))
 
-                Text(text = feed.publishedDate?.substring(0, 10)  ?: "", style = Typography.subtitle2)
+                Text(
+                    text = feed.publishedDate?.substring(0, 10) ?: "",
+                    style = Typography.subtitle2
+                )
 
                 Spacer(modifier = Modifier.padding(5.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {

@@ -6,5 +6,5 @@ dependencyResolutionManagement {
         maven { url 'https://jitpack.io' }
     }
 }
-rootProject.name = "Polygot"
+rootProject.name = "Polyglot"
 include ':app'

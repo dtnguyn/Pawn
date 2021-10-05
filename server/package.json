@@ -38,6 +38,7 @@
     "scrape-it": "^5.3.2",
     "server": "^1.0.33",
     "superagent": "^6.1.0",
+    "tinyurl": "^1.1.7",
     "typeorm": "0.2.29"
   },
   "devDependencies": {

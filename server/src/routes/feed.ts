@@ -11,8 +11,6 @@ import { getSavedWords } from "../controllers/WordController";
 import { User } from "../entity/User";
 import ApiResponse from "../utils/ApiResponse";
 import { checkAuthentication } from "../utils/middlewares";
-import scrapeIt from "scrape-it";
-import Mercury from "@postlight/mercury-parser";
 
 const router = Router();
 

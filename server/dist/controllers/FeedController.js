@@ -14,7 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const User_1 = require("../entity/User");
 const superagent_1 = __importDefault(require("superagent"));
 const typeorm_1 = require("typeorm");
-const mercury_parser_1 = __importDefault(require("@postlight/mercury-parser"));
+const tinyurl_1 = __importDefault(require("tinyurl"));
 exports.getFeeds = (savedWords, language, feedTopics) => __awaiter(this, void 0, void 0, function* () {
     const queryValues = savedWords.map((savedWord) => savedWord.value);
     const newsFeeds = yield getNews(queryValues, language, feedTopics);
@@ -29,17 +29,28 @@ exports.getFeedDetail = (id, feedType, feedUrl) => __awaiter(this, void 0, void 
         return detail;
     }
     else {
+        return null;
     }
 });
 const getNewsDetail = (id, newsUrl) => __awaiter(this, void 0, void 0, function* () {
-    const result = yield mercury_parser_1.default.parse(newsUrl);
+    const shortenUrl = (yield tinyurl_1.default.shorten(newsUrl));
+    console.log("shortenUrl", shortenUrl);
+    const result = yield superagent_1.default
+        .get(`https://article-parser.p.rapidapi.com/`)
+        .query({ website_url: newsUrl })
+        .set("x-rapidapi-host", "article-parser.p.rapidapi.com")
+        .set("x-rapidapi-key", process.env.NEWS_PARSER_API_KEY);
+    console.log("result", result.body);
     return {
         id,
         type: "news",
+        title: result.body.title,
+        thumbnail: result.body.thumbnail,
         content: {
-            value: result.content
-                ? result.content
+            value: result.body.text
+                ? result.body.text
                 : "Cannot load data for this article!",
+            images: result.body.images,
         },
     };
 });

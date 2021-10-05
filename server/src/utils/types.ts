@@ -40,11 +40,14 @@ export type FeedJSON = {
 export type FeedDetailJSON = {
   id: string;
   type: string;
+  title: string;
+  thumbnail: string;
   content: NewsDetailJSON | VideoDetailJSON;
 };
 
 export type NewsDetailJSON = {
   value: string;
+  images: string[];
 };
 
 export type VideoDetailJSON = {

@@ -7,7 +7,9 @@ import {
 import superagent from "superagent";
 import { getRepository } from "typeorm";
 import { FeedJSON } from "../utils/types";
-import Mercury from "@postlight/mercury-parser";
+import TinyURL from "tinyurl";
+
+// import Mercury from "@postlight/mercury-parser";
 
 export const getFeeds = async (
   savedWords: WordDetailSimplifyJSON[],
@@ -35,20 +37,35 @@ export const getFeedDetail = async (
     return detail;
   } else {
     //Get video detail
+    return null;
   }
 };
 
 const getNewsDetail = async (id: string, newsUrl: string) => {
-  const result = await Mercury.parse(newsUrl);
+  const shortenUrl = (await TinyURL.shorten(newsUrl)) as string;
+  console.log("shortenUrl", shortenUrl);
+
+  const result = await superagent
+    .get(`https://article-parser.p.rapidapi.com/`)
+    .query({ website_url: newsUrl })
+    .set("x-rapidapi-host", "article-parser.p.rapidapi.com")
+    .set("x-rapidapi-key", process.env.NEWS_PARSER_API_KEY as string);
+
+  console.log("result", result.body);
+
+  // const result = await Mercury.parse(newsUrl);
   return {
     id,
     type: "news",
+    title: result.body.title,
+    thumbnail: result.body.thumbnail,
     content: {
-      value: result.content
-        ? result.content
+      value: result.body.text
+        ? result.body.text
         : "Cannot load data for this article!",
+      images: result.body.images,
     } as NewsDetailJSON,
-  };
+  } as FeedDetailJSON;
 };
 
 const getNews = async (

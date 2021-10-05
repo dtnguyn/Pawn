@@ -15,6 +15,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.nguyen.polyglot.R
 import com.nguyen.polyglot.model.FeedDetail
@@ -169,18 +170,10 @@ fun NewsDetailScreen(
                     Spacer(modifier = Modifier.padding(3.dp))
                 } else {
                     newsDetail?.content?.value?.let{
-                        HtmlText(html = it, modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-
-                        )
+                        Text(text = it, style = Typography.body1, fontSize = 18.sp)
                     }
                 }
-
-
             }
-
-
         }
     }
 

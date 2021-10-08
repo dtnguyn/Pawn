@@ -24,6 +24,7 @@ class FeedDetailViewModel
     val newsDetailUIState: State<UIState<FeedDetail<NewsDetail>>> = _newsDetailUIState
 
 
+
     fun getNewsDetail(accessToken: String?, newsUrl: String, newsId: String) {
 
         if(accessToken == null){

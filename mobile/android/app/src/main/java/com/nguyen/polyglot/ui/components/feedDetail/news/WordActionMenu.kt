@@ -21,7 +21,7 @@ import com.nguyen.polyglot.util.UIState
 fun WordActionMenu(
     word: String,
     onLookUpDefinition: (word: String) -> Unit,
-    onLookUpImages: () -> Unit,
+    onLookUpImages: (word: String) -> Unit,
 ) {
     Column(Modifier.padding(20.dp)) {
         Text(text = "\"${word}\"", style = Typography.h2)
@@ -41,7 +41,7 @@ fun WordActionMenu(
         Spacer(modifier = Modifier.padding(5.dp))
         Button(
             onClick = {
-
+                onLookUpImages(word)
             },
             content = {
                 Text(text = "Find images", style = Typography.h6)

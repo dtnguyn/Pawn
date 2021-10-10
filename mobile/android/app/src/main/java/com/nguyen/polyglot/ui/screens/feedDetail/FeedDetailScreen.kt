@@ -1,10 +1,12 @@
 package com.nguyen.polyglot.ui.screens.feedDetail
 
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.navigation.NavController
 import com.nguyen.polyglot.ui.SharedViewModel
 
+@ExperimentalMaterialApi
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FeedDetailScreen(

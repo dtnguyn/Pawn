@@ -52,13 +52,25 @@ fun WordDefinition(word: Word?, isLoading: Boolean, onBackClick: () -> Unit, onD
                 .padding(horizontal = 20.dp)
         )
         Spacer(modifier = Modifier.padding(10.dp))
-        DailyWordCard(
-            isLoading = isLoading,
-            word = word?.value ?: "",
-            definition = word?.mainDefinition ?: "",
-            onClick = {
-                onDetailClick()
-            })
+
+        if(isLoading){
+            DailyWordCard(
+                isLoading = true,
+                word = "",
+                definition = "",
+                onClick = {
+                    onDetailClick()
+                })
+        } else {
+            DailyWordCard(
+                isLoading = false,
+                word = word?.value ?: "",
+                definition = word?.mainDefinition ?: "",
+                onClick = {
+                    onDetailClick()
+                })
+        }
+
         Spacer(Modifier.padding(10.dp))
     }
 }

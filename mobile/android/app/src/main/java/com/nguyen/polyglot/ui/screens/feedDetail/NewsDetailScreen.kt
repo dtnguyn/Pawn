@@ -1,10 +1,15 @@
 package com.nguyen.polyglot.ui.screens.feedDetail
 
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -17,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.nguyen.polyglot.R
@@ -24,6 +30,7 @@ import com.nguyen.polyglot.model.FeedDetail
 import com.nguyen.polyglot.model.NewsDetail
 import com.nguyen.polyglot.model.Word
 import com.nguyen.polyglot.ui.SharedViewModel
+import com.nguyen.polyglot.ui.components.BackHandler
 import com.nguyen.polyglot.ui.components.SelectableText
 import com.nguyen.polyglot.ui.components.feedDetail.news.WordActionMenu
 import com.nguyen.polyglot.ui.components.feedDetail.news.WordDefinition
@@ -69,17 +76,21 @@ fun NewsDetailScreen(
     var currentFocusWord: String? by remember { mutableStateOf(null) }
     val coroutineScope = rememberCoroutineScope()
     val selectableTextRange = remember { mutableStateOf<TextRange?>(null) }
+    val articleScrollState = rememberScrollState()
 
     val bottomSheetScaffoldState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden
     )
 
     LaunchedEffect(true) {
-        viewModel.getNewsDetail(
-            DataStoreUtils.getAccessTokenFromDataStore(context),
-            newsId,
-            newsUrl
-        )
+        if(newsDetailUIState !is UIState.Loaded){
+            viewModel.getNewsDetail(
+                DataStoreUtils.getAccessTokenFromDataStore(context),
+                newsId,
+                newsUrl
+            )
+        }
+
     }
 
     LaunchedEffect(newsDetailUIState) {
@@ -105,7 +116,9 @@ fun NewsDetailScreen(
     }
     LaunchedEffect(bottomSheetScaffoldState.isVisible) {
         if (!bottomSheetScaffoldState.isVisible) {
+            //When the bottom sheet is closed
             selectableTextRange.value = null
+            viewModel.resetWordDefinition()
         }
     }
 
@@ -135,11 +148,12 @@ fun NewsDetailScreen(
 
         sheetShape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
         sheetContent = {
-            if (wordDefinitionUIState is UIState.Loading || wordDefinition != null) {
+            if (wordDefinitionUIState !is UIState.Initial) {
                 WordDefinition(
                     word = wordDefinition,
                     isLoading = wordDefinitionUIState is UIState.Loading,
                     onBackClick = {
+                        viewModel.resetWordDefinition()
                         wordDefinition = null
                     },
                     onDetailClick = {
@@ -161,152 +175,167 @@ fun NewsDetailScreen(
 
                         }
                     },
-                    onLookUpImages = {}
+                    onLookUpImages = { word ->
+                        val openURL = Intent(Intent.ACTION_VIEW)
+                        openURL.data = Uri.parse("http://images.google.com/images?um=1&hl=en&safe=active&nfpr=1&q=${word}")
+                        startActivity(context, openURL, null )
+
+                    }
                 )
             }
 
         },
         sheetState = bottomSheetScaffoldState,
     ) {
-
+        BackHandler(onBack = {
+            viewModel.resetState()
+            navController.popBackStack()
+        })
         Scaffold(
             backgroundColor = Color.White, modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
 
         ) {
-            LazyColumn(modifier = Modifier.padding(horizontal = 8.dp)) {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .verticalScroll(articleScrollState),
 
+            ) {
+                coroutineScope.launch{
+                    articleScrollState.scrollTo(viewModel.articleScrollPosition)
+                }
 
-                item {
-                    Spacer(modifier = Modifier.padding(10.dp))
+                Spacer(modifier = Modifier.padding(10.dp))
 
-                    Text(text = title, style = Typography.h3)
-                    Spacer(modifier = Modifier.padding(2.dp))
-                    Text(text = publishedDate?.substring(0, 10) ?: "", style = Typography.subtitle2)
-                    Log.d("NewsDetailScreen", "url: ${newsUrl}")
+                Text(text = title, style = Typography.h3)
+                Spacer(modifier = Modifier.padding(2.dp))
+                Text(text = publishedDate?.substring(0, 10) ?: "", style = Typography.subtitle2)
+                Log.d("NewsDetailScreen", "url: ${newsUrl}")
 
-                    Spacer(modifier = Modifier.padding(5.dp))
+                Spacer(modifier = Modifier.padding(5.dp))
 
-                    GlideImage(
-                        imageModel = thumbnail ?: "",
-                        // Crop, Fit, Inside, FillHeight, FillWidth, None
-                        contentScale = ContentScale.FillWidth,
-                        // shows an image with a circular revealed animation.
-                        circularReveal = CircularReveal(duration = 250),
-                        // shows a placeholder ImageBitmap when loading.
-                        placeHolder = ImageBitmap.imageResource(id = R.drawable.cat_loading_icon),
-                        // shows an error ImageBitmap when the request failed.
-                        error = ImageBitmap.imageResource(R.drawable.image_loading_error),
+                GlideImage(
+                    imageModel = thumbnail ?: "",
+                    // Crop, Fit, Inside, FillHeight, FillWidth, None
+                    contentScale = ContentScale.FillWidth,
+                    // shows an image with a circular revealed animation.
+                    circularReveal = CircularReveal(duration = 250),
+                    // shows a placeholder ImageBitmap when loading.
+                    placeHolder = ImageBitmap.imageResource(id = R.drawable.cat_loading_icon),
+                    // shows an error ImageBitmap when the request failed.
+                    error = ImageBitmap.imageResource(R.drawable.image_loading_error),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(15.dp))
+                )
+
+                Spacer(modifier = Modifier.padding(10.dp))
+
+                if (loading) {
+
+                    ShimmerAnimation(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(15.dp))
+                            .height(30.dp), shape = RoundedCornerShape(40.dp)
                     )
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f)
+                            .height(30.dp), shape = RoundedCornerShape(40.dp)
+                    )
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(
+                        modifier = Modifier
+                            .fillMaxWidth(0.93f)
+                            .height(30.dp), shape = RoundedCornerShape(40.dp)
+                    )
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(
+                        modifier = Modifier
+                            .fillMaxWidth(0.98f)
+                            .height(30.dp), shape = RoundedCornerShape(40.dp)
+                    )
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(
+                        modifier = Modifier
+                            .fillMaxWidth(0.3f)
+                            .height(30.dp), shape = RoundedCornerShape(40.dp)
+                    )
+                    Spacer(modifier = Modifier.padding(7.dp))
 
-                    Spacer(modifier = Modifier.padding(10.dp))
-
-                    if (loading) {
-
-                        ShimmerAnimation(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(30.dp), shape = RoundedCornerShape(40.dp)
-                        )
-                        Spacer(modifier = Modifier.padding(3.dp))
-                        ShimmerAnimation(
-                            modifier = Modifier
-                                .fillMaxWidth(0.9f)
-                                .height(30.dp), shape = RoundedCornerShape(40.dp)
-                        )
-                        Spacer(modifier = Modifier.padding(3.dp))
-                        ShimmerAnimation(
-                            modifier = Modifier
-                                .fillMaxWidth(0.93f)
-                                .height(30.dp), shape = RoundedCornerShape(40.dp)
-                        )
-                        Spacer(modifier = Modifier.padding(3.dp))
-                        ShimmerAnimation(
-                            modifier = Modifier
-                                .fillMaxWidth(0.98f)
-                                .height(30.dp), shape = RoundedCornerShape(40.dp)
-                        )
-                        Spacer(modifier = Modifier.padding(3.dp))
-                        ShimmerAnimation(
-                            modifier = Modifier
-                                .fillMaxWidth(0.3f)
-                                .height(30.dp), shape = RoundedCornerShape(40.dp)
-                        )
-                        Spacer(modifier = Modifier.padding(7.dp))
-
-                        ShimmerAnimation(
-                            modifier = Modifier
-                                .fillMaxWidth(0.95f)
-                                .height(30.dp), shape = RoundedCornerShape(40.dp)
-                        )
-                        Spacer(modifier = Modifier.padding(3.dp))
-                        ShimmerAnimation(
-                            modifier = Modifier
-                                .fillMaxWidth(0.9f)
-                                .height(30.dp), shape = RoundedCornerShape(40.dp)
-                        )
-                        Spacer(modifier = Modifier.padding(3.dp))
-                        ShimmerAnimation(
-                            modifier = Modifier
-                                .fillMaxWidth(0.93f)
-                                .height(30.dp), shape = RoundedCornerShape(40.dp)
-                        )
-                        Spacer(modifier = Modifier.padding(3.dp))
-                        ShimmerAnimation(
-                            modifier = Modifier
-                                .fillMaxWidth(0.87f)
-                                .height(30.dp), shape = RoundedCornerShape(40.dp)
-                        )
-                        Spacer(modifier = Modifier.padding(3.dp))
-                        ShimmerAnimation(
-                            modifier = Modifier
-                                .fillMaxWidth(0.97f)
-                                .height(30.dp), shape = RoundedCornerShape(40.dp)
-                        )
-                        Spacer(modifier = Modifier.padding(3.dp))
-                        ShimmerAnimation(
-                            modifier = Modifier
-                                .fillMaxWidth(0.91f)
-                                .height(30.dp), shape = RoundedCornerShape(40.dp)
-                        )
-                        Spacer(modifier = Modifier.padding(3.dp))
-                        ShimmerAnimation(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(30.dp), shape = RoundedCornerShape(40.dp)
-                        )
-                        Spacer(modifier = Modifier.padding(3.dp))
-                        ShimmerAnimation(
-                            modifier = Modifier
-                                .fillMaxWidth(0.96f)
-                                .height(30.dp), shape = RoundedCornerShape(40.dp)
-                        )
-                        Spacer(modifier = Modifier.padding(3.dp))
-                        ShimmerAnimation(
-                            modifier = Modifier
-                                .fillMaxWidth(0.8f)
-                                .height(30.dp), shape = RoundedCornerShape(40.dp)
-                        )
-                        Spacer(modifier = Modifier.padding(3.dp))
-                    } else {
-                        newsDetail?.content?.value?.let {
-                            SelectableText(
-                                text = it,
-                                textRange = selectableTextRange,
-                                onLongClick = { word ->
-                                    if (word != "") {
-                                        currentFocusWord = word
-                                        coroutineScope.launch {
-                                            bottomSheetScaffoldState.show()
-                                        }
+                    ShimmerAnimation(
+                        modifier = Modifier
+                            .fillMaxWidth(0.95f)
+                            .height(30.dp), shape = RoundedCornerShape(40.dp)
+                    )
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f)
+                            .height(30.dp), shape = RoundedCornerShape(40.dp)
+                    )
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(
+                        modifier = Modifier
+                            .fillMaxWidth(0.93f)
+                            .height(30.dp), shape = RoundedCornerShape(40.dp)
+                    )
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(
+                        modifier = Modifier
+                            .fillMaxWidth(0.87f)
+                            .height(30.dp), shape = RoundedCornerShape(40.dp)
+                    )
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(
+                        modifier = Modifier
+                            .fillMaxWidth(0.97f)
+                            .height(30.dp), shape = RoundedCornerShape(40.dp)
+                    )
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(
+                        modifier = Modifier
+                            .fillMaxWidth(0.91f)
+                            .height(30.dp), shape = RoundedCornerShape(40.dp)
+                    )
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(30.dp), shape = RoundedCornerShape(40.dp)
+                    )
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(
+                        modifier = Modifier
+                            .fillMaxWidth(0.96f)
+                            .height(30.dp), shape = RoundedCornerShape(40.dp)
+                    )
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    ShimmerAnimation(
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .height(30.dp), shape = RoundedCornerShape(40.dp)
+                    )
+                    Spacer(modifier = Modifier.padding(3.dp))
+                } else {
+                    newsDetail?.content?.value?.let {
+                        SelectableText(
+                            text = it,
+                            textRange = selectableTextRange,
+                            onLongClick = { word ->
+                                if (word != "") {
+                                    Log.d("NewsDetailScreen", "scroll position: ${articleScrollState.value}")
+                                    viewModel.updateArticleScrollPosition(articleScrollState.value)
+                                    currentFocusWord = word
+                                    coroutineScope.launch {
+                                        bottomSheetScaffoldState.show()
                                     }
                                 }
-                            )
-                        }
+                            }
+                        )
                     }
                 }
             }

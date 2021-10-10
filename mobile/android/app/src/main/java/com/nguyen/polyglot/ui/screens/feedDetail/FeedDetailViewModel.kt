@@ -18,21 +18,23 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FeedDetailViewModel
-@Inject constructor (
+@Inject constructor(
     private val feedRepo: FeedRepository,
-): ViewModel()  {
+) : ViewModel() {
 
-    private val _newsDetailUIState: MutableState<UIState<FeedDetail<NewsDetail>>> = mutableStateOf(UIState.Initial(null))
+    private val _newsDetailUIState: MutableState<UIState<FeedDetail<NewsDetail>>> =
+        mutableStateOf(UIState.Initial(null))
     val newsDetailUIState: State<UIState<FeedDetail<NewsDetail>>> = _newsDetailUIState
 
-    private val _wordDefinitionUIState: MutableState<UIState<Word>> = mutableStateOf(UIState.Initial(null))
+    private val _wordDefinitionUIState: MutableState<UIState<Word>> =
+        mutableStateOf(UIState.Initial(null))
     val wordDefinitionUIState: State<UIState<Word>> = _wordDefinitionUIState
 
-
+    var articleScrollPosition: Int = 0
 
     fun getNewsDetail(accessToken: String?, newsUrl: String, newsId: String) {
 
-        if(accessToken == null){
+        if (accessToken == null) {
             _newsDetailUIState.value = UIState.Error("Please login first!")
             return
         }
@@ -47,7 +49,7 @@ class FeedDetailViewModel
     fun getWordDefinition(accessToken: String?, wordValue: String?, language: String?) {
         viewModelScope.launch {
 
-            if(accessToken == null) {
+            if (accessToken == null) {
                 _wordDefinitionUIState.value = UIState.Error("Please login first!")
                 return@launch
             }
@@ -65,4 +67,17 @@ class FeedDetailViewModel
         }
     }
 
+    fun resetWordDefinition() {
+        _wordDefinitionUIState.value = UIState.Initial(null)
+    }
+
+    fun updateArticleScrollPosition(position: Int) {
+        articleScrollPosition = position
+    }
+
+    fun resetState() {
+        resetWordDefinition()
+        _newsDetailUIState.value = UIState.Initial(null)
+        articleScrollPosition = 0
+    }
 }

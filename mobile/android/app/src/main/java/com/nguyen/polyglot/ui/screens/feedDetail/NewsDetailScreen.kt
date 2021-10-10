@@ -70,10 +70,14 @@ fun NewsDetailScreen(
 
     val wordDefinitionUIState: UIState<Word> by viewModel.wordDefinitionUIState
     var wordDefinition by remember { mutableStateOf(wordDefinitionUIState.value) }
+    var currentFocusWord: String? by remember { mutableStateOf(wordDefinition?.value) }
+
 
     var loading by remember { mutableStateOf(false) }
 
-    var currentFocusWord: String? by remember { mutableStateOf(null) }
+    val focusMode by viewModel.focusMode
+    val isFindingDefinition by viewModel.isFindingDefinition
+
     val coroutineScope = rememberCoroutineScope()
     val selectableTextRange = remember { mutableStateOf<TextRange?>(null) }
     val articleScrollState = rememberScrollState()
@@ -117,14 +121,15 @@ fun NewsDetailScreen(
     LaunchedEffect(bottomSheetScaffoldState.isVisible) {
         if (!bottomSheetScaffoldState.isVisible) {
             //When the bottom sheet is closed
-            selectableTextRange.value = null
-            viewModel.resetWordDefinition()
+//            selectableTextRange.value = null
+//            viewModel.resetWordDefinition()
+            viewModel.setFocusMode(false)
         }
     }
 
-    LaunchedEffect(currentFocusWord) {
-        wordDefinition = null
-    }
+//    LaunchedEffect(currentFocusWord) {
+//        isFocusing = false
+//    }
 
     LaunchedEffect(wordDefinitionUIState) {
         when (wordDefinitionUIState) {
@@ -148,13 +153,12 @@ fun NewsDetailScreen(
 
         sheetShape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
         sheetContent = {
-            if (wordDefinitionUIState !is UIState.Initial) {
+            if (isFindingDefinition) {
                 WordDefinition(
                     word = wordDefinition,
                     isLoading = wordDefinitionUIState is UIState.Loading,
                     onBackClick = {
-                        viewModel.resetWordDefinition()
-                        wordDefinition = null
+                        viewModel.setIsFindingDefinition(false)
                     },
                     onDetailClick = {
                         navController.navigate("${PolyglotScreens.WordDetail.route}/${wordDefinition!!.value}/${sharedViewModel.currentPickedLanguage.value?.id}")
@@ -172,6 +176,7 @@ fun NewsDetailScreen(
                                 word,
                                 sharedViewModel.currentPickedLanguage.value?.id
                             )
+                            viewModel.setIsFindingDefinition(true)
 
                         }
                     },
@@ -325,10 +330,12 @@ fun NewsDetailScreen(
                         SelectableText(
                             text = it,
                             textRange = selectableTextRange,
+                            isFocusing = focusMode,
                             onLongClick = { word ->
                                 if (word != "") {
                                     Log.d("NewsDetailScreen", "scroll position: ${articleScrollState.value}")
                                     viewModel.updateArticleScrollPosition(articleScrollState.value)
+                                    viewModel.setFocusMode(true)
                                     currentFocusWord = word
                                     coroutineScope.launch {
                                         bottomSheetScaffoldState.show()

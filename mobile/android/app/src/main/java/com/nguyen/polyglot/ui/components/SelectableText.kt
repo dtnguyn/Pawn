@@ -19,6 +19,7 @@ import com.nguyen.polyglot.ui.theme.Typography
 fun SelectableText(
     text: String,
     textRange: MutableState<TextRange?>,
+    isFocusing: Boolean,
     onLongClick: (word: String) -> Unit
 ){
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
@@ -42,7 +43,7 @@ fun SelectableText(
     Text(
         text = buildAnnotatedString {
             val range = textRange.value
-            if(range != null){
+            if(range != null && isFocusing){
                 append(text.substring(0, range.start))
                 withStyle(style = SpanStyle(background = Grey)) {
                     append(text.substring(textRange.value!!.start, range.end))

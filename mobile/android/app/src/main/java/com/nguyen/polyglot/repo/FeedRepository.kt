@@ -10,6 +10,7 @@ import com.nguyen.polyglot.db.mapper.FeedMapper
 import com.nguyen.polyglot.model.Feed
 import com.nguyen.polyglot.model.FeedDetail
 import com.nguyen.polyglot.model.NewsDetail
+import com.nguyen.polyglot.model.Word
 import com.nguyen.polyglot.repo.utils.mainGetNetworkBoundResource
 import com.nguyen.polyglot.repo.utils.mainPostNetworkBoundResource
 import com.nguyen.polyglot.util.Constants
@@ -152,6 +153,32 @@ class FeedRepository
             },
             saveFetchResult = {
                 detail = it
+            }
+        )
+    }
+
+    fun getWordDefinition(accessToken: String, word: String, language: String): Flow<UIState<Word>> {
+        var wordDefinition: Word? = null
+        return mainGetNetworkBoundResource(
+            query = {
+                flow {
+                    emit(wordDefinition)
+                }
+            },
+            fetch = {
+                val response: ApiResponse<Word> = apiClient.get("${Constants.apiURL}/feed/word/definition?word=${word}&language=${language}") {
+                    contentType(ContentType.Application.Json)
+                    headers {
+                        append(HttpHeaders.Authorization, "Bearer $accessToken")
+                    }
+                }
+                if (response.status) {
+                    Log.d(TAG, "getWordDefinition: ${response}")
+                    response.data
+                } else throw CustomAppException(response.message)
+            },
+            saveFetchResult = {
+                wordDefinition = it
             }
         )
     }

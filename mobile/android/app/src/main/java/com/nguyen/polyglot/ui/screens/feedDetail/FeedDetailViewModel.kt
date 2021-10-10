@@ -7,9 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nguyen.polyglot.model.FeedDetail
 import com.nguyen.polyglot.model.NewsDetail
+import com.nguyen.polyglot.model.Word
 import com.nguyen.polyglot.repo.FeedRepository
 import com.nguyen.polyglot.util.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,6 +24,9 @@ class FeedDetailViewModel
 
     private val _newsDetailUIState: MutableState<UIState<FeedDetail<NewsDetail>>> = mutableStateOf(UIState.Initial(null))
     val newsDetailUIState: State<UIState<FeedDetail<NewsDetail>>> = _newsDetailUIState
+
+    private val _wordDefinitionUIState: MutableState<UIState<Word>> = mutableStateOf(UIState.Initial(null))
+    val wordDefinitionUIState: State<UIState<Word>> = _wordDefinitionUIState
 
 
 
@@ -37,9 +42,27 @@ class FeedDetailViewModel
                 _newsDetailUIState.value = it
             }
         }
-
-
     }
 
+    fun getWordDefinition(accessToken: String?, wordValue: String?, language: String?) {
+        viewModelScope.launch {
+
+            if(accessToken == null) {
+                _wordDefinitionUIState.value = UIState.Error("Please login first!")
+                return@launch
+            }
+
+            if (wordValue == null || language == null) {
+                _wordDefinitionUIState.value = UIState.Error("No definition found!")
+                return@launch
+            }
+
+
+
+            feedRepo.getWordDefinition(accessToken, wordValue, language).collect {
+                _wordDefinitionUIState.value = it
+            }
+        }
+    }
 
 }

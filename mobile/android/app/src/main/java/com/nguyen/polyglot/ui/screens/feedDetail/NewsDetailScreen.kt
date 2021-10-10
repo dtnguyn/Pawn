@@ -22,8 +22,12 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.nguyen.polyglot.R
 import com.nguyen.polyglot.model.FeedDetail
 import com.nguyen.polyglot.model.NewsDetail
+import com.nguyen.polyglot.model.Word
 import com.nguyen.polyglot.ui.SharedViewModel
 import com.nguyen.polyglot.ui.components.SelectableText
+import com.nguyen.polyglot.ui.components.feedDetail.news.WordActionMenu
+import com.nguyen.polyglot.ui.components.feedDetail.news.WordDefinition
+import com.nguyen.polyglot.ui.navigation.PolyglotScreens
 import com.nguyen.polyglot.ui.theme.Blue
 import com.nguyen.polyglot.ui.theme.LightGreen
 import com.nguyen.polyglot.ui.theme.LightRed
@@ -57,11 +61,14 @@ fun NewsDetailScreen(
     val newsDetailUIState: UIState<FeedDetail<NewsDetail>> by viewModel.newsDetailUIState
     var newsDetail by remember { mutableStateOf(newsDetailUIState.value) }
 
+    val wordDefinitionUIState: UIState<Word> by viewModel.wordDefinitionUIState
+    var wordDefinition by remember { mutableStateOf(wordDefinitionUIState.value) }
+
     var loading by remember { mutableStateOf(false) }
 
     var currentFocusWord: String? by remember { mutableStateOf(null) }
     val coroutineScope = rememberCoroutineScope()
-    val selectableTextRange = remember { mutableStateOf<TextRange?>(null)}
+    val selectableTextRange = remember { mutableStateOf<TextRange?>(null) }
 
     val bottomSheetScaffoldState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden
@@ -96,9 +103,31 @@ fun NewsDetailScreen(
 
         }
     }
-    LaunchedEffect(bottomSheetScaffoldState.isVisible){
-        if(!bottomSheetScaffoldState.isVisible){
+    LaunchedEffect(bottomSheetScaffoldState.isVisible) {
+        if (!bottomSheetScaffoldState.isVisible) {
             selectableTextRange.value = null
+        }
+    }
+
+    LaunchedEffect(currentFocusWord) {
+        wordDefinition = null
+    }
+
+    LaunchedEffect(wordDefinitionUIState) {
+        when (wordDefinitionUIState) {
+            is UIState.Initial -> {
+
+            }
+            is UIState.Loading -> {
+
+            }
+            is UIState.Error -> {
+
+            }
+            is UIState.Loaded -> {
+                wordDefinition = wordDefinitionUIState.value
+            }
+
         }
     }
 
@@ -106,33 +135,36 @@ fun NewsDetailScreen(
 
         sheetShape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
         sheetContent = {
-            Column(Modifier.padding(20.dp)) {
-                Text(text = "\"${currentFocusWord ?: ""}\"", style = Typography.h2)
-                Spacer(modifier = Modifier.padding(10.dp))
-                Button(
-                    onClick = {
-
+            if (wordDefinitionUIState is UIState.Loading || wordDefinition != null) {
+                WordDefinition(
+                    word = wordDefinition,
+                    isLoading = wordDefinitionUIState is UIState.Loading,
+                    onBackClick = {
+                        wordDefinition = null
                     },
-                    content = {
-                        Text(text = "Look up definitions", style = Typography.h6)
-                    },
-                    shape = RoundedCornerShape(30.dp),
-                    colors = ButtonDefaults.buttonColors(LightRed),
+                    onDetailClick = {
+                        navController.navigate("${PolyglotScreens.WordDetail.route}/${wordDefinition!!.value}/${sharedViewModel.currentPickedLanguage.value?.id}")
+                    }
                 )
+            } else {
+                WordActionMenu(
+                    word = currentFocusWord ?: "",
+                    onLookUpDefinition = { word ->
+                        coroutineScope.launch {
+                            viewModel.getWordDefinition(
+                                DataStoreUtils.getAccessTokenFromDataStore(
+                                    context
+                                ),
+                                word,
+                                sharedViewModel.currentPickedLanguage.value?.id
+                            )
 
-                Spacer(modifier = Modifier.padding(5.dp))
-                Button(
-                    onClick = {
-
+                        }
                     },
-                    content = {
-                        Text(text = "Find images", style = Typography.h6)
-                    },
-                    shape = RoundedCornerShape(30.dp),
-                    colors = ButtonDefaults.buttonColors(LightGreen),
+                    onLookUpImages = {}
                 )
-
             }
+
         },
         sheetState = bottomSheetScaffoldState,
     ) {
@@ -266,7 +298,7 @@ fun NewsDetailScreen(
                                 text = it,
                                 textRange = selectableTextRange,
                                 onLongClick = { word ->
-                                    if(word != "") {
+                                    if (word != "") {
                                         currentFocusWord = word
                                         coroutineScope.launch {
                                             bottomSheetScaffoldState.show()

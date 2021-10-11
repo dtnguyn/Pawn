@@ -9,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -27,8 +28,8 @@ import com.nguyen.polyglot.ui.screens.auth.AuthViewModel
 import com.nguyen.polyglot.ui.screens.auth.ChangePasswordScreen
 import com.nguyen.polyglot.ui.screens.auth.VerifyCodeScreen
 import com.nguyen.polyglot.ui.screens.definition.WordDetailViewModel
-import com.nguyen.polyglot.ui.screens.feedDetail.FeedDetailScreen
-import com.nguyen.polyglot.ui.screens.feedDetail.FeedDetailViewModel
+import com.nguyen.polyglot.ui.screens.newsDetail.NewsDetailViewModel
+import com.nguyen.polyglot.ui.screens.newsDetail.NewsDetailScreen
 import com.nguyen.polyglot.ui.screens.feeds.FeedViewModel
 import com.nguyen.polyglot.ui.screens.home.HomeViewModel
 import com.nguyen.polyglot.ui.screens.search.SearchViewModel
@@ -36,6 +37,7 @@ import com.nguyen.polyglot.ui.theme.PawnTheme
 import com.nguyen.polyglot.util.DataStoreUtils
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @ExperimentalPagerApi
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
@@ -48,7 +50,7 @@ fun PolygotApp(
     searchViewModel: SearchViewModel,
     sharedViewModel: SharedViewModel,
     feedViewModel: FeedViewModel,
-    feedDetailViewModel: FeedDetailViewModel,
+    newsDetailViewModel: NewsDetailViewModel,
 ) {
 
     val navController = rememberNavController()
@@ -149,15 +151,14 @@ fun PolygotApp(
                 }
                 composable(PolyglotScreens.ChangePassword.route) { ChangePasswordScreen(navController = navController) }
                 composable(PolyglotScreens.VerifyCode.route) { VerifyCodeScreen(navController = navController) }
-                composable("${PolyglotScreens.FeedDetail.route}/{feedId}/{title}/{publishedDate}/{thumbnail}/{feedType}/{feedUrl}") {
-                    FeedDetailScreen(
-                        viewModel = feedDetailViewModel,
+                composable("${PolyglotScreens.NewsDetail.route}/{feedId}/{title}/{publishedDate}/{thumbnail}/{feedUrl}") {
+                    NewsDetailScreen(
+                        viewModel = newsDetailViewModel,
                         sharedViewModel = sharedViewModel,
                         navController = navController,
-                        feedUrl = it.arguments?.getString("feedUrl"),
-                        feedId = it.arguments?.getString("feedId"),
-                        feedType = it.arguments?.getString("feedType"),
-                        title = it.arguments?.getString("title"),
+                        newsUrl = it.arguments?.getString("feedUrl") ?: "",
+                        newsId = it.arguments?.getString("feedId") ?: "",
+                        title = it.arguments?.getString("title") ?: "",
                         publishedDate = it.arguments?.getString("publishedDate"),
                         thumbnail = it.arguments?.getString("thumbnail"),
                     )

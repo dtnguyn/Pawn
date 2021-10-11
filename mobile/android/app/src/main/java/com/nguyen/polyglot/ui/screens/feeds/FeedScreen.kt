@@ -307,10 +307,12 @@ fun FeedScreen(
                                         )
                                         .padding(horizontal = 20.dp)
                                 ) {
-                                    FeedItem(feed = it[index], onClick = {feed ->
+                                    FeedItem(feed = it[index], onClick = { feed ->
                                         val url = feed.url.replace("/", "<")
                                         val thumbnail = feed.thumbnail?.replace("/", "<")
-                                        navController.navigate("${PolyglotScreens.FeedDetail.route}/${feed.id}/${feed.title}/${feed.publishedDate}/${thumbnail}/news/${url}")
+                                        if (feed.type == "news") {
+                                            navController.navigate("${PolyglotScreens.NewsDetail.route}/${feed.id}/${feed.title}/${feed.publishedDate}/${thumbnail}/${url}")
+                                        }
                                     })
                                 }
                             }

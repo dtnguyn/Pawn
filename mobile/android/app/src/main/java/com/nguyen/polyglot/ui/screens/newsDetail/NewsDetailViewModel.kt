@@ -1,4 +1,4 @@
-package com.nguyen.polyglot.ui.screens.feedDetail
+package com.nguyen.polyglot.ui.screens.newsDetail
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FeedDetailViewModel
+class NewsDetailViewModel
 @Inject constructor(
     private val feedRepo: FeedRepository,
 ) : ViewModel() {

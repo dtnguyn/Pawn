@@ -312,6 +312,8 @@ fun FeedScreen(
                                         val thumbnail = feed.thumbnail?.replace("/", "<")
                                         if (feed.type == "news") {
                                             navController.navigate("${PolyglotScreens.NewsDetail.route}/${feed.id}/${feed.title}/${feed.publishedDate}/${thumbnail}/${url}")
+                                        } else {
+                                            navController.navigate("${PolyglotScreens.VideoDetail.route}/${feed.id}")
                                         }
                                     })
                                 }

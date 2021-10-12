@@ -32,6 +32,7 @@ import com.nguyen.polyglot.ui.screens.newsDetail.NewsDetailViewModel
 import com.nguyen.polyglot.ui.screens.newsDetail.NewsDetailScreen
 import com.nguyen.polyglot.ui.screens.feeds.FeedViewModel
 import com.nguyen.polyglot.ui.screens.home.HomeViewModel
+import com.nguyen.polyglot.ui.screens.newsDetail.VideoDetailScreen
 import com.nguyen.polyglot.ui.screens.search.SearchViewModel
 import com.nguyen.polyglot.ui.theme.PawnTheme
 import com.nguyen.polyglot.util.DataStoreUtils
@@ -161,6 +162,14 @@ fun PolygotApp(
                         title = it.arguments?.getString("title") ?: "",
                         publishedDate = it.arguments?.getString("publishedDate"),
                         thumbnail = it.arguments?.getString("thumbnail"),
+                    )
+                }
+
+                composable("${PolyglotScreens.VideoDetail.route}/{videoId}") {
+                    VideoDetailScreen(
+                        sharedViewModel = sharedViewModel,
+                        navController = navController,
+                        videoId = it.arguments?.getString("videoId") ?: ""
                     )
                 }
 

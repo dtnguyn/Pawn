@@ -5,9 +5,13 @@ import CustomError from "../utils/CustomError";
 import {
   getFeedDetail,
   getFeeds,
+  getVideoSubtitle,
   updateTopics,
 } from "../controllers/FeedController";
-import { getSavedWords } from "../controllers/WordController";
+import {
+  getSavedWords,
+  getWordDetailSimplify,
+} from "../controllers/WordController";
 import { User } from "../entity/User";
 import ApiResponse from "../utils/ApiResponse";
 import { checkAuthentication } from "../utils/middlewares";
@@ -111,6 +115,55 @@ router.get("/detail", checkAuthentication, async (req, res) => {
     const feedDetail = await getFeedDetail(feedId, feedType, feedUrl);
 
     res.send(new ApiResponse(true, "", feedDetail));
+  } catch (error) {
+    if (error instanceof CustomError) {
+      res.send(new ApiResponse(false, error.message, null));
+    } else {
+      console.log("get feed error ", error.message);
+      res.send(new ApiResponse(false, "Something went wrong", null));
+    }
+  }
+});
+
+router.get("/word/definition", checkAuthentication, async (req, res) => {
+  try {
+    const wordValue = req.query.word as string;
+
+    if (!wordValue) {
+      throw new CustomError("Please provide word value!");
+    }
+
+    const language = req.query.language as string;
+    if (!language) {
+      throw new CustomError("Please provide target language!");
+    }
+
+    const word = await getWordDetailSimplify(wordValue, language);
+    console.log(word, wordValue, language);
+
+    res.send(new ApiResponse(true, "", word));
+  } catch (error) {
+    if (error instanceof CustomError) {
+      res.send(new ApiResponse(false, error.message, null));
+    } else {
+      console.log("get feed error ", error.message);
+      res.send(new ApiResponse(false, "Something went wrong", null));
+    }
+  }
+});
+
+router.get("/video/subtitle", checkAuthentication, async (req, res) => {
+  try {
+    const videoId = req.query.videoId as string;
+
+    if (!videoId) {
+      throw new CustomError("Please provide the id of the video!");
+    }
+
+    const subtitleParts = await getVideoSubtitle(videoId);
+
+    if (subtitleParts) res.send(new ApiResponse(true, "", subtitleParts));
+    else throw new CustomError("Couldn't find subtitle for this video!");
   } catch (error) {
     if (error instanceof CustomError) {
       res.send(new ApiResponse(false, error.message, null));

@@ -117,5 +117,51 @@ router.get("/detail", middlewares_1.checkAuthentication, (req, res) => __awaiter
         }
     }
 }));
+router.get("/word/definition", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const wordValue = req.query.word;
+        if (!wordValue) {
+            throw new CustomError_1.default("Please provide word value!");
+        }
+        const language = req.query.language;
+        if (!language) {
+            throw new CustomError_1.default("Please provide target language!");
+        }
+        const word = yield WordController_1.getWordDetailSimplify(wordValue, language);
+        console.log(word, wordValue, language);
+        res.send(new ApiResponse_1.default(true, "", word));
+    }
+    catch (error) {
+        if (error instanceof CustomError_1.default) {
+            res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            console.log("get feed error ", error.message);
+            res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
+    }
+}));
+router.get("/video/subtitle", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const videoId = req.query.videoId;
+        if (!videoId) {
+            throw new CustomError_1.default("Please provide the id of the video!");
+        }
+        const subtitleParts = yield FeedController_1.getVideoSubtitle(videoId);
+        if (subtitleParts)
+            res.send(new ApiResponse_1.default(true, "", subtitleParts));
+        else
+            throw new CustomError_1.default("Couldn't find subtitle for this video!");
+    }
+    catch (error) {
+        if (error instanceof CustomError_1.default) {
+            res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            console.log("get feed error ", error.message);
+            res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
+    }
+}));
 exports.default = router;
 //# sourceMappingURL=feed.js.map

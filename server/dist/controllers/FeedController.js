@@ -32,15 +32,22 @@ exports.getFeedDetail = (id, feedType, feedUrl) => __awaiter(this, void 0, void 
         return null;
     }
 });
+exports.getVideoSubtitle = (videoId) => __awaiter(this, void 0, void 0, function* () {
+    const result = yield superagent_1.default
+        .get(`https://subtitles-for-youtube.p.rapidapi.com/subtitles/${videoId}`)
+        .set("x-rapidapi-host", "subtitles-for-youtube.p.rapidapi.com")
+        .set("x-rapidapi-key", process.env.SUBTITLE_API_KEY);
+    const subtitle = result.body;
+    console.log("result", result.body);
+    return subtitle ? subtitle : null;
+});
 const getNewsDetail = (id, newsUrl) => __awaiter(this, void 0, void 0, function* () {
     const shortenUrl = (yield tinyurl_1.default.shorten(newsUrl));
-    console.log("shortenUrl", shortenUrl);
     const result = yield superagent_1.default
         .get(`https://article-parser.p.rapidapi.com/`)
-        .query({ website_url: newsUrl })
+        .query({ website_url: shortenUrl })
         .set("x-rapidapi-host", "article-parser.p.rapidapi.com")
         .set("x-rapidapi-key", process.env.NEWS_PARSER_API_KEY);
-    console.log("result", result.body);
     return {
         id,
         type: "news",
@@ -55,82 +62,95 @@ const getNewsDetail = (id, newsUrl) => __awaiter(this, void 0, void 0, function*
     };
 });
 const getNews = (queryValues, language, topics) => __awaiter(this, void 0, void 0, function* () {
-    let queryString = "";
-    queryValues.forEach((query, index) => {
-        if (index == queryValues.length - 1)
-            queryString += query;
-        else
-            queryString += query + " OR ";
-    });
-    const result = yield superagent_1.default
-        .get(`https://free-news.p.rapidapi.com/v1/search`)
-        .query({ q: queryString, lang: language.substring(0, 2) })
-        .set("x-rapidapi-host", "free-news.p.rapidapi.com")
-        .set("x-rapidapi-key", process.env.NEWS_API_KEY);
-    const articles = result.body.articles;
-    if (articles) {
-        const newsFeeds = articles.map((article) => {
-            if (article._id && article.title && article.summary && article.link) {
-                return {
-                    id: article._id,
-                    type: "news",
-                    title: article.title,
-                    author: article.author,
-                    topic: article.topic,
-                    language: language,
-                    url: article.link,
-                    description: article.summary,
-                    thumbnail: article.media,
-                    publishedDate: article.published_date,
-                };
-            }
+    try {
+        let queryString = "";
+        queryValues.forEach((query, index) => {
+            if (index == queryValues.length - 1)
+                queryString += query;
+            else
+                queryString += query + " OR ";
         });
-        return newsFeeds.filter((news) => news != undefined);
+        const result = yield superagent_1.default
+            .get(`https://free-news.p.rapidapi.com/v1/search`)
+            .query({ q: queryString, lang: language.substring(0, 2) })
+            .set("x-rapidapi-host", "free-news.p.rapidapi.com")
+            .set("x-rapidapi-key", process.env.NEWS_API_KEY);
+        const articles = result.body.articles;
+        if (articles) {
+            const newsFeeds = articles.map((article) => {
+                if (article._id && article.title && article.summary && article.link) {
+                    return {
+                        id: article._id,
+                        type: "news",
+                        title: article.title,
+                        author: article.author,
+                        topic: article.topic,
+                        language: language,
+                        url: article.link,
+                        description: article.summary,
+                        thumbnail: article.media,
+                        publishedDate: article.published_date,
+                    };
+                }
+            });
+            return newsFeeds.filter((news) => news != undefined);
+        }
+        else
+            return [];
     }
-    else
+    catch (error) {
+        console.log("Error when getting news feed: ", error.message);
         return [];
+    }
 });
 const getVideos = (queryValues, language, topics) => __awaiter(this, void 0, void 0, function* () {
-    let queryString = "";
-    queryValues.forEach((query, index) => {
-        if (index == queryValues.length - 1)
-            queryString += query;
-        else
-            queryString += query + "|";
-    });
-    const result = yield superagent_1.default
-        .get("https://youtube.googleapis.com/youtube/v3/search")
-        .query({
-        key: process.env.YOUTUBE_API_KEY,
-        part: "snippet",
-        q: queryString,
-        relevanceLanguage: language,
-        type: "video",
-    });
-    const videos = result.body.items;
-    if (videos) {
-        const videoFeeds = videos.map((video) => {
-            if (video.id && video.id.videoId && video.snippet) {
-                return {
-                    id: video.id.videoId,
-                    type: "video",
-                    title: video.snippet.title,
-                    author: video.snippet.channelTitle,
-                    thumbnail: video.snippet.thumbnails.high.url
-                        ? video.snippet.thumbnails.high.url
-                        : null,
-                    topic: null,
-                    url: `https://youtu.be/${video.id.videoId}`,
-                    language: language,
-                    description: video.snippet.description,
-                    publishedDate: video.snippet.publishedAt.toString(),
-                };
-            }
+    try {
+        let queryString = "";
+        queryValues.forEach((query, index) => {
+            if (index == queryValues.length - 1)
+                queryString += query;
+            else
+                queryString += query + "|";
         });
-        return videoFeeds.filter((video) => video != undefined);
+        const result = yield superagent_1.default
+            .get("https://youtube.googleapis.com/youtube/v3/search")
+            .query({
+            key: process.env.YOUTUBE_API_KEY,
+            part: "snippet",
+            q: queryString,
+            relevanceLanguage: language,
+            videoCaption: "closedCaption",
+            type: "video",
+        });
+        const videos = result.body.items;
+        if (videos) {
+            const videoFeeds = videos.map((video) => {
+                if (video.id && video.id.videoId && video.snippet) {
+                    return {
+                        id: video.id.videoId,
+                        type: "video",
+                        title: video.snippet.title,
+                        author: video.snippet.channelTitle,
+                        thumbnail: video.snippet.thumbnails.high.url
+                            ? video.snippet.thumbnails.high.url
+                            : null,
+                        topic: null,
+                        url: `https://youtu.be/${video.id.videoId}`,
+                        language: language,
+                        description: video.snippet.description,
+                        publishedDate: video.snippet.publishedAt.toString(),
+                    };
+                }
+            });
+            return videoFeeds.filter((video) => video != undefined);
+        }
+        else
+            return [];
     }
-    else
+    catch (error) {
+        console.log("Error when get videos feed: ", error.message);
         return [];
+    }
 });
 function shuffle(array) {
     let currentIndex = array.length, randomIndex;

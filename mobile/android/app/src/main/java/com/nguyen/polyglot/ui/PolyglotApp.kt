@@ -34,6 +34,7 @@ import com.nguyen.polyglot.ui.screens.feeds.FeedViewModel
 import com.nguyen.polyglot.ui.screens.home.HomeViewModel
 import com.nguyen.polyglot.ui.screens.newsDetail.VideoDetailScreen
 import com.nguyen.polyglot.ui.screens.search.SearchViewModel
+import com.nguyen.polyglot.ui.screens.videoDetail.VideoDetailViewModel
 import com.nguyen.polyglot.ui.theme.PawnTheme
 import com.nguyen.polyglot.util.DataStoreUtils
 
@@ -52,6 +53,7 @@ fun PolygotApp(
     sharedViewModel: SharedViewModel,
     feedViewModel: FeedViewModel,
     newsDetailViewModel: NewsDetailViewModel,
+    videoDetailViewModel: VideoDetailViewModel
 ) {
 
     val navController = rememberNavController()
@@ -167,6 +169,7 @@ fun PolygotApp(
 
                 composable("${PolyglotScreens.VideoDetail.route}/{videoId}") {
                     VideoDetailScreen(
+                        viewModel = videoDetailViewModel,
                         sharedViewModel = sharedViewModel,
                         navController = navController,
                         videoId = it.arguments?.getString("videoId") ?: ""

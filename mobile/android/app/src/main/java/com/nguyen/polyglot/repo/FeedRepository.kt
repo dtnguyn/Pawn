@@ -6,11 +6,8 @@ import com.nguyen.polyglot.api.model.ApiResponse
 import com.nguyen.polyglot.api.model.UpdateFeedTopicsRequestBody
 import com.nguyen.polyglot.db.PolyglotDatabase
 import com.nguyen.polyglot.db.mapper.FeedMapper
+import com.nguyen.polyglot.model.*
 //import com.nguyen.polygot.db.mapper.FeedMapper
-import com.nguyen.polyglot.model.Feed
-import com.nguyen.polyglot.model.FeedDetail
-import com.nguyen.polyglot.model.NewsDetail
-import com.nguyen.polyglot.model.Word
 import com.nguyen.polyglot.repo.utils.mainGetNetworkBoundResource
 import com.nguyen.polyglot.repo.utils.mainPostNetworkBoundResource
 import com.nguyen.polyglot.util.Constants
@@ -66,8 +63,8 @@ class FeedRepository
                         append(HttpHeaders.Authorization, "Bearer $accessToken")
                     }
                 }
+                Log.d(TAG, "feed response: ${response}")
                 if (response.status) {
-                    Log.d(TAG, "response: ${response.data.size}")
                     response.data
                 }
                 else throw CustomAppException(response.message)
@@ -179,6 +176,34 @@ class FeedRepository
             },
             saveFetchResult = {
                 wordDefinition = it
+            }
+        )
+    }
+
+    fun getVideoSubtitle(videoId: String, accessToken: String): Flow<UIState<List<SubtitlePart>>> {
+        var subtitle: List<SubtitlePart>? = null
+        return mainGetNetworkBoundResource(
+            query = {
+                flow {
+                    emit(subtitle)
+                }
+            },
+            fetch = {
+                Log.d("VideoDetailViewModel", "Call to get subtitle")
+                val response: ApiResponse<List<SubtitlePart>> = apiClient.get("${Constants.apiURL}/feed/video/subtitle?videoId=${videoId}") {
+                    contentType(ContentType.Application.Json)
+                    headers {
+                        append(HttpHeaders.Authorization, "Bearer $accessToken")
+                    }
+                }
+                Log.d(TAG, "getVideoSubtitle: ${response}")
+
+                if (response.status) {
+                    response.data
+                } else throw CustomAppException(response.message)
+            },
+            saveFetchResult = {
+                subtitle = it
             }
         )
     }

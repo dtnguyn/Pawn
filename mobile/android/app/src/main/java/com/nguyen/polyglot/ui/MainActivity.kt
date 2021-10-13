@@ -14,6 +14,7 @@ import com.nguyen.polyglot.ui.screens.newsDetail.NewsDetailViewModel
 import com.nguyen.polyglot.ui.screens.feeds.FeedViewModel
 import com.nguyen.polyglot.ui.screens.home.HomeViewModel
 import com.nguyen.polyglot.ui.screens.search.SearchViewModel
+import com.nguyen.polyglot.ui.screens.videoDetail.VideoDetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @ExperimentalPagerApi
@@ -28,6 +29,7 @@ class MainActivity : ComponentActivity() {
     private val wordDetailViewModel: WordDetailViewModel by viewModels()
     private val feedViewModel: FeedViewModel by viewModels()
     private val newsDetailViewModel: NewsDetailViewModel by viewModels()
+    private val videoDetailViewModel: VideoDetailViewModel by viewModels()
 
     @ExperimentalFoundationApi
     @ExperimentalAnimationApi
@@ -42,7 +44,8 @@ class MainActivity : ComponentActivity() {
                 searchViewModel = searchViewModel,
                 wordDetailViewModel = wordDetailViewModel,
                 feedViewModel = feedViewModel,
-                newsDetailViewModel = newsDetailViewModel
+                newsDetailViewModel = newsDetailViewModel,
+                videoDetailViewModel = videoDetailViewModel
             )
         }
 

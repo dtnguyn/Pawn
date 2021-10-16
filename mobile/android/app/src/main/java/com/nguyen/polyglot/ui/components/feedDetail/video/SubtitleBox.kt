@@ -1,6 +1,7 @@
 package com.nguyen.polyglot.ui.components.feedDetail.video
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -11,13 +12,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nguyen.polyglot.model.SubtitlePart
+import com.nguyen.polyglot.ui.components.SelectableText
 import com.nguyen.polyglot.ui.theme.LightGreen
 import com.nguyen.polyglot.ui.theme.Neon
 import com.nguyen.polyglot.ui.theme.Typography
 
 @Composable
-fun SubtitleBox(selected: Boolean, mainLanguage: String, subtitleText: String?){
-    if(subtitleText == null) return
+fun SubtitleBox(
+    selected: Boolean,
+    mainLanguage: String,
+    subtitleText: String?,
+    onClick: () -> Unit
+) {
+    if (subtitleText == null) return
 
     Box(
         modifier = Modifier
@@ -27,12 +34,18 @@ fun SubtitleBox(selected: Boolean, mainLanguage: String, subtitleText: String?){
 
         Card(
             shape = RoundedCornerShape(30.dp),
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 15.dp),
-            backgroundColor = if(selected) Neon else Color.LightGray,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 30.dp, vertical = 15.dp)
+                .clickable {
+                    onClick()
+                },
+            backgroundColor = if (selected) Neon else Color.LightGray,
         ) {
             Column(Modifier.padding(30.dp)) {
                 Text(text = mainLanguage, style = Typography.h6)
                 Spacer(modifier = Modifier.padding(5.dp))
+
                 Text(text = subtitleText, style = Typography.body1, fontSize = 18.sp)
             }
         }

@@ -1,5 +1,7 @@
 package com.nguyen.polyglot.util
 
+import android.os.Build
+import android.text.Html
 import android.util.DisplayMetrics
 import androidx.compose.ui.graphics.Color
 import com.nguyen.polyglot.ui.theme.*
@@ -54,5 +56,11 @@ object UtilFunctions {
             SupportedLanguage.SPANISH.id -> SupportedLanguage.SPANISH.icon
             else -> SupportedLanguage.ENGLISH.icon
         }
+    }
+
+    fun reformatString(str: String) = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        Html.fromHtml(str, Html.FROM_HTML_MODE_LEGACY).toString()
+    } else {
+        Html.fromHtml(str).toString()
     }
 }

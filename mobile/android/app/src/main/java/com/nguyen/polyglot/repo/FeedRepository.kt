@@ -180,7 +180,7 @@ class FeedRepository
         )
     }
 
-    fun getVideoSubtitle(videoId: String, accessToken: String): Flow<UIState<List<SubtitlePart>>> {
+    fun getVideoSubtitle(videoId: String, language: String,accessToken: String): Flow<UIState<List<SubtitlePart>>> {
         var subtitle: List<SubtitlePart>? = null
         return mainGetNetworkBoundResource(
             query = {
@@ -190,7 +190,7 @@ class FeedRepository
             },
             fetch = {
                 Log.d("VideoDetailViewModel", "Call to get subtitle")
-                val response: ApiResponse<List<SubtitlePart>> = apiClient.get("${Constants.apiURL}/feed/video/subtitle?videoId=${videoId}") {
+                val response: ApiResponse<List<SubtitlePart>> = apiClient.get("${Constants.apiURL}/feed/video/subtitle?videoId=${videoId}&language=${language}") {
                     contentType(ContentType.Application.Json)
                     headers {
                         append(HttpHeaders.Authorization, "Bearer $accessToken")

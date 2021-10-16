@@ -1,8 +1,7 @@
 package com.nguyen.polyglot.ui.screens.videoDetail
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import android.util.Log
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nguyen.polyglot.model.SubtitlePart
@@ -23,23 +22,51 @@ class VideoDetailViewModel
     private val _videoSubtitleMutableState: MutableState<UIState<List<SubtitlePart>>> = mutableStateOf(UIState.Initial(null))
     val videoSubtitleUIState: State<UIState<List<SubtitlePart>>> = _videoSubtitleMutableState
 
+    var startSecond = 0f
+    var currentSubtitleIndex = 0
 
-    fun getVideoSubtitle(accessToken: String?, videoId: String?) {
-        if(accessToken == null){
+
+    fun getVideoSubtitle(accessToken: String?, videoId: String?, language: String?) {
+        if (accessToken == null) {
             _videoSubtitleMutableState.value = UIState.Error("Please login first!")
             return
         }
 
-        if(videoId == null){
-            _videoSubtitleMutableState.value = UIState.Error("Couldn't find subtitle for this video!")
+        if (videoId == null) {
+            _videoSubtitleMutableState.value =
+                UIState.Error("Couldn't find subtitle for this video!")
+            return
+        }
+
+        if (language == null) {
+            _videoSubtitleMutableState.value =
+                UIState.Error("Need language to get subtitles!")
             return
         }
 
         viewModelScope.launch {
-            feedRepo.getVideoSubtitle(accessToken = accessToken, videoId = videoId).collectLatest {
+            feedRepo.getVideoSubtitle(accessToken = accessToken, videoId = videoId, language = language).collectLatest {
                 _videoSubtitleMutableState.value = it
             }
         }
+    }
+
+
+    fun updateStartSecond(second: Float){
+        startSecond = second
+    }
+
+    fun getVideoStartSecond() = startSecond
+
+
+    fun updateSubtitleIndex(index: Int){
+        currentSubtitleIndex = index
+    }
+
+    fun getSubtitleIndex() = currentSubtitleIndex
+
+    fun resetState() {
+
     }
 
 

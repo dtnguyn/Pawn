@@ -1,5 +1,6 @@
 package com.nguyen.polyglot.ui.components
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -21,15 +22,22 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.Abs
 
 
 @Composable
-fun VideoPlayer(videoId: String) {
+fun VideoPlayer(videoId: String, start: Float, onPlaying: (currentSecond: Float) -> Unit) {
 
 
     val context = LocalContext.current
     val playerView = YouTubePlayerView(context)
     playerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
         override fun onReady(youTubePlayer: YouTubePlayer) {
-            youTubePlayer.loadVideo(videoId, 0f)
+            youTubePlayer.loadVideo(videoId, start)
         }
+
+        override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
+//            youTubePlayer.play()
+            onPlaying(second)
+        }
+
+
     })
 
     AndroidView(factory = {

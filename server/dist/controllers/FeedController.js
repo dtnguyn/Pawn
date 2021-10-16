@@ -32,13 +32,14 @@ exports.getFeedDetail = (id, feedType, feedUrl) => __awaiter(this, void 0, void 
         return null;
     }
 });
-exports.getVideoSubtitle = (videoId) => __awaiter(this, void 0, void 0, function* () {
+exports.getVideoSubtitle = (videoId, lang) => __awaiter(this, void 0, void 0, function* () {
     const result = yield superagent_1.default
         .get(`https://subtitles-for-youtube.p.rapidapi.com/subtitles/${videoId}`)
+        .query({ lang: lang.substr(0, 2) })
         .set("x-rapidapi-host", "subtitles-for-youtube.p.rapidapi.com")
         .set("x-rapidapi-key", process.env.SUBTITLE_API_KEY);
     const subtitle = result.body;
-    console.log("result", result.body);
+    console.log("result", result.body[0]);
     return subtitle ? subtitle : null;
 });
 const getNewsDetail = (id, newsUrl) => __awaiter(this, void 0, void 0, function* () {

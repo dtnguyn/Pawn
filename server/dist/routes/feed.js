@@ -147,7 +147,11 @@ router.get("/video/subtitle", middlewares_1.checkAuthentication, (req, res) => _
         if (!videoId) {
             throw new CustomError_1.default("Please provide the id of the video!");
         }
-        const subtitleParts = yield FeedController_1.getVideoSubtitle(videoId);
+        const language = req.query.language;
+        if (!language) {
+            throw new CustomError_1.default("Please provide the target language!");
+        }
+        const subtitleParts = yield FeedController_1.getVideoSubtitle(videoId, language);
         if (subtitleParts)
             res.send(new ApiResponse_1.default(true, "", subtitleParts));
         else

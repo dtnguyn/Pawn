@@ -160,7 +160,13 @@ router.get("/video/subtitle", checkAuthentication, async (req, res) => {
       throw new CustomError("Please provide the id of the video!");
     }
 
-    const subtitleParts = await getVideoSubtitle(videoId);
+    const language = req.query.language as string;
+
+    if (!language) {
+      throw new CustomError("Please provide the target language!");
+    }
+
+    const subtitleParts = await getVideoSubtitle(videoId, language);
 
     if (subtitleParts) res.send(new ApiResponse(true, "", subtitleParts));
     else throw new CustomError("Couldn't find subtitle for this video!");

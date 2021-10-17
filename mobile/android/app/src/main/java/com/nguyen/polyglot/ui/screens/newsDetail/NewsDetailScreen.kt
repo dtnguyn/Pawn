@@ -242,7 +242,7 @@ fun NewsDetailScreen(
                     newsDetail?.content?.value?.let {
                         SelectableText(
                             text = it,
-                            textRange = selectableTextRange,
+//                            textRange = selectableTextRange,
                             isFocusing = focusMode,
                             onLongClick = { word ->
                                 if (word != "") {

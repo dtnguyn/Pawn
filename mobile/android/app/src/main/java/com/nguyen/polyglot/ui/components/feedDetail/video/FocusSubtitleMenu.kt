@@ -46,6 +46,7 @@ fun FocusSubtitleMenu(
     var isFindingDefinition by remember { mutableStateOf(false) }
     var currentFocusWord: String? by remember { mutableStateOf(null) }
 
+
     Column(Modifier.padding(20.dp)) {
         Text(text = "Subtitle Action", style = Typography.h6)
         Card(
@@ -62,7 +63,7 @@ fun FocusSubtitleMenu(
 
                 SelectableText(
                     text = reformatString(subtitlePart.text ?: ""),
-                    textRange = selectableTextRange,
+//                    textRange = selectableTextRange,
                     isFocusing = focusMode,
                     onLongClick = { word ->
                         if (word != "") {

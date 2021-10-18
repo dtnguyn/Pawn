@@ -10,14 +10,13 @@ Polyglot is a language application that help users learn vocabulary in different
 </br>
 
 <p align="center">
-<img src="/screenshots/screenshot_shelter.png" alt="Images comming soon"/>
+<img src="/mobile/android/screenshots/collections.png" alt="Images comming soon"/>
 </p>
 
 ## Try out this app
 The app is almost finshed now. Once it's finished, a link to the Google Play Store will be posted.
 For now, you can clone it and use Android Studio to run this app
 
-<img src="/screenshots/app_gif.gif"  alt="Images comming soon" align="right" width="30%"/>
 
 ## Tech stack & libraries
 
@@ -68,7 +67,7 @@ If you find this repo useful or you like the code that I write, leave a star ⭐
 # License
 ```xml
 
-Copyright 2020 dtnguyn (Adron Nguyen)
+Copyright 2021 dtnguyn (Adron Nguyen)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
 associated documentation files (the "Software"), to deal in the Software without restriction, including 

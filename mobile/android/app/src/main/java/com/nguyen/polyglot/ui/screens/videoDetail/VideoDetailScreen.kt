@@ -57,6 +57,7 @@ fun VideoDetailScreen(
     var currentFocusWord: String? by remember { mutableStateOf(null) }
 
 
+
     var listState = rememberLazyListState()
 
     val currentLanguage by sharedViewModel.currentPickedLanguage
@@ -81,6 +82,14 @@ fun VideoDetailScreen(
                 videoId,
                 sharedViewModel.currentPickedLanguage.value?.value
             )
+        }
+    }
+
+    LaunchedEffect(modalBottomSheetState.isVisible) {
+        if (!modalBottomSheetState.isVisible) {
+            //When the bottom sheet is closed
+            currentFocusWord = null
+            focusSubtitlePart = null
         }
     }
 
@@ -136,6 +145,7 @@ fun VideoDetailScreen(
                 FocusSubtitleMenu(
                     subtitlePart = it,
                     mainLanguage = currentLanguage?.id ?: "",
+                    currentFocusWord = currentFocusWord,
                     onDismiss = {
                         focusSubtitlePart = null
                     },

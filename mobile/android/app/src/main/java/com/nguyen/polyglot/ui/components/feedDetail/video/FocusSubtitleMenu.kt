@@ -35,17 +35,11 @@ import com.nguyen.polyglot.ui.theme.LightRed
 @Composable
 fun FocusSubtitleMenu(
     subtitlePart: SubtitlePart,
+    currentFocusWord: String?,
     mainLanguage: String,
     onDismiss: () -> Unit,
     onLongClick: (word: String) -> Unit
 ) {
-
-    val selectableTextRange = remember { mutableStateOf<TextRange?>(null) }
-    var focusMode by remember { mutableStateOf(false) }
-
-    var isFindingDefinition by remember { mutableStateOf(false) }
-    var currentFocusWord: String? by remember { mutableStateOf(null) }
-
 
     Column(Modifier.padding(20.dp)) {
         Text(text = "Subtitle Action", style = Typography.h6)
@@ -63,12 +57,10 @@ fun FocusSubtitleMenu(
 
                 SelectableText(
                     text = reformatString(subtitlePart.text ?: ""),
-//                    textRange = selectableTextRange,
-                    isFocusing = focusMode,
+                    isFocusing = currentFocusWord != null,
                     onLongClick = { word ->
                         if (word != "") {
-                            focusMode = true
-                            currentFocusWord = word
+                            onLongClick(word)
                         }
                     }
                 )

@@ -22,10 +22,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.nguyen.polyglot.model.SubtitlePart
+import com.nguyen.polyglot.model.Word
 import com.nguyen.polyglot.ui.components.BackHandler
 import com.nguyen.polyglot.ui.components.feedDetail.news.WordActionMenu
 import com.nguyen.polyglot.ui.components.feedDetail.video.FocusSubtitleMenu
 import com.nguyen.polyglot.ui.components.feedDetail.video.SubtitleBox
+import com.nguyen.polyglot.ui.navigation.PolyglotScreens
 import com.nguyen.polyglot.util.DataStoreUtils
 import com.nguyen.polyglot.util.UIState
 import com.nguyen.polyglot.util.UtilFunctions.reformatString
@@ -47,25 +49,25 @@ fun VideoDetailScreen(
     val videoSubtitleUIState by viewModel.videoSubtitleUIState
     var videoSubtitle by remember { mutableStateOf(videoSubtitleUIState.value) }
 
+
+
     var currentIndex by remember { mutableStateOf(viewModel.currentSubtitleIndex) }
-    var currentSecond by remember { mutableStateOf(0f) }
-
-    var pauseVideo by remember { mutableStateOf(false) }
-
-    var focusSubtitlePart: SubtitlePart? by remember { mutableStateOf(null) }
-    var isFindingDefinition by remember { mutableStateOf(false) }
-    var currentFocusWord: String? by remember { mutableStateOf(null) }
+    var currentSecond by remember { mutableStateOf(viewModel.startSecond) }
 
 
+    var focusSubtitlePart: SubtitlePart? by remember { mutableStateOf(viewModel.focusSubtitlePart) }
 
-    var listState = rememberLazyListState()
+    val currentPickedLanguage by sharedViewModel.currentPickedLanguage
+
+
+    val listState = rememberLazyListState()
 
     val currentLanguage by sharedViewModel.currentPickedLanguage
 
     val context = LocalContext.current
 
     val modalBottomSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden
+        initialValue = if(viewModel.focusSubtitlePart != null)ModalBottomSheetValue.Expanded else ModalBottomSheetValue.Hidden
     )
     val coroutineScope = rememberCoroutineScope()
 
@@ -85,13 +87,7 @@ fun VideoDetailScreen(
         }
     }
 
-    LaunchedEffect(modalBottomSheetState.isVisible) {
-        if (!modalBottomSheetState.isVisible) {
-            //When the bottom sheet is closed
-            currentFocusWord = null
-            focusSubtitlePart = null
-        }
-    }
+
 
     LaunchedEffect(videoSubtitleUIState) {
         when (videoSubtitleUIState) {
@@ -138,20 +134,23 @@ fun VideoDetailScreen(
             listState.scrollToItem(currentIndex)
     }
 
+
+
+
     ModalBottomSheetLayout(
         sheetShape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
         sheetContent = {
             focusSubtitlePart?.let {
                 FocusSubtitleMenu(
-                    subtitlePart = it,
-                    mainLanguage = currentLanguage?.id ?: "",
-                    currentFocusWord = currentFocusWord,
-                    onDismiss = {
-                        focusSubtitlePart = null
-                    },
-                    onLongClick = {
-                        currentFocusWord = it
-//                                isFindingDefinition = true
+                    isOpen = modalBottomSheetState.isVisible,
+                    subtitlePart = focusSubtitlePart,
+                    viewModel = viewModel,
+                    sharedViewModel = sharedViewModel,
+                    moveToWordDetail = {
+                        viewModel.updateSubtitleIndex(currentIndex)
+                        viewModel.updateStartSecond(currentSecond)
+                        viewModel.focusSubtitlePart = focusSubtitlePart
+                        navController.navigate("${PolyglotScreens.WordDetail.route}/${it}/${sharedViewModel.currentPickedLanguage.value?.id}")
                     }
                 )
             }
@@ -159,6 +158,10 @@ fun VideoDetailScreen(
         },
         sheetState = modalBottomSheetState,
     ) {
+        BackHandler(onBack = {
+            viewModel.resetState()
+            navController.popBackStack()
+        })
         Scaffold(
             modifier = Modifier
                 .fillMaxWidth()
@@ -178,8 +181,6 @@ fun VideoDetailScreen(
                 videoSubtitle?.let { subtitleParts ->
 
 
-
-
 //                    VideoPlayer(
 //                        videoId,
 //                        start = viewModel.getVideoStartSecond(),
@@ -194,6 +195,7 @@ fun VideoDetailScreen(
                             override fun onReady(youTubePlayer: YouTubePlayer) {
                                 player = youTubePlayer
                                 youTubePlayer.loadVideo(videoId, viewModel.getVideoStartSecond())
+                                youTubePlayer.pause()
                             }
 
                             override fun onCurrentSecond(

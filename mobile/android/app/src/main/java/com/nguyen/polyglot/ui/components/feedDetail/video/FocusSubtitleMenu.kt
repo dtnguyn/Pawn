@@ -28,70 +28,148 @@ import com.nguyen.polyglot.ui.theme.Typography
 import com.nguyen.polyglot.util.UtilFunctions.reformatString
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.DialogProperties
+import androidx.navigation.NavController
+import com.nguyen.polyglot.model.Word
+import com.nguyen.polyglot.ui.SharedViewModel
+import com.nguyen.polyglot.ui.components.feedDetail.news.WordDefinition
+import com.nguyen.polyglot.ui.navigation.PolyglotScreens
+import com.nguyen.polyglot.ui.screens.videoDetail.VideoDetailViewModel
 import com.nguyen.polyglot.ui.theme.LightGreen
 import com.nguyen.polyglot.ui.theme.LightRed
+import com.nguyen.polyglot.util.DataStoreUtils
+import com.nguyen.polyglot.util.UIState
 
 @Composable
 fun FocusSubtitleMenu(
-    subtitlePart: SubtitlePart,
-    currentFocusWord: String?,
-    mainLanguage: String,
-    onDismiss: () -> Unit,
-    onLongClick: (word: String) -> Unit
+    isOpen: Boolean,
+    subtitlePart: SubtitlePart?,
+    viewModel: VideoDetailViewModel,
+    sharedViewModel: SharedViewModel,
+    moveToWordDetail: (word: String) -> Unit
 ) {
 
-    Column(Modifier.padding(20.dp)) {
-        Text(text = "Subtitle Action", style = Typography.h6)
-        Card(
-            shape = RoundedCornerShape(30.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 30.dp, vertical = 15.dp),
+    val language by sharedViewModel.currentPickedLanguage
 
-            backgroundColor = Neon,
-        ) {
-            Column(Modifier.padding(30.dp)) {
-                Text(text = mainLanguage, style = Typography.h6)
-                Spacer(modifier = Modifier.padding(5.dp))
+    var currentFocusWord: String? by remember { mutableStateOf(null) }
 
-                SelectableText(
-                    text = reformatString(subtitlePart.text ?: ""),
-                    isFocusing = currentFocusWord != null,
-                    onLongClick = { word ->
-                        if (word != "") {
-                            onLongClick(word)
-                        }
-                    }
-                )
+    val wordDefinitionUIState: UIState<Word> by viewModel.wordDefinitionUIState
+    var wordDefinition by remember { mutableStateOf(wordDefinitionUIState.value) }
+
+    var isFindingDefinition by remember { mutableStateOf(false) }
+    var isTranslatingSubtitle by remember { mutableStateOf(false) }
+
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+
+    LaunchedEffect(isOpen) {
+        if (!isOpen) {
+            //When the bottom sheet is closed
+            currentFocusWord = null
+        }
+    }
+
+    LaunchedEffect(wordDefinitionUIState) {
+        when (wordDefinitionUIState) {
+            is UIState.Initial -> {
+
+            }
+            is UIState.Loading -> {
+
+            }
+            is UIState.Error -> {
+
+            }
+            is UIState.Loaded -> {
+                wordDefinition = wordDefinitionUIState.value
+                Log.d("VideoDetailScreen", "definition: ${wordDefinitionUIState.value}")
             }
         }
-        Spacer(modifier = Modifier.padding(10.dp))
+
+    }
 
 
-        Button(
-            onClick = {
-            },
-            content = {
-                Text(text = "Translate text", style = Typography.h6)
-            },
-            shape = RoundedCornerShape(30.dp),
-            colors = ButtonDefaults.buttonColors(LightRed),
-        )
-
-        currentFocusWord?.let{
-            Spacer(modifier = Modifier.padding(5.dp))
-            Button(
-                onClick = {
+    when {
+        isFindingDefinition -> {
+            WordDefinition(
+                word = wordDefinition,
+                isLoading = wordDefinitionUIState is UIState.Loading,
+                onBackClick = {
+                    isFindingDefinition = false
                 },
-                content = {
-                    Text(text = "Find definition for \"${it}\" ", style = Typography.h6)
-                },
-                shape = RoundedCornerShape(30.dp),
-                colors = ButtonDefaults.buttonColors(LightGreen),
+                onDetailClick = {
+                    moveToWordDetail(wordDefinition?.value ?: "")
+                }
             )
         }
+        isTranslatingSubtitle -> {
 
+        }
+        else -> {
+            Column(Modifier.padding(20.dp)) {
+                Text(text = "Subtitle Action", style = Typography.h6)
+                Card(
+                    shape = RoundedCornerShape(30.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 30.dp, vertical = 15.dp),
+
+                    backgroundColor = Neon,
+                ) {
+                    Column(Modifier.padding(30.dp)) {
+                        Text(text = language?.id ?: "", style = Typography.h6)
+                        Spacer(modifier = Modifier.padding(5.dp))
+
+                        SelectableText(
+                            text = reformatString(subtitlePart?.text ?: ""),
+                            isFocusing = currentFocusWord != null,
+                            onLongClick = { word ->
+                                if (word != "") {
+                                    currentFocusWord = word
+                                }
+                            }
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.padding(10.dp))
+
+
+                Button(
+                    onClick = {
+                    },
+                    content = {
+                        Text(text = "Translate text", style = Typography.h6)
+                    },
+                    shape = RoundedCornerShape(30.dp),
+                    colors = ButtonDefaults.buttonColors(LightRed),
+                )
+
+                currentFocusWord?.let {
+                    Spacer(modifier = Modifier.padding(5.dp))
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                viewModel.getWordDefinition(
+                                    DataStoreUtils.getAccessTokenFromDataStore(
+                                        context
+                                    ), currentFocusWord, language?.id
+                                )
+                                isFindingDefinition = true
+                            }
+                        },
+                        content = {
+                            Text(text = "Find definition for \"${it}\" ", style = Typography.h6)
+                        },
+                        shape = RoundedCornerShape(30.dp),
+                        colors = ButtonDefaults.buttonColors(LightGreen),
+                    )
+                }
+            }
+
+
+        }
     }
 
 

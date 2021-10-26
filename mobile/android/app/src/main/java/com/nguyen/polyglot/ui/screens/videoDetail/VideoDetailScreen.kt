@@ -3,6 +3,7 @@ package com.nguyen.polyglot.ui.screens.newsDetail
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -17,10 +18,13 @@ import androidx.navigation.NavController
 import com.nguyen.polyglot.ui.SharedViewModel
 import com.nguyen.polyglot.ui.screens.videoDetail.VideoDetailViewModel
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import com.nguyen.polyglot.R
 import com.nguyen.polyglot.model.SubtitlePart
 import com.nguyen.polyglot.model.Word
 import com.nguyen.polyglot.ui.components.BackHandler
@@ -28,6 +32,7 @@ import com.nguyen.polyglot.ui.components.feedDetail.news.WordActionMenu
 import com.nguyen.polyglot.ui.components.feedDetail.video.FocusSubtitleMenu
 import com.nguyen.polyglot.ui.components.feedDetail.video.SubtitleBox
 import com.nguyen.polyglot.ui.navigation.PolyglotScreens
+import com.nguyen.polyglot.ui.theme.Typography
 import com.nguyen.polyglot.util.DataStoreUtils
 import com.nguyen.polyglot.util.UIState
 import com.nguyen.polyglot.util.UtilFunctions.reformatString
@@ -59,6 +64,7 @@ fun VideoDetailScreen(
 
     val currentPickedLanguage by sharedViewModel.currentPickedLanguage
 
+    var isTranslated by remember { mutableStateOf(false)}
 
     val listState = rememberLazyListState()
 
@@ -180,6 +186,36 @@ fun VideoDetailScreen(
 
             Column {
                 videoSubtitle?.let { subtitleParts ->
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp)) {
+                        IconButton(
+                            modifier = Modifier.align(Alignment.CenterStart),
+                            onClick = {
+                                viewModel.resetState()
+                                navController.popBackStack()
+                            }
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.back_32_black),
+                                contentDescription = "Back icon"
+                            )
+
+                        }
+
+                        Row(modifier = Modifier.align(Alignment.CenterEnd)) {
+                            Text(text = "Translated", style = Typography.body1)
+
+                            Switch(
+                                checked = isTranslated,
+                                onCheckedChange = { isTranslated = it }
+                            )
+                        }
+                    }
+
+
+
 
                     AndroidView(factory = {
                         playerView.addYouTubePlayerListener(object :
@@ -210,7 +246,7 @@ fun VideoDetailScreen(
                             SubtitleBox(
                                 selected = currentIndex == index,
                                 subtitlePart = subtitleParts[index],
-                                isTranslated = true,
+                                isTranslated = isTranslated,
                                 onClick = {
                                     Log.d("VideoDetailScreen", "player: $player")
                                     player?.pause()

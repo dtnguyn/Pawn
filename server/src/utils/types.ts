@@ -53,3 +53,13 @@ export type NewsDetailJSON = {
 export type VideoDetailJSON = {
   value: any;
 };
+
+export type SubtitlePart = {
+  start: number;
+  dur: number;
+  end: number;
+  text: string;
+  translatedText: string;
+  lang: string;
+  translatedLang: string;
+};

@@ -154,6 +154,11 @@ router.get("/word/definition", checkAuthentication, async (req, res) => {
 
 router.get("/video/subtitle", checkAuthentication, async (req, res) => {
   try {
+    const user = (req as any).user;
+    if (!user) {
+      throw new CustomError("Please login first!");
+    }
+
     const videoId = req.query.videoId as string;
 
     if (!videoId) {
@@ -166,7 +171,17 @@ router.get("/video/subtitle", checkAuthentication, async (req, res) => {
       throw new CustomError("Please provide the target language!");
     }
 
-    const subtitleParts = await getVideoSubtitle(videoId, language);
+    const translatedLanguage = req.query.translatedLanguage as string;
+
+    if (!language) {
+      throw new CustomError("Please provide the translated language!");
+    }
+
+    const subtitleParts = await getVideoSubtitle(
+      videoId,
+      language,
+      translatedLanguage
+    );
 
     if (subtitleParts) res.send(new ApiResponse(true, "", subtitleParts));
     else throw new CustomError("Couldn't find subtitle for this video!");
@@ -174,7 +189,7 @@ router.get("/video/subtitle", checkAuthentication, async (req, res) => {
     if (error instanceof CustomError) {
       res.send(new ApiResponse(false, error.message, null));
     } else {
-      console.log("get feed error ", error.message);
+      console.log("get subtitle error ", error.message);
       res.send(new ApiResponse(false, "Something went wrong", null));
     }
   }

@@ -143,6 +143,10 @@ router.get("/word/definition", middlewares_1.checkAuthentication, (req, res) => 
 }));
 router.get("/video/subtitle", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
+        const user = req.user;
+        if (!user) {
+            throw new CustomError_1.default("Please login first!");
+        }
         const videoId = req.query.videoId;
         if (!videoId) {
             throw new CustomError_1.default("Please provide the id of the video!");
@@ -151,7 +155,11 @@ router.get("/video/subtitle", middlewares_1.checkAuthentication, (req, res) => _
         if (!language) {
             throw new CustomError_1.default("Please provide the target language!");
         }
-        const subtitleParts = yield FeedController_1.getVideoSubtitle(videoId, language);
+        const translatedLanguage = req.query.translatedLanguage;
+        if (!language) {
+            throw new CustomError_1.default("Please provide the translated language!");
+        }
+        const subtitleParts = yield FeedController_1.getVideoSubtitle(videoId, language, translatedLanguage);
         if (subtitleParts)
             res.send(new ApiResponse_1.default(true, "", subtitleParts));
         else
@@ -162,7 +170,7 @@ router.get("/video/subtitle", middlewares_1.checkAuthentication, (req, res) => _
             res.send(new ApiResponse_1.default(false, error.message, null));
         }
         else {
-            console.log("get feed error ", error.message);
+            console.log("get subtitle error ", error.message);
             res.send(new ApiResponse_1.default(false, "Something went wrong", null));
         }
     }

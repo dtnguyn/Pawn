@@ -144,6 +144,7 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   // Authenticate User
+  console.log("logging in");
   try {
     //Check user input
     if (!req.body.usernameOrEmail)

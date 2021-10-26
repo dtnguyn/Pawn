@@ -32,15 +32,38 @@ exports.getFeedDetail = (id, feedType, feedUrl) => __awaiter(this, void 0, void 
         return null;
     }
 });
-exports.getVideoSubtitle = (videoId, lang) => __awaiter(this, void 0, void 0, function* () {
-    const result = yield superagent_1.default
+exports.getVideoSubtitle = (videoId, lang, translatedLang) => __awaiter(this, void 0, void 0, function* () {
+    const orgResponse = superagent_1.default
         .get(`https://subtitles-for-youtube.p.rapidapi.com/subtitles/${videoId}`)
         .query({ lang: lang.substr(0, 2) })
         .set("x-rapidapi-host", "subtitles-for-youtube.p.rapidapi.com")
         .set("x-rapidapi-key", process.env.SUBTITLE_API_KEY);
-    const subtitle = result.body;
-    console.log("result", result.body[0]);
-    return subtitle ? subtitle : null;
+    const translatedResponse = superagent_1.default
+        .get(`https://subtitles-for-youtube.p.rapidapi.com/subtitles/${videoId}`)
+        .query({ translated: "Translated", lang: translatedLang.substr(0, 2) })
+        .set("x-rapidapi-host", "subtitles-for-youtube.p.rapidapi.com")
+        .set("x-rapidapi-key", process.env.SUBTITLE_API_KEY);
+    const data = yield Promise.all([orgResponse, translatedResponse]);
+    const subtitle = data[0].body;
+    const translatedSubtitle = data[1].body;
+    var result = null;
+    if (subtitle.length &&
+        translatedSubtitle.length &&
+        subtitle.length === translatedSubtitle.length) {
+        result = [];
+        for (let i = 0; i < subtitle.length; i++) {
+            result.push({
+                start: subtitle[i].start,
+                end: subtitle[i].end,
+                dur: subtitle[i].dur,
+                text: subtitle[i].text,
+                translatedText: translatedSubtitle[i].text,
+                translatedLang,
+                lang,
+            });
+        }
+    }
+    return result;
 });
 const getNewsDetail = (id, newsUrl) => __awaiter(this, void 0, void 0, function* () {
     const shortenUrl = (yield tinyurl_1.default.shorten(newsUrl));

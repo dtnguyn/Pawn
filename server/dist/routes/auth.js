@@ -118,6 +118,7 @@ router.post("/register", (req, res) => __awaiter(this, void 0, void 0, function*
     }
 }));
 router.post("/login", (req, res) => __awaiter(this, void 0, void 0, function* () {
+    console.log("logging in");
     try {
         if (!req.body.usernameOrEmail)
             throw new CustomError_1.default("Please provide username or email!");

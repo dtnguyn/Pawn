@@ -57,17 +57,17 @@ class FeedRepository
                 }
             },
             fetch = {
-                val response: ApiResponse<List<Feed>> = apiClient.get("${Constants.apiURL}/feed?language=${language}") {
-                    contentType(ContentType.Application.Json)
-                    headers {
-                        append(HttpHeaders.Authorization, "Bearer $accessToken")
+                val response: ApiResponse<List<Feed>> =
+                    apiClient.get("${Constants.apiURL}/feed?language=${language}") {
+                        contentType(ContentType.Application.Json)
+                        headers {
+                            append(HttpHeaders.Authorization, "Bearer $accessToken")
+                        }
                     }
-                }
                 Log.d(TAG, "feed response: ${response}")
                 if (response.status) {
                     response.data
-                }
-                else throw CustomAppException(response.message)
+                } else throw CustomAppException(response.message)
 
             },
             saveFetchResult = { feeds ->
@@ -87,15 +87,16 @@ class FeedRepository
                 flow { emit(topics) }
             },
             shouldFetch = {
-               true
+                true
             },
             fetch = {
-                val response: ApiResponse<String> = apiClient.get("${Constants.apiURL}/feed/topics") {
-                    contentType(ContentType.Application.Json)
-                    headers {
-                        append(HttpHeaders.Authorization, "Bearer $accessToken")
+                val response: ApiResponse<String> =
+                    apiClient.get("${Constants.apiURL}/feed/topics") {
+                        contentType(ContentType.Application.Json)
+                        headers {
+                            append(HttpHeaders.Authorization, "Bearer $accessToken")
+                        }
                     }
-                }
                 if (response.status) {
                     response.data
                 } else throw CustomAppException(response.message)
@@ -107,28 +108,33 @@ class FeedRepository
         )
     }
 
-    fun updateTopics(accessToken: String, newTopics: String): Flow<UIState<String>>{
+    fun updateTopics(accessToken: String, newTopics: String): Flow<UIState<String>> {
         return mainPostNetworkBoundResource(
             submit = {
-                val response: ApiResponse<String> = apiClient.post("${Constants.apiURL}/feed/topics") {
-                    contentType(ContentType.Application.Json)
-                    headers {
-                        append(HttpHeaders.Authorization, "Bearer $accessToken")
+                val response: ApiResponse<String> =
+                    apiClient.post("${Constants.apiURL}/feed/topics") {
+                        contentType(ContentType.Application.Json)
+                        headers {
+                            append(HttpHeaders.Authorization, "Bearer $accessToken")
+                        }
+                        body = UpdateFeedTopicsRequestBody(newTopics)
                     }
-                    body = UpdateFeedTopicsRequestBody(newTopics)
-                }
                 if (response.status) {
                     Log.d("FeedRepository", "topic response: $response")
                     response.data
                 } else throw CustomAppException(response.message)
             },
-            shouldSave = {false },
+            shouldSave = { false },
             saveSubmitResult = {}
         )
     }
 
 
-    fun getNewsDetail(accessToken: String, id: String, url: String): Flow<UIState<FeedDetail<NewsDetail>>> {
+    fun getNewsDetail(
+        accessToken: String,
+        id: String,
+        url: String
+    ): Flow<UIState<FeedDetail<NewsDetail>>> {
         var detail: FeedDetail<NewsDetail>? = null
         return mainGetNetworkBoundResource(
             query = {
@@ -137,12 +143,13 @@ class FeedRepository
                 }
             },
             fetch = {
-                val response: ApiResponse<FeedDetail<NewsDetail>> = apiClient.get("${Constants.apiURL}/feed/detail?url=${url}&id=${id}&type=news") {
-                    contentType(ContentType.Application.Json)
-                    headers {
-                        append(HttpHeaders.Authorization, "Bearer $accessToken")
+                val response: ApiResponse<FeedDetail<NewsDetail>> =
+                    apiClient.get("${Constants.apiURL}/feed/detail?url=${url}&id=${id}&type=news") {
+                        contentType(ContentType.Application.Json)
+                        headers {
+                            append(HttpHeaders.Authorization, "Bearer $accessToken")
+                        }
                     }
-                }
                 if (response.status) {
                     Log.d(TAG, "getNewsDetail: ${response.data}")
                     response.data
@@ -154,7 +161,11 @@ class FeedRepository
         )
     }
 
-    fun getWordDefinition(accessToken: String, word: String, language: String): Flow<UIState<Word>> {
+    fun getWordDefinition(
+        accessToken: String,
+        word: String,
+        language: String
+    ): Flow<UIState<Word>> {
         var wordDefinition: Word? = null
         return mainGetNetworkBoundResource(
             query = {
@@ -163,12 +174,13 @@ class FeedRepository
                 }
             },
             fetch = {
-                val response: ApiResponse<Word> = apiClient.get("${Constants.apiURL}/feed/word/definition?word=${word}&language=${language}") {
-                    contentType(ContentType.Application.Json)
-                    headers {
-                        append(HttpHeaders.Authorization, "Bearer $accessToken")
+                val response: ApiResponse<Word> =
+                    apiClient.get("${Constants.apiURL}/feed/word/definition?word=${word}&language=${language}") {
+                        contentType(ContentType.Application.Json)
+                        headers {
+                            append(HttpHeaders.Authorization, "Bearer $accessToken")
+                        }
                     }
-                }
                 if (response.status) {
                     Log.d(TAG, "getWordDefinition: ${response}")
                     response.data
@@ -180,7 +192,12 @@ class FeedRepository
         )
     }
 
-    fun getVideoSubtitle(videoId: String, language: String,accessToken: String): Flow<UIState<List<SubtitlePart>>> {
+    fun getVideoSubtitle(
+        videoId: String,
+        language: String,
+        translatedLanguage: String,
+        accessToken: String
+    ): Flow<UIState<List<SubtitlePart>>> {
         var subtitle: List<SubtitlePart>? = null
         return mainGetNetworkBoundResource(
             query = {
@@ -190,12 +207,13 @@ class FeedRepository
             },
             fetch = {
                 Log.d("VideoDetailViewModel", "Call to get subtitle")
-                val response: ApiResponse<List<SubtitlePart>> = apiClient.get("${Constants.apiURL}/feed/video/subtitle?videoId=${videoId}&language=${language}") {
-                    contentType(ContentType.Application.Json)
-                    headers {
-                        append(HttpHeaders.Authorization, "Bearer $accessToken")
+                val response: ApiResponse<List<SubtitlePart>> =
+                    apiClient.get("${Constants.apiURL}/feed/video/subtitle?videoId=${videoId}&language=${language}&translatedLanguage=${translatedLanguage}") {
+                        contentType(ContentType.Application.Json)
+                        headers {
+                            append(HttpHeaders.Authorization, "Bearer $accessToken")
+                        }
                     }
-                }
                 Log.d(TAG, "getVideoSubtitle: ${response}")
 
                 if (response.status) {

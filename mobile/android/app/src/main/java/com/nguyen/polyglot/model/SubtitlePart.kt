@@ -5,4 +5,7 @@ data class SubtitlePart(
     val dur: Float,
     val end: Float,
     val text: String?,
+    val translatedText: String?,
+    val lang: String,
+    val translatedLang: String,
 )

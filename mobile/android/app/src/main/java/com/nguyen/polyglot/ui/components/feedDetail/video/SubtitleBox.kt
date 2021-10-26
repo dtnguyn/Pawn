@@ -12,19 +12,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nguyen.polyglot.model.SubtitlePart
-import com.nguyen.polyglot.ui.components.SelectableText
 import com.nguyen.polyglot.ui.theme.LightGreen
 import com.nguyen.polyglot.ui.theme.Neon
 import com.nguyen.polyglot.ui.theme.Typography
+import com.nguyen.polyglot.util.UtilFunctions.reformatString
 
 @Composable
 fun SubtitleBox(
     selected: Boolean,
-    mainLanguage: String,
-    subtitleText: String?,
+    isTranslated: Boolean,
+    subtitlePart: SubtitlePart,
     onClick: () -> Unit
 ) {
-    if (subtitleText == null) return
 
     Box(
         modifier = Modifier
@@ -42,11 +41,18 @@ fun SubtitleBox(
                 },
             backgroundColor = if (selected) Neon else Color.LightGray,
         ) {
-            Column(Modifier.padding(30.dp)) {
-                Text(text = mainLanguage, style = Typography.h6)
-                Spacer(modifier = Modifier.padding(5.dp))
+            Column(Modifier.padding(20.dp)) {
+                Text(text = subtitlePart.lang, style = Typography.h6)
+                Spacer(modifier = Modifier.padding(3.dp))
+                Text(text = reformatString(subtitlePart.text ?: ""), style = Typography.body1, fontSize = 18.sp)
+                if(isTranslated){
+                    Spacer(modifier = Modifier.padding(10.dp))
+                    Text(text = subtitlePart.translatedLang, style = Typography.h6)
+                    Spacer(modifier = Modifier.padding(3.dp))
+                    Text(text = reformatString(subtitlePart.translatedText ?: ""), style = Typography.body1, fontSize = 18.sp)
+                }
 
-                Text(text = subtitleText, style = Typography.body1, fontSize = 18.sp)
+
             }
         }
 

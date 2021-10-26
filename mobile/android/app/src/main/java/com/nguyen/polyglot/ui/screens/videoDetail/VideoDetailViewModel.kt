@@ -20,10 +20,12 @@ class VideoDetailViewModel
 ) : ViewModel() {
 
 
-    private val _videoSubtitleUIState: MutableState<UIState<List<SubtitlePart>>> = mutableStateOf(UIState.Initial(null))
+    private val _videoSubtitleUIState: MutableState<UIState<List<SubtitlePart>>> =
+        mutableStateOf(UIState.Initial(null))
     val videoSubtitleUIState: State<UIState<List<SubtitlePart>>> = _videoSubtitleUIState
 
-    private val _wordDefinitionUIState: MutableState<UIState<Word>> = mutableStateOf(UIState.Initial(null))
+    private val _wordDefinitionUIState: MutableState<UIState<Word>> =
+        mutableStateOf(UIState.Initial(null))
     val wordDefinitionUIState: State<UIState<Word>> = _wordDefinitionUIState
 
     var startSecond = 0f
@@ -31,8 +33,12 @@ class VideoDetailViewModel
     var focusSubtitlePart: SubtitlePart? = null
 
 
-
-    fun getVideoSubtitle(accessToken: String?, videoId: String?, language: String?) {
+    fun getVideoSubtitle(
+        accessToken: String?,
+        videoId: String?,
+        language: String?,
+        translatedLanguage: String?
+    ) {
         if (accessToken == null) {
             _videoSubtitleUIState.value = UIState.Error("Please login first!")
             return
@@ -50,8 +56,19 @@ class VideoDetailViewModel
             return
         }
 
+        if (translatedLanguage == null) {
+            _videoSubtitleUIState.value =
+                UIState.Error("Need native language to get subtitles!")
+            return
+        }
+
         viewModelScope.launch {
-            feedRepo.getVideoSubtitle(accessToken = accessToken, videoId = videoId, language = language).collectLatest {
+            feedRepo.getVideoSubtitle(
+                accessToken = accessToken,
+                videoId = videoId,
+                language = language,
+                translatedLanguage = translatedLanguage
+            ).collectLatest {
                 _videoSubtitleUIState.value = it
             }
         }
@@ -79,14 +96,14 @@ class VideoDetailViewModel
     }
 
 
-    fun updateStartSecond(second: Float){
+    fun updateStartSecond(second: Float) {
         startSecond = second
     }
 
     fun getVideoStartSecond() = startSecond
 
 
-    fun updateSubtitleIndex(index: Int){
+    fun updateSubtitleIndex(index: Int) {
         currentSubtitleIndex = index
     }
 

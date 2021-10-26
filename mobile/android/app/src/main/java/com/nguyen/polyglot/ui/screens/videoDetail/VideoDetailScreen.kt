@@ -34,6 +34,7 @@ import com.nguyen.polyglot.util.UtilFunctions.reformatString
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import io.ktor.utils.io.concurrent.*
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -48,7 +49,6 @@ fun VideoDetailScreen(
 
     val videoSubtitleUIState by viewModel.videoSubtitleUIState
     var videoSubtitle by remember { mutableStateOf(videoSubtitleUIState.value) }
-
 
 
     var currentIndex by remember { mutableStateOf(viewModel.currentSubtitleIndex) }
@@ -67,7 +67,7 @@ fun VideoDetailScreen(
     val context = LocalContext.current
 
     val modalBottomSheetState = rememberModalBottomSheetState(
-        initialValue = if(viewModel.focusSubtitlePart != null)ModalBottomSheetValue.Expanded else ModalBottomSheetValue.Hidden
+        initialValue = if (viewModel.focusSubtitlePart != null) ModalBottomSheetValue.Expanded else ModalBottomSheetValue.Hidden
     )
     val coroutineScope = rememberCoroutineScope()
 
@@ -82,7 +82,8 @@ fun VideoDetailScreen(
             viewModel.getVideoSubtitle(
                 DataStoreUtils.getAccessTokenFromDataStore(context),
                 videoId,
-                sharedViewModel.currentPickedLanguage.value?.value
+                sharedViewModel.currentPickedLanguage.value?.id,
+                sharedViewModel.authStatusUIState.value.value?.user?.nativeLanguageId
             )
         }
     }
@@ -180,22 +181,12 @@ fun VideoDetailScreen(
             Column {
                 videoSubtitle?.let { subtitleParts ->
 
-
-//                    VideoPlayer(
-//                        videoId,
-//                        start = viewModel.getVideoStartSecond(),
-//                        pause = pauseVideo,
-//                        onPlaying = { second ->
-//                            currentSecond = second
-//                        }
-//                    )
                     AndroidView(factory = {
                         playerView.addYouTubePlayerListener(object :
                             AbstractYouTubePlayerListener() {
                             override fun onReady(youTubePlayer: YouTubePlayer) {
                                 player = youTubePlayer
                                 youTubePlayer.loadVideo(videoId, viewModel.getVideoStartSecond())
-                                youTubePlayer.pause()
                             }
 
                             override fun onCurrentSecond(
@@ -218,11 +209,8 @@ fun VideoDetailScreen(
                         items(subtitleParts.size) { index ->
                             SubtitleBox(
                                 selected = currentIndex == index,
-                                mainLanguage = sharedViewModel.currentPickedLanguage.value?.value?.substring(
-                                    0,
-                                    2
-                                ) ?: "",
-                                subtitleText = reformatString(subtitleParts[index].text ?: ""),
+                                subtitlePart = subtitleParts[index],
+                                isTranslated = true,
                                 onClick = {
                                     Log.d("VideoDetailScreen", "player: $player")
                                     player?.pause()

@@ -58,7 +58,6 @@ fun FocusSubtitleMenu(
     var wordDefinition by remember { mutableStateOf(wordDefinitionUIState.value) }
 
     var isFindingDefinition by remember { mutableStateOf(false) }
-    var isTranslatingSubtitle by remember { mutableStateOf(false) }
 
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -104,9 +103,6 @@ fun FocusSubtitleMenu(
                 }
             )
         }
-        isTranslatingSubtitle -> {
-
-        }
         else -> {
             Column(Modifier.padding(20.dp)) {
                 Text(text = "Subtitle Action", style = Typography.h6)
@@ -119,7 +115,7 @@ fun FocusSubtitleMenu(
                     backgroundColor = Neon,
                 ) {
                     Column(Modifier.padding(30.dp)) {
-                        Text(text = language?.id ?: "", style = Typography.h6)
+                        Text(text = language?.id?.substring(0,2) ?: "", style = Typography.h6)
                         Spacer(modifier = Modifier.padding(5.dp))
 
                         SelectableText(
@@ -135,18 +131,11 @@ fun FocusSubtitleMenu(
                 }
                 Spacer(modifier = Modifier.padding(10.dp))
 
-
-                Button(
-                    onClick = {
-                    },
-                    content = {
-                        Text(text = "Translate text", style = Typography.h6)
-                    },
-                    shape = RoundedCornerShape(30.dp),
-                    colors = ButtonDefaults.buttonColors(LightRed),
+                if (currentFocusWord == null) Text(
+                    text = "Press and hold on a word",
+                    style = Typography.body1
                 )
-
-                currentFocusWord?.let {
+                else {
                     Spacer(modifier = Modifier.padding(5.dp))
                     Button(
                         onClick = {
@@ -160,12 +149,14 @@ fun FocusSubtitleMenu(
                             }
                         },
                         content = {
-                            Text(text = "Find definition for \"${it}\" ", style = Typography.h6)
+                            Text(text = "Find definition for \"${currentFocusWord!!}\" ", style = Typography.h6)
                         },
                         shape = RoundedCornerShape(30.dp),
                         colors = ButtonDefaults.buttonColors(LightGreen),
                     )
                 }
+
+
             }
 
 

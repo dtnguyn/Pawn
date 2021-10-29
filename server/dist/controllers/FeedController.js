@@ -14,7 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const User_1 = require("../entity/User");
 const superagent_1 = __importDefault(require("superagent"));
 const typeorm_1 = require("typeorm");
-const tinyurl_1 = __importDefault(require("tinyurl"));
+const unfluff_1 = __importDefault(require("unfluff"));
 exports.getFeeds = (savedWords, language, feedTopics) => __awaiter(this, void 0, void 0, function* () {
     const queryValues = savedWords.map((savedWord) => savedWord.value);
     const newsFeeds = yield getNews(queryValues, language, feedTopics);
@@ -58,32 +58,28 @@ exports.getVideoSubtitle = (videoId, lang, translatedLang) => __awaiter(this, vo
                 dur: subtitle[i].dur,
                 text: subtitle[i].text,
                 translatedText: translatedSubtitle[i].text,
-                translatedLang,
-                lang,
+                translatedLang: translatedLang.substr(0, 2),
+                lang: lang.substr(0, 2),
             });
         }
     }
     return result;
 });
 const getNewsDetail = (id, newsUrl) => __awaiter(this, void 0, void 0, function* () {
-    const shortenUrl = (yield tinyurl_1.default.shorten(newsUrl));
-    const result = yield superagent_1.default
-        .get(`https://article-parser.p.rapidapi.com/`)
-        .query({ website_url: shortenUrl })
-        .set("x-rapidapi-host", "article-parser.p.rapidapi.com")
-        .set("x-rapidapi-key", process.env.NEWS_PARSER_API_KEY);
-    return {
+    const result = yield superagent_1.default.get(newsUrl);
+    const data = unfluff_1.default(result.text);
+    const newsDetail = {
+        value: data.text ? data.text : "Article not available",
+        images: [data.image],
+    };
+    const feedDetail = {
         id,
         type: "news",
-        title: result.body.title,
-        thumbnail: result.body.thumbnail,
-        content: {
-            value: result.body.text
-                ? result.body.text
-                : "Cannot load data for this article!",
-            images: result.body.images,
-        },
+        title: data.title ? data.title : "Unavailable Data",
+        thumbnail: data.image,
+        content: newsDetail,
     };
+    return feedDetail;
 });
 const getNews = (queryValues, language, topics) => __awaiter(this, void 0, void 0, function* () {
     try {

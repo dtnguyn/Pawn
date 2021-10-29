@@ -172,8 +172,9 @@ router.get("/video/subtitle", checkAuthentication, async (req, res) => {
     }
 
     const translatedLanguage = req.query.translatedLanguage as string;
+    console.log(translatedLanguage);
 
-    if (!language) {
+    if (!translatedLanguage) {
       throw new CustomError("Please provide the translated language!");
     }
 

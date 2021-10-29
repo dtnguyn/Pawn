@@ -156,7 +156,8 @@ router.get("/video/subtitle", middlewares_1.checkAuthentication, (req, res) => _
             throw new CustomError_1.default("Please provide the target language!");
         }
         const translatedLanguage = req.query.translatedLanguage;
-        if (!language) {
+        console.log(translatedLanguage);
+        if (!translatedLanguage) {
             throw new CustomError_1.default("Please provide the translated language!");
         }
         const subtitleParts = yield FeedController_1.getVideoSubtitle(videoId, language, translatedLanguage);

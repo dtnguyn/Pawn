@@ -8,7 +8,7 @@ import {
 import superagent from "superagent";
 import { getRepository } from "typeorm";
 import { FeedJSON } from "../utils/types";
-import TinyURL from "tinyurl";
+import extractor from "unfluff";
 
 // import Mercury from "@postlight/mercury-parser";
 
@@ -77,8 +77,8 @@ export const getVideoSubtitle = async (
         dur: subtitle[i].dur,
         text: subtitle[i].text,
         translatedText: translatedSubtitle[i].text,
-        translatedLang,
-        lang,
+        translatedLang: translatedLang.substr(0, 2),
+        lang: lang.substr(0, 2),
       });
     }
   }
@@ -87,26 +87,24 @@ export const getVideoSubtitle = async (
 };
 
 const getNewsDetail = async (id: string, newsUrl: string) => {
-  const shortenUrl = (await TinyURL.shorten(newsUrl)) as string;
+  const result = await superagent.get(newsUrl);
 
-  const result = await superagent
-    .get(`https://article-parser.p.rapidapi.com/`)
-    .query({ website_url: shortenUrl })
-    .set("x-rapidapi-host", "article-parser.p.rapidapi.com")
-    .set("x-rapidapi-key", process.env.NEWS_PARSER_API_KEY as string);
+  const data = extractor(result.text);
 
-  return {
+  const newsDetail: NewsDetailJSON = {
+    value: data.text ? data.text : "Article not available",
+    images: [data.image],
+  };
+
+  const feedDetail: FeedDetailJSON = {
     id,
     type: "news",
-    title: result.body.title,
-    thumbnail: result.body.thumbnail,
-    content: {
-      value: result.body.text
-        ? result.body.text
-        : "Cannot load data for this article!",
-      images: result.body.images,
-    } as NewsDetailJSON,
-  } as FeedDetailJSON;
+    title: data.title ? data.title : "Unavailable Data",
+    thumbnail: data.image,
+    content: newsDetail,
+  };
+
+  return feedDetail;
 };
 
 const getNews = async (

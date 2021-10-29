@@ -39,7 +39,8 @@
     "server": "^1.0.33",
     "superagent": "^6.1.0",
     "tinyurl": "^1.1.7",
-    "typeorm": "0.2.29"
+    "typeorm": "0.2.29",
+    "unfluff": "^3.2.0"
   },
   "devDependencies": {
     "@types/node": "^8.0.29",

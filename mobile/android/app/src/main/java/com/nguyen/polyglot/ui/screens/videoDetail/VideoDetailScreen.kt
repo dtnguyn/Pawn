@@ -116,14 +116,14 @@ fun VideoDetailScreen(
     LaunchedEffect(currentSecond) {
         if (videoSubtitle != null) {
             if (currentSecond >= videoSubtitle!![currentIndex].end) {
-                var tempSec = currentSecond
+                val tempSec = currentSecond
                 var tempIndex = currentIndex
                 while (tempSec >= videoSubtitle!![tempIndex].end && tempIndex < videoSubtitle!!.size - 1) {
                     tempIndex++
                 }
                 if (tempIndex >= 0 && tempIndex < videoSubtitle!!.size) currentIndex = tempIndex
             } else if (currentSecond < videoSubtitle!![currentIndex].start) {
-                var tempSec = currentSecond
+                val tempSec = currentSecond
                 var tempIndex = currentIndex
                 while (tempSec < videoSubtitle!![tempIndex].start) {
                     Log.d("VideoDetailScreen", "start: ${videoSubtitle!![tempIndex].start}")

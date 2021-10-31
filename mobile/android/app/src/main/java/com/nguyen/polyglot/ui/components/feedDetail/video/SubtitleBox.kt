@@ -8,6 +8,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,9 +37,12 @@ fun SubtitleBox(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 30.dp, vertical = 15.dp)
+                .clip(RoundedCornerShape(30.dp))
                 .clickable {
                     onClick()
-                },
+                }
+
+            ,
             backgroundColor = if (selected) Neon else Color.LightGray,
         ) {
             Column(Modifier.padding(20.dp)) {

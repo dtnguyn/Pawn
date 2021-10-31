@@ -198,6 +198,7 @@ class FeedRepository
         translatedLanguage: String,
         accessToken: String
     ): Flow<UIState<List<SubtitlePart>>> {
+        Log.d("FeedRepo", "translatedLanguage $translatedLanguage")
         var subtitle: List<SubtitlePart>? = null
         return mainGetNetworkBoundResource(
             query = {

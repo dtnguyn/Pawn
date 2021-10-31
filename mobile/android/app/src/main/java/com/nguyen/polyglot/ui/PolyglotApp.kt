@@ -154,16 +154,17 @@ fun PolygotApp(
                 }
                 composable(PolyglotScreens.ChangePassword.route) { ChangePasswordScreen(navController = navController) }
                 composable(PolyglotScreens.VerifyCode.route) { VerifyCodeScreen(navController = navController) }
-                composable("${PolyglotScreens.NewsDetail.route}/{feedId}/{title}/{publishedDate}/{thumbnail}/{feedUrl}") {
+                composable("${PolyglotScreens.NewsDetail.route}/{feedId}/{title}/{publishedDate}/{thumbnail}/{feedUrl}",
+                arguments = listOf()) {
                     NewsDetailScreen(
                         viewModel = newsDetailViewModel,
                         sharedViewModel = sharedViewModel,
                         navController = navController,
                         newsUrl = it.arguments?.getString("feedUrl") ?: "",
-                        newsId = it.arguments?.getString("feedId") ?: "",
-                        title = it.arguments?.getString("title") ?: "",
-                        publishedDate = it.arguments?.getString("publishedDate"),
-                        thumbnail = it.arguments?.getString("thumbnail"),
+                        newsId = (it.arguments?.getString("feedId")) ?: "",
+                        title = if(it.arguments?.getString("title") == "null") null else it.arguments?.getString("title"),
+                        publishedDate = if(it.arguments?.getString("publishedDate") == "null") null else it.arguments?.getString("publishedDate"),
+                        thumbnail = if(it.arguments?.getString("thumbnail") == "null") null else it.arguments?.getString("thumbnail"),
                     )
                 }
 

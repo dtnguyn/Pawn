@@ -31,6 +31,7 @@ import com.nguyen.polyglot.ui.theme.*
 import com.nguyen.polyglot.util.DataStoreUtils
 import com.nguyen.polyglot.util.UIState
 import kotlinx.coroutines.launch
+import java.util.*
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -278,7 +279,25 @@ fun FeedScreen(
                     imageLoader = imageLoader,
                     onDismiss = { customFeedDialog = false },
                     onHandleUrlChange = { customFeedUrl = it },
-                    onChangeType = { customFeedType = it })
+                    onChangeType = { customFeedType = it },
+                    onAddClick = {
+                        feedViewModel.saveFeedScrollingState(
+                            feedScrollState.firstVisibleItemIndex,
+                            feedScrollState.firstVisibleItemScrollOffset
+                        )
+                        if (customFeedType == "news"){
+                            val url = it.replace("/", "<")
+                            val date = null
+                            val thumbnail = null
+                            val title = null
+                            navController.navigate("${PolyglotScreens.NewsDetail.route}/${UUID.randomUUID()}/${title}/${Date()}/${thumbnail}/${url}")
+                        } else {
+                            val videoId = it.substring(it.length - 11, it.length)
+                            Log.d("FeedScreen", "videoId: $videoId")
+                            navController.navigate("${PolyglotScreens.VideoDetail.route}/${videoId}")
+                        }
+                    }
+                )
             }
 
             Box(

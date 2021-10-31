@@ -108,6 +108,7 @@ fun VideoDetailScreen(
 
             }
             is UIState.Loaded -> {
+                Log.d("VideoDetailScreen", "videoSubtitle value ${videoSubtitleUIState.value}")
                 videoSubtitle = videoSubtitleUIState.value
             }
         }
@@ -181,8 +182,6 @@ fun VideoDetailScreen(
                 viewModel.updateSubtitleIndex(currentIndex)
                 navController.popBackStack()
             })
-
-
 
             Column {
                 videoSubtitle?.let { subtitleParts ->

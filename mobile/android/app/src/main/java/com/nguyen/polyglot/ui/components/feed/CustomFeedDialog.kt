@@ -33,7 +33,8 @@ fun CustomFeedDialog(
     imageLoader: ImageLoader,
     onDismiss: () -> Unit,
     onHandleUrlChange: (url: String) -> Unit,
-    onChangeType: (type: String) -> Unit
+    onChangeType: (type: String) -> Unit,
+    onAddClick: (url: String) -> Unit,
 ) {
     Dialog(onDismissRequest = { onDismiss() }) {
         Surface(
@@ -136,7 +137,7 @@ fun CustomFeedDialog(
                         .aspectRatio(5f),
                     colors = ButtonDefaults.buttonColors(ReallyRed),
                     shape = RoundedCornerShape(15.dp),
-                    onClick = { /*TODO*/ }) {
+                    onClick = { onAddClick(customUrl) }) {
                     Text(
                         text = "Add",
                         color = Color.White,

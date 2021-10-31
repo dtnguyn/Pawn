@@ -51,7 +51,7 @@ fun NewsDetailScreen(
     viewModel: NewsDetailViewModel,
     sharedViewModel: SharedViewModel,
     navController: NavController,
-    title: String,
+    title: String?,
     publishedDate: String?,
     thumbnail: String?,
     newsId: String,
@@ -216,7 +216,7 @@ fun NewsDetailScreen(
 
                 }
 
-                Text(text = title, style = Typography.h3)
+                Text(text = title ?: newsDetail?.title ?: "", style = Typography.h3)
                 Spacer(modifier = Modifier.padding(2.dp))
                 Text(text = publishedDate?.substring(0, 10) ?: "", style = Typography.subtitle2)
                 Log.d("NewsDetailScreen", "url: ${newsUrl}")
@@ -224,7 +224,7 @@ fun NewsDetailScreen(
                 Spacer(modifier = Modifier.padding(5.dp))
 
                 GlideImage(
-                    imageModel = thumbnail?.replace("<", "/") ?: "",
+                    imageModel = thumbnail?.replace("<", "/") ?: newsDetail?.thumbnail ?: "",
                     contentScale = ContentScale.FillWidth,
                     circularReveal = CircularReveal(duration = 250),
                     placeHolder = ImageBitmap.imageResource(id = R.drawable.cat_loading_icon),

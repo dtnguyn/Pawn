@@ -30,7 +30,10 @@ class FeedViewModel@Inject constructor (
     private val _topics: MutableState<UIState<String>> = mutableStateOf(UIState.Initial(""))
     val topics: State<UIState<String>> = _topics
 
-    val topicMap = HashMap<String, Boolean?>()
+    private val topicMap = HashMap<String, Boolean?>()
+
+    var currentFeedIndex = 0
+    var currentFeedOffset = 0
 
     init {
         allTopics.forEach {
@@ -117,6 +120,11 @@ class FeedViewModel@Inject constructor (
 
     fun isTopicPicked(topic: String): Boolean {
         return topicMap[topic] ?: false
+    }
+
+    fun saveFeedScrollingState(index: Int, offset: Int){
+        currentFeedIndex = index
+        currentFeedOffset = offset
     }
 
 

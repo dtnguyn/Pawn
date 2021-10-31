@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -53,6 +54,7 @@ fun FeedScreen(
         initialValue = ModalBottomSheetValue.Hidden
     )
     val coroutineScope = rememberCoroutineScope()
+    val feedScrollState = rememberLazyListState()
 
     var isLoading by remember { mutableStateOf(false) }
 
@@ -146,7 +148,13 @@ fun FeedScreen(
                 .fillMaxHeight(),
             backgroundColor = Color.White,
         ) {
-            LazyColumn(Modifier.padding(bottom = 50.dp)) {
+            LazyColumn(modifier = Modifier.padding(bottom = 50.dp), state = feedScrollState) {
+                coroutineScope.launch {
+                    feedScrollState.scrollToItem(
+                        feedViewModel.currentFeedIndex,
+                        feedViewModel.currentFeedOffset
+                    )
+                }
                 item {
 
                     Row(
@@ -311,8 +319,16 @@ fun FeedScreen(
                                         val url = feed.url.replace("/", "<")
                                         val thumbnail = feed.thumbnail?.replace("/", "<")
                                         if (feed.type == "news") {
+                                            feedViewModel.saveFeedScrollingState(
+                                                feedScrollState.firstVisibleItemIndex,
+                                                feedScrollState.firstVisibleItemScrollOffset
+                                            )
                                             navController.navigate("${PolyglotScreens.NewsDetail.route}/${feed.id}/${feed.title}/${feed.publishedDate}/${thumbnail}/${url}")
                                         } else {
+                                            feedViewModel.saveFeedScrollingState(
+                                                feedScrollState.firstVisibleItemIndex,
+                                                feedScrollState.firstVisibleItemScrollOffset
+                                            )
                                             navController.navigate("${PolyglotScreens.VideoDetail.route}/${feed.id}")
                                         }
                                     })

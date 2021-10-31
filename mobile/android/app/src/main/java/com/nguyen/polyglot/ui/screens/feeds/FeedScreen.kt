@@ -23,9 +23,7 @@ import com.nguyen.polyglot.model.Feed
 import com.nguyen.polyglot.model.Language
 import com.nguyen.polyglot.ui.SharedViewModel
 import com.nguyen.polyglot.ui.components.RoundButton
-import com.nguyen.polyglot.ui.components.feed.FeedItem
-import com.nguyen.polyglot.ui.components.feed.LoadingFeedItem
-import com.nguyen.polyglot.ui.components.feed.TopicMenu
+import com.nguyen.polyglot.ui.components.feed.*
 import com.nguyen.polyglot.ui.navigation.PolyglotScreens
 import com.nguyen.polyglot.ui.screens.feeds.FeedViewModel
 import com.nguyen.polyglot.ui.theme.*
@@ -156,80 +154,29 @@ fun FeedScreen(
                     )
                 }
                 item {
-
-                    Row(
-                        Modifier
-                            .padding(vertical = 20.dp, horizontal = 20.dp)
-                    ) {
-                        Column(Modifier.weight(3f)) {
-                            Text(text = "Your feed", style = Typography.h3)
-                            Text(
-                                text = "News and videos generated from your saved words",
-                                style = Typography.body2
-                            )
+                    FeedTopBar(onClickTopicMenu = {
+                        coroutineScope.launch {
+                            if (bottomSheetScaffoldState.isVisible) bottomSheetScaffoldState.hide()
+                            else bottomSheetScaffoldState.show()
                         }
-
-                        Column(
-                            Modifier
-                                .weight(1f)
-                                .align(Alignment.CenterVertically)
-                        ) {
-                            Box(
-                                Modifier
-                                    .align(Alignment.End)
-                            ) {
-                                RoundButton(
-                                    backgroundColor = TextFieldGrey,
-                                    size = 56.dp,
-                                    icon = R.drawable.paint,
-                                    padding = 11.dp
-                                ) {
-                                    coroutineScope.launch {
-//                                        if(bottomSheetScaffoldState.isVisible)
-//                                            bottomSheetScaffoldState.ex()
-//                                        else bottomSheetScaffoldState.bottomSheetState.collapse()
-                                        if (bottomSheetScaffoldState.isVisible) bottomSheetScaffoldState.hide()
-                                        else bottomSheetScaffoldState.show()
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    })
                 }
 
                 item {
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .padding(bottom = 40.dp, start = 20.dp, end = 20.dp)
-
-                    ) {
-                        sharedViewModel.pickedLanguagesUIState.value.value?.forEach { language ->
-                            Image(
-                                painter = painterResource(
-                                    id = UtilFunctions.generateFlagForLanguage(
-                                        language.id
+                    sharedViewModel.pickedLanguagesUIState.value.value?.let { languages ->
+                        currentPickedLanguage?.let { language ->
+                            FeedLanguageBar(
+                                languages = languages,
+                                currentPickedLanguage = language,
+                                onPickLanguage = {
+                                    sharedViewModel.changeCurrentPickedLanguage(
+                                        it
                                     )
-                                ),
-                                contentDescription = "language icon",
-                                modifier = Modifier
-                                    .padding(horizontal = 5.dp)
-                                    .size(if (language.id == currentPickedLanguage?.id) 46.dp else 38.dp)
-                                    .clip(CircleShape)
-                                    .border(
-                                        if (language.id == currentPickedLanguage?.id) 3.dp else 0.dp,
-                                        DarkBlue,
-                                        CircleShape
-                                    )
-                                    .clickable {
-                                        sharedViewModel.changeCurrentPickedLanguage(
-                                            language
-                                        )
-                                    }
+                                }
                             )
                         }
                     }
+
                 }
 
 
@@ -267,40 +214,9 @@ fun FeedScreen(
                                         .padding(horizontal = 20.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text(
-                                            text = "Your feed is empty right now",
-                                            style = Typography.h5,
-                                            color = Color.Gray,
-                                            textAlign = TextAlign.Center
-                                        )
-                                        Spacer(modifier = Modifier.padding(10.dp))
-                                        Spacer(modifier = Modifier.padding(10.dp))
-                                        Image(
-                                            painter = painterResource(id = R.drawable.list_icon),
-                                            contentDescription = "list_icon",
-                                            modifier = Modifier
-                                                .size(128.dp)
-                                                .padding(end = 5.dp)
-                                        )
-                                        Spacer(modifier = Modifier.padding(10.dp))
-
-                                        Text(
-                                            text = "Save more words to get more news and videos to your feed",
-                                            style = Typography.body1,
-                                            color = Color.Gray,
-                                            textAlign = TextAlign.Center
-                                        )
-
-                                        Spacer(modifier = Modifier.padding(10.dp))
-                                        Spacer(modifier = Modifier.padding(10.dp))
-                                        Spacer(modifier = Modifier.padding(10.dp))
-                                        Spacer(modifier = Modifier.padding(10.dp))
-
-
-                                    }
-
+                                    FeedEmptyPlaceholder()
                                 }
+
                             }
                         } else {
                             items(it.size) { index ->
@@ -341,6 +257,4 @@ fun FeedScreen(
             }
         }
     }
-
-
 }

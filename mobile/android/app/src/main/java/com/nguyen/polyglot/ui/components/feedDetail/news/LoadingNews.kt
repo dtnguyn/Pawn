@@ -15,6 +15,31 @@ fun LoadingNews() {
     ShimmerAnimation(
         modifier = Modifier
             .fillMaxWidth()
+            .height(40.dp), shape = RoundedCornerShape(40.dp)
+    )
+    Spacer(modifier = Modifier.padding(3.dp))
+    ShimmerAnimation(
+        modifier = Modifier
+            .fillMaxWidth(0.4f)
+            .height(40.dp), shape = RoundedCornerShape(40.dp)
+    )
+    Spacer(modifier = Modifier.padding(3.dp))
+    ShimmerAnimation(
+        modifier = Modifier
+            .fillMaxWidth(0.2f)
+            .height(20.dp), shape = RoundedCornerShape(40.dp)
+    )
+    Spacer(modifier = Modifier.padding(5.dp))
+    ShimmerAnimation(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(250.dp), shape = RoundedCornerShape(40.dp)
+    )
+    Spacer(modifier = Modifier.padding(10.dp))
+
+    ShimmerAnimation(
+        modifier = Modifier
+            .fillMaxWidth()
             .height(30.dp), shape = RoundedCornerShape(40.dp)
     )
     Spacer(modifier = Modifier.padding(3.dp))

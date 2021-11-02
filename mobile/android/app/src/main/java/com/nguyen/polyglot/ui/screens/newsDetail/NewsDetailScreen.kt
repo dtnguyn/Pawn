@@ -1,5 +1,6 @@
 package com.nguyen.polyglot.ui.screens.newsDetail
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
@@ -38,9 +39,11 @@ import com.nguyen.polyglot.ui.navigation.PolyglotScreens
 import com.nguyen.polyglot.ui.theme.Typography
 import com.nguyen.polyglot.util.DataStoreUtils
 import com.nguyen.polyglot.util.UIState
+import com.nguyen.polyglot.util.UtilFunctions.reformatDateString
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 
 
 @ExperimentalMaterialApi
@@ -51,9 +54,6 @@ fun NewsDetailScreen(
     viewModel: NewsDetailViewModel,
     sharedViewModel: SharedViewModel,
     navController: NavController,
-    title: String?,
-    publishedDate: String?,
-    thumbnail: String?,
     newsId: String,
     newsUrl: String
 ) {
@@ -75,6 +75,8 @@ fun NewsDetailScreen(
     val bottomSheetScaffoldState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden
     )
+
+
 
 
 
@@ -216,29 +218,34 @@ fun NewsDetailScreen(
 
                 }
 
-                Text(text = title ?: newsDetail?.title ?: "", style = Typography.h3)
-                Spacer(modifier = Modifier.padding(2.dp))
-                Text(text = publishedDate?.substring(0, 10) ?: "", style = Typography.subtitle2)
-                Log.d("NewsDetailScreen", "url: ${newsUrl}")
 
-                Spacer(modifier = Modifier.padding(5.dp))
-
-                GlideImage(
-                    imageModel = thumbnail?.replace("<", "/") ?: newsDetail?.thumbnail ?: "",
-                    contentScale = ContentScale.FillWidth,
-                    circularReveal = CircularReveal(duration = 250),
-                    placeHolder = ImageBitmap.imageResource(id = R.drawable.cat_loading_icon),
-                    error = ImageBitmap.imageResource(R.drawable.image_loading_error),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(15.dp))
-                )
-
-                Spacer(modifier = Modifier.padding(10.dp))
 
                 if (loading) {
                     LoadingNews()
                 } else {
+                    Text(text = newsDetail?.title ?: "", style = Typography.h3)
+                    Spacer(modifier = Modifier.padding(2.dp))
+                    Text(text = newsDetail?.content?.source ?: "", style = Typography.subtitle2)
+                    Text(
+                        text = reformatDateString(newsDetail?.content?.publishedDate)
+                            ?: "", style = Typography.subtitle2
+                    )
+                    Log.d("NewsDetailScreen", "url: ${newsUrl}")
+
+                    Spacer(modifier = Modifier.padding(5.dp))
+
+                    GlideImage(
+                        imageModel = newsDetail?.thumbnail ?: "",
+                        contentScale = ContentScale.FillWidth,
+                        circularReveal = CircularReveal(duration = 250),
+                        placeHolder = ImageBitmap.imageResource(id = R.drawable.cat_loading_icon),
+                        error = ImageBitmap.imageResource(R.drawable.image_loading_error),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(15.dp))
+                    )
+
+                    Spacer(modifier = Modifier.padding(10.dp))
                     newsDetail?.content?.value?.let {
                         SelectableText(
                             text = it,

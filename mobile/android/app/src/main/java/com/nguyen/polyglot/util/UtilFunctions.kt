@@ -1,10 +1,13 @@
 package com.nguyen.polyglot.util
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.text.Html
 import android.util.DisplayMetrics
 import androidx.compose.ui.graphics.Color
 import com.nguyen.polyglot.ui.theme.*
+import java.text.ParseException
+import java.text.SimpleDateFormat
 
 object UtilFunctions {
 
@@ -62,5 +65,18 @@ object UtilFunctions {
         Html.fromHtml(str, Html.FROM_HTML_MODE_LEGACY).toString()
     } else {
         Html.fromHtml(str).toString()
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    fun reformatDateString(dateString: String?): String?{
+        try {
+            if(dateString == null) return null
+            val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(dateString)
+            val formattedDate = SimpleDateFormat("dd/MM/yyyy, Ka").format(date)
+            return formattedDate
+        } catch (error: ParseException){
+            return null
+        }
+
     }
 }

@@ -255,7 +255,7 @@ fun FeedScreen(
                                                 feedScrollState.firstVisibleItemIndex,
                                                 feedScrollState.firstVisibleItemScrollOffset
                                             )
-                                            navController.navigate("${PolyglotScreens.NewsDetail.route}/${feed.id}/${feed.title}/${feed.publishedDate}/${thumbnail}/${url}")
+                                            navController.navigate("${PolyglotScreens.NewsDetail.route}/${feed.id}/${url}")
                                         } else {
                                             feedViewModel.saveFeedScrollingState(
                                                 feedScrollState.firstVisibleItemIndex,
@@ -290,7 +290,7 @@ fun FeedScreen(
                             val date = null
                             val thumbnail = null
                             val title = null
-                            navController.navigate("${PolyglotScreens.NewsDetail.route}/${UUID.randomUUID()}/${title}/${Date()}/${thumbnail}/${url}")
+                            navController.navigate("${PolyglotScreens.NewsDetail.route}/${UUID.randomUUID()}/${url}")
                         } else {
                             val videoId = it.substring(it.length - 11, it.length)
                             Log.d("FeedScreen", "videoId: $videoId")

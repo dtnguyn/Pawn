@@ -20,8 +20,8 @@ const router = Router();
 
 router.get("/", checkAuthentication, async (req, res) => {
   try {
-    const userId = (req as any).user.id as string;
-    if (!userId) {
+    const user = (req as any).user;
+    if (!user) {
       throw new CustomError("Please login first!");
     }
 
@@ -36,7 +36,7 @@ router.get("/", checkAuthentication, async (req, res) => {
     if (!language) {
       throw new CustomError("Please provide target language!");
     }
-    const words = await getSavedWords(userId, language);
+    const words = await getSavedWords(user.id, language);
 
     const feeds = await getFeeds(words, language, feedTopics);
     console.log("feeds length ", feeds.length);

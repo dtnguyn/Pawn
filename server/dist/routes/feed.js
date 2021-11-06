@@ -22,8 +22,8 @@ const middlewares_1 = require("../utils/middlewares");
 const router = express_1.Router();
 router.get("/", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
-        const userId = req.user.id;
-        if (!userId) {
+        const user = req.user;
+        if (!user) {
             throw new CustomError_1.default("Please login first!");
         }
         var feedTopics = req.user.feedTopics;
@@ -34,7 +34,7 @@ router.get("/", middlewares_1.checkAuthentication, (req, res) => __awaiter(this,
         if (!language) {
             throw new CustomError_1.default("Please provide target language!");
         }
-        const words = yield WordController_1.getSavedWords(userId, language);
+        const words = yield WordController_1.getSavedWords(user.id, language);
         const feeds = yield FeedController_1.getFeeds(words, language, feedTopics);
         console.log("feeds length ", feeds.length);
         res.send(new ApiResponse_1.default(true, "", feeds));

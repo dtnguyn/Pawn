@@ -47,6 +47,9 @@ export type FeedDetailJSON = {
 
 export type NewsDetailJSON = {
   value: string;
+  publishedDate: string;
+  source: string;
+  author: string;
   images: string[];
 };
 

@@ -15,6 +15,7 @@ const User_1 = require("../entity/User");
 const superagent_1 = __importDefault(require("superagent"));
 const typeorm_1 = require("typeorm");
 const unfluff_1 = __importDefault(require("unfluff"));
+const moment_1 = __importDefault(require("moment"));
 exports.getFeeds = (savedWords, language, feedTopics) => __awaiter(this, void 0, void 0, function* () {
     const queryValues = savedWords.map((savedWord) => savedWord.value);
     const newsFeeds = yield getNews(queryValues, language, feedTopics);
@@ -47,9 +48,7 @@ exports.getVideoSubtitle = (videoId, lang, translatedLang) => __awaiter(this, vo
     const subtitle = data[0].body;
     const translatedSubtitle = data[1].body;
     var result = null;
-    if (subtitle.length &&
-        translatedSubtitle.length &&
-        subtitle.length === translatedSubtitle.length) {
+    if (subtitle.length && translatedSubtitle.length) {
         result = [];
         for (let i = 0; i < subtitle.length; i++) {
             result.push({
@@ -57,21 +56,31 @@ exports.getVideoSubtitle = (videoId, lang, translatedLang) => __awaiter(this, vo
                 end: subtitle[i].end,
                 dur: subtitle[i].dur,
                 text: subtitle[i].text,
-                translatedText: translatedSubtitle[i].text,
+                translatedText: translatedSubtitle[i]
+                    ? translatedSubtitle[i].text
+                    : "Unable to translate",
                 translatedLang: translatedLang.substr(0, 2),
                 lang: lang.substr(0, 2),
             });
         }
     }
+    console.log(subtitle.length);
+    console.log(translatedSubtitle.length);
     return result;
 });
 const getNewsDetail = (id, newsUrl) => __awaiter(this, void 0, void 0, function* () {
     const result = yield superagent_1.default.get(newsUrl);
     const data = unfluff_1.default(result.text);
+    const date = new Date(data.date);
+    const formattedDate = moment_1.default(date).format("ll");
     const newsDetail = {
         value: data.text ? data.text : "Article not available",
         images: [data.image],
+        source: data.publisher,
+        author: data.author.length ? data.author[0] : null,
+        publishedDate: formattedDate,
     };
+    console.log(formattedDate);
     const feedDetail = {
         id,
         type: "news",
@@ -99,6 +108,8 @@ const getNews = (queryValues, language, topics) => __awaiter(this, void 0, void 
         if (articles) {
             const newsFeeds = articles.map((article) => {
                 if (article._id && article.title && article.summary && article.link) {
+                    const date = new Date(article.published_date);
+                    const formattedDate = moment_1.default(date).format("ll");
                     return {
                         id: article._id,
                         type: "news",
@@ -109,11 +120,12 @@ const getNews = (queryValues, language, topics) => __awaiter(this, void 0, void 
                         url: article.link,
                         description: article.summary,
                         thumbnail: article.media,
-                        publishedDate: article.published_date,
+                        publishedDate: formattedDate,
                     };
                 }
+                return null;
             });
-            return newsFeeds.filter((news) => news != undefined);
+            return newsFeeds.filter((news) => news != null);
         }
         else
             return [];
@@ -146,6 +158,8 @@ const getVideos = (queryValues, language, topics) => __awaiter(this, void 0, voi
         if (videos) {
             const videoFeeds = videos.map((video) => {
                 if (video.id && video.id.videoId && video.snippet) {
+                    const date = new Date(video.snippet.publishedAt.toString());
+                    const formattedDate = moment_1.default(date).format("ll");
                     return {
                         id: video.id.videoId,
                         type: "video",
@@ -158,7 +172,7 @@ const getVideos = (queryValues, language, topics) => __awaiter(this, void 0, voi
                         url: `https://youtu.be/${video.id.videoId}`,
                         language: language,
                         description: video.snippet.description,
-                        publishedDate: video.snippet.publishedAt.toString(),
+                        publishedDate: formattedDate,
                     };
                 }
             });

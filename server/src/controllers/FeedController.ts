@@ -9,6 +9,7 @@ import superagent from "superagent";
 import { getRepository } from "typeorm";
 import { FeedJSON } from "../utils/types";
 import extractor from "unfluff";
+import moment from "moment";
 
 // import Mercury from "@postlight/mercury-parser";
 
@@ -64,11 +65,7 @@ export const getVideoSubtitle = async (
   const translatedSubtitle = data[1].body;
 
   var result: Array<SubtitlePart> | null = null;
-  if (
-    subtitle.length &&
-    translatedSubtitle.length &&
-    subtitle.length === translatedSubtitle.length
-  ) {
+  if (subtitle.length && translatedSubtitle.length) {
     result = [];
     for (let i = 0; i < subtitle.length; i++) {
       result.push({
@@ -76,12 +73,17 @@ export const getVideoSubtitle = async (
         end: subtitle[i].end,
         dur: subtitle[i].dur,
         text: subtitle[i].text,
-        translatedText: translatedSubtitle[i].text,
+        translatedText: translatedSubtitle[i]
+          ? translatedSubtitle[i].text
+          : "Unable to translate",
         translatedLang: translatedLang.substr(0, 2),
         lang: lang.substr(0, 2),
       });
     }
   }
+
+  console.log(subtitle.length);
+  console.log(translatedSubtitle.length);
 
   return result;
 };
@@ -91,11 +93,16 @@ const getNewsDetail = async (id: string, newsUrl: string) => {
 
   const data = extractor(result.text);
 
+  const date = new Date(data.date);
+  const formattedDate = moment(date).format("ll");
   const newsDetail: NewsDetailJSON = {
     value: data.text ? data.text : "Article not available",
     images: [data.image],
+    source: data.publisher,
+    author: data.author.length ? data.author[0] : null,
+    publishedDate: formattedDate,
   };
-
+  console.log(formattedDate);
   const feedDetail: FeedDetailJSON = {
     id,
     type: "news",
@@ -130,6 +137,8 @@ const getNews = async (
     if (articles) {
       const newsFeeds = articles.map((article) => {
         if (article._id && article.title && article.summary && article.link) {
+          const date = new Date(article.published_date);
+          const formattedDate = moment(date).format("ll");
           return {
             id: article._id,
             type: "news",
@@ -140,12 +149,13 @@ const getNews = async (
             url: article.link,
             description: article.summary,
             thumbnail: article.media,
-            publishedDate: article.published_date,
+            publishedDate: formattedDate,
           } as FeedJSON;
         }
+        return null;
       });
 
-      return newsFeeds.filter((news) => news != undefined);
+      return newsFeeds.filter((news) => news != null);
     } else return [];
   } catch (error) {
     console.log("Error when getting news feed: ", error.message);
@@ -180,6 +190,8 @@ const getVideos = async (
     if (videos) {
       const videoFeeds = videos.map((video) => {
         if (video.id && video.id.videoId && video.snippet) {
+          const date = new Date(video.snippet.publishedAt.toString());
+          const formattedDate = moment(date).format("ll");
           return {
             id: video.id.videoId,
             type: "video",
@@ -192,7 +204,7 @@ const getVideos = async (
             url: `https://youtu.be/${video.id.videoId}`,
             language: language,
             description: video.snippet.description,
-            publishedDate: video.snippet.publishedAt.toString(),
+            publishedDate: formattedDate,
           } as FeedJSON;
         }
       });

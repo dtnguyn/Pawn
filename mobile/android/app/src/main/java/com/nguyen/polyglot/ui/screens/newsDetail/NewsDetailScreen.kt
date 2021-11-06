@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -225,11 +226,26 @@ fun NewsDetailScreen(
                 } else {
                     Text(text = newsDetail?.title ?: "", style = Typography.h3)
                     Spacer(modifier = Modifier.padding(2.dp))
-                    Text(text = newsDetail?.content?.source ?: "", style = Typography.subtitle2)
-                    Text(
-                        text = reformatDateString(newsDetail?.content?.publishedDate)
-                            ?: "", style = Typography.subtitle2
-                    )
+                    Box(Modifier.fillMaxWidth()) {
+                        Column {
+                            Text(
+                                text = newsDetail?.content?.source ?: "",
+                                style = Typography.subtitle2
+                            )
+                            Text(
+                                text = newsDetail?.content?.author ?: "",
+                                style = Typography.subtitle2
+                            )
+                        }
+                        Text(
+                            text = newsDetail?.content?.publishedDate ?: "",
+                            style = Typography.subtitle2,
+                            modifier = Modifier.align(
+                                Alignment.TopEnd
+                            )
+                        )
+                    }
+
                     Log.d("NewsDetailScreen", "url: ${newsUrl}")
 
                     Spacer(modifier = Modifier.padding(5.dp))

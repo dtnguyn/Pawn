@@ -48,7 +48,7 @@ fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
                 Text(text = feed.title, style = Typography.h5)
                 Spacer(modifier = Modifier.padding(2.dp))
                 Text(
-                    text = feed.publishedDate?.substring(0, 10) ?: "",
+                    text = feed.publishedDate ?:"",
                     style = Typography.subtitle2
                 )
 
@@ -125,7 +125,7 @@ fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
                 Spacer(modifier = Modifier.padding(2.dp))
 
                 Text(
-                    text = feed.publishedDate?.substring(0, 10) ?: "",
+                    text = feed.publishedDate ?: "",
                     style = Typography.subtitle2
                 )
 

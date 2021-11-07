@@ -1,6 +1,8 @@
 package com.nguyen.polyglot.ui.components.feed
 
+import android.os.Build
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,11 +12,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
+import coil.compose.rememberImagePainter
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
 import com.nguyen.polyglot.R
 import com.nguyen.polyglot.model.Feed
 import com.nguyen.polyglot.ui.theme.Typography
@@ -23,6 +31,7 @@ import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
+
     Card(
         shape = RoundedCornerShape(15.dp),
         modifier = Modifier
@@ -48,7 +57,7 @@ fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
                 Text(text = feed.title, style = Typography.h5)
                 Spacer(modifier = Modifier.padding(2.dp))
                 Text(
-                    text = feed.publishedDate ?:"",
+                    text = feed.publishedDate ?: "",
                     style = Typography.subtitle2
                 )
 
@@ -56,18 +65,20 @@ fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
 
                 GlideImage(
                     imageModel = feed.thumbnail ?: "",
+                    alignment = Alignment.Center,
                     // Crop, Fit, Inside, FillHeight, FillWidth, None
                     contentScale = ContentScale.FillWidth,
                     // shows an image with a circular revealed animation.
-//                    circularReveal = CircularReveal(duration = 250),
+                    circularReveal = CircularReveal(duration = 250),
                     // shows a placeholder ImageBitmap when loading.
                     placeHolder = ImageBitmap.imageResource(id = R.drawable.cat_loading_icon),
                     // shows an error ImageBitmap when the request failed.
-                    error = ImageBitmap.imageResource(R.drawable.image_loading_error),
+                    error = ImageBitmap.imageResource(id = R.drawable.image_loading_error),
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(15.dp))
                 )
+
 
                 Spacer(modifier = Modifier.padding(5.dp))
 

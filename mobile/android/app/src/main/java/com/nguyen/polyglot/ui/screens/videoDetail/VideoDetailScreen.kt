@@ -3,6 +3,7 @@ package com.nguyen.polyglot.ui.screens.newsDetail
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -41,7 +42,9 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.Abs
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import io.ktor.utils.io.concurrent.*
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
+@ExperimentalFoundationApi
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun VideoDetailScreen(
@@ -56,19 +59,17 @@ fun VideoDetailScreen(
     var videoSubtitle by remember { mutableStateOf(videoSubtitleUIState.value) }
 
 
-    var currentIndex by remember { mutableStateOf(viewModel.currentSubtitleIndex) }
-    var currentSecond by remember { mutableStateOf(viewModel.startSecond) }
+    var currentIndexState by remember { mutableStateOf(viewModel.currentSubtitleIndex) }
+    var currentIndex = viewModel.currentSubtitleIndex
+    var currentSecond = viewModel.startSecond
 
 
     var focusSubtitlePart: SubtitlePart? by remember { mutableStateOf(viewModel.focusSubtitlePart) }
 
-    val currentPickedLanguage by sharedViewModel.currentPickedLanguage
 
-    var isTranslated by remember { mutableStateOf(false)}
+    var isTranslated by remember { mutableStateOf(false) }
 
     val listState = rememberLazyListState()
-
-    val currentLanguage by sharedViewModel.currentPickedLanguage
 
     val context = LocalContext.current
 
@@ -87,7 +88,8 @@ fun VideoDetailScreen(
         if (videoSubtitleUIState !is UIState.Loaded) {
             viewModel.getVideoSubtitle(
                 DataStoreUtils.getAccessTokenFromDataStore(context),
-                videoId,
+                videoId
+                ,
                 sharedViewModel.currentPickedLanguage.value?.id,
                 sharedViewModel.authStatusUIState.value.value?.user?.nativeLanguageId
             )
@@ -114,32 +116,9 @@ fun VideoDetailScreen(
         }
     }
 
-    LaunchedEffect(currentSecond) {
-        if (videoSubtitle != null) {
-            if (currentSecond >= videoSubtitle!![currentIndex].end) {
-                val tempSec = currentSecond
-                var tempIndex = currentIndex
-                while (tempSec >= videoSubtitle!![tempIndex].end && tempIndex < videoSubtitle!!.size - 1) {
-                    tempIndex++
-                }
-                if (tempIndex >= 0 && tempIndex < videoSubtitle!!.size) currentIndex = tempIndex
-            } else if (currentSecond < videoSubtitle!![currentIndex].start) {
-                val tempSec = currentSecond
-                var tempIndex = currentIndex
-                while (tempSec < videoSubtitle!![tempIndex].start) {
-                    Log.d("VideoDetailScreen", "start: ${videoSubtitle!![tempIndex].start}")
-                    tempIndex--
-                }
-                if (tempIndex >= 0 && tempIndex < videoSubtitle!!.size) currentIndex = tempIndex
-
-            }
-        }
-
-    }
-
-    LaunchedEffect(currentIndex) {
+    LaunchedEffect(currentIndexState) {
         if (videoSubtitle != null)
-            listState.scrollToItem(currentIndex)
+            listState.scrollToItem(currentIndexState)
     }
 
 
@@ -188,7 +167,8 @@ fun VideoDetailScreen(
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .padding(5.dp)) {
+                            .padding(5.dp)
+                    ) {
                         IconButton(
                             modifier = Modifier.align(Alignment.CenterStart),
                             onClick = {
@@ -214,23 +194,46 @@ fun VideoDetailScreen(
                     }
 
 
-
-
                     AndroidView(factory = {
                         playerView.addYouTubePlayerListener(object :
                             AbstractYouTubePlayerListener() {
                             override fun onReady(youTubePlayer: YouTubePlayer) {
                                 player = youTubePlayer
-                                youTubePlayer.loadVideo(videoId, viewModel.getVideoStartSecond())
+                                youTubePlayer.loadVideo(
+                                    videoId,
+                                    viewModel.getVideoStartSecond()
+                                )
                             }
 
                             override fun onCurrentSecond(
                                 youTubePlayer: YouTubePlayer,
                                 second: Float
                             ) {
-                                currentSecond = second
+                              currentSecond = second
+                                if (second >= subtitleParts[currentIndex].end && currentIndex != subtitleParts.size - 1) {
+                                    //This check if 2 subtitle parts have a time gap
+                                    if (subtitleParts[currentIndex + 1].start > second) return
+                                    val tempSec = second
+                                    var tempIndex = currentIndex
+                                    while (tempSec >= subtitleParts[tempIndex].end && tempIndex < subtitleParts.size - 1) {
+                                        tempIndex++
+                                    }
+                                    if (tempIndex >= 0 && tempIndex < subtitleParts.size) {
+                                        currentIndex = tempIndex
+                                        currentIndexState = tempIndex
+                                    }
+                                } else if (second < subtitleParts[currentIndex].start && currentIndex != 0) {
+                                    val tempSec = second
+                                    var tempIndex = currentIndex
+                                    while (tempSec < subtitleParts[tempIndex].start && tempIndex != 0) {
+                                        tempIndex--
+                                    }
+                                    if (tempIndex >= 0 && tempIndex < subtitleParts.size) {
+                                        currentIndex = tempIndex
+                                        currentIndexState = tempIndex
+                                    }
+                                }
                             }
-
                         })
                         playerView
                     })
@@ -243,11 +246,13 @@ fun VideoDetailScreen(
 
                         items(subtitleParts.size) { index ->
                             SubtitleBox(
-                                selected = currentIndex == index,
+                                selected = currentIndexState == index,
                                 subtitlePart = subtitleParts[index],
-                                isTranslated = isTranslated,
+                                isTranslated = isTranslated && currentIndexState == index,
                                 onClick = {
-                                    Log.d("VideoDetailScreen", "player: $player")
+                                    player?.seekTo(subtitleParts[index].start)
+                                },
+                                onLongClick = {
                                     player?.pause()
                                     focusSubtitlePart = subtitleParts[index]
                                     coroutineScope.launch {

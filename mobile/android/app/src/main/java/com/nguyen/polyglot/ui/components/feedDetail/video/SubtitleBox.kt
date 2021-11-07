@@ -1,7 +1,9 @@
 package com.nguyen.polyglot.ui.components.feedDetail.video
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -18,12 +20,14 @@ import com.nguyen.polyglot.ui.theme.Neon
 import com.nguyen.polyglot.ui.theme.Typography
 import com.nguyen.polyglot.util.UtilFunctions.reformatString
 
+@ExperimentalFoundationApi
 @Composable
 fun SubtitleBox(
     selected: Boolean,
     isTranslated: Boolean,
     subtitlePart: SubtitlePart,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
 ) {
 
     Box(
@@ -38,22 +42,33 @@ fun SubtitleBox(
                 .fillMaxWidth()
                 .padding(horizontal = 30.dp, vertical = 15.dp)
                 .clip(RoundedCornerShape(30.dp))
-                .clickable {
-                    onClick()
-                }
-
-            ,
+                .combinedClickable(
+                    onClick = {
+                        onClick()
+                    },
+                    onLongClick = {
+                        onLongClick()
+                    }
+                ),
             backgroundColor = if (selected) Neon else Color.LightGray,
         ) {
             Column(Modifier.padding(20.dp)) {
                 Text(text = subtitlePart.lang, style = Typography.h6)
                 Spacer(modifier = Modifier.padding(3.dp))
-                Text(text = reformatString(subtitlePart.text ?: ""), style = Typography.body1, fontSize = 18.sp)
-                if(isTranslated){
+                Text(
+                    text = reformatString(subtitlePart.text ?: ""),
+                    style = Typography.body1,
+                    fontSize = 18.sp
+                )
+                if (isTranslated) {
                     Spacer(modifier = Modifier.padding(10.dp))
                     Text(text = subtitlePart.translatedLang, style = Typography.h6)
                     Spacer(modifier = Modifier.padding(3.dp))
-                    Text(text = reformatString(subtitlePart.translatedText ?: ""), style = Typography.body1, fontSize = 18.sp)
+                    Text(
+                        text = reformatString(subtitlePart.translatedText ?: ""),
+                        style = Typography.body1,
+                        fontSize = 18.sp
+                    )
                 }
 
 

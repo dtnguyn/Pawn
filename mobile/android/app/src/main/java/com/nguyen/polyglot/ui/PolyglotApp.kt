@@ -176,6 +176,7 @@ fun PolygotApp(
                         videoId = it.arguments?.getString("videoId") ?: ""
                     )
                 }
+                composable(PolyglotScreens.WordReviewMenuScreen.route) { WordReviewMenuScreen(navController = navController) }
 
             }
         }

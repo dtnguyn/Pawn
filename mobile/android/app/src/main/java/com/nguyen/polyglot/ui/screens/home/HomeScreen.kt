@@ -557,16 +557,12 @@ fun HomeScreen(
 
                                         Row(Modifier.padding(vertical = 5.dp)) {
                                             RoundButton(
-                                                backgroundColor = Blue,
-                                                size = 32.dp,
-                                                icon = R.drawable.add,
-                                                onClick = {})
-                                            Spacer(modifier = Modifier.padding(horizontal = 5.dp))
-                                            RoundButton(
                                                 backgroundColor = Grey,
                                                 size = 32.dp,
                                                 icon = R.drawable.review,
-                                                onClick = {})
+                                                onClick = {
+                                                    navController.navigate(PolyglotScreens.WordReviewMenuScreen.route)
+                                                })
                                         }
                                     }
                                 }

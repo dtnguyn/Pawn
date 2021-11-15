@@ -82,8 +82,8 @@ export const getVideoSubtitle = async (
     }
   }
 
-  console.log(subtitle.length);
-  console.log(translatedSubtitle.length);
+  console.log(lang.substr(0, 2), subtitle.length);
+  console.log(translatedLang.substr(0, 2), translatedSubtitle.length);
 
   return result;
 };

@@ -64,8 +64,8 @@ exports.getVideoSubtitle = (videoId, lang, translatedLang) => __awaiter(this, vo
             });
         }
     }
-    console.log(subtitle.length);
-    console.log(translatedSubtitle.length);
+    console.log(lang.substr(0, 2), subtitle.length);
+    console.log(translatedLang.substr(0, 2), translatedSubtitle.length);
     return result;
 });
 const getNewsDetail = (id, newsUrl) => __awaiter(this, void 0, void 0, function* () {

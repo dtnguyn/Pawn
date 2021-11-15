@@ -13,14 +13,6 @@
   "license": "ISC",
   "dependencies": {
     "@postlight/mercury-parser": "^2.2.1",
-    "@types/bcrypt": "^5.0.0",
-    "@types/express": "^4.17.11",
-    "@types/jsonwebtoken": "^8.5.1",
-    "@types/node": "^15.3.0",
-    "@types/nodemailer": "^6.4.2",
-    "@types/passport": "^1.0.6",
-    "@types/passport-google-oauth20": "^2.0.7",
-    "@types/superagent": "^4.1.11",
     "all-the-german-words": "^1.1.0",
     "an-array-of-english-words": "^2.0.0",
     "an-array-of-french-words": "^2.0.0",
@@ -44,8 +36,15 @@
     "unfluff": "^3.2.0"
   },
   "devDependencies": {
-    "@types/node": "^8.0.29",
+    "@types/node": "^15.3.0",
     "ts-node": "3.3.0",
-    "typescript": "3.3.3333"
+    "typescript": "3.3.3333",
+    "@types/bcrypt": "^5.0.0",
+    "@types/express": "^4.17.11",
+    "@types/jsonwebtoken": "^8.5.1",
+    "@types/nodemailer": "^6.4.2",
+    "@types/passport": "^1.0.6",
+    "@types/passport-google-oauth20": "^2.0.7",
+    "@types/superagent": "^4.1.11"
   }
 }

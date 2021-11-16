@@ -35,6 +35,7 @@ import com.nguyen.polyglot.ui.screens.home.HomeViewModel
 import com.nguyen.polyglot.ui.screens.newsDetail.VideoDetailScreen
 import com.nguyen.polyglot.ui.screens.search.SearchViewModel
 import com.nguyen.polyglot.ui.screens.videoDetail.VideoDetailViewModel
+import com.nguyen.polyglot.ui.screens.wordReview.WordReviewScreen
 import com.nguyen.polyglot.ui.theme.PawnTheme
 import com.nguyen.polyglot.util.DataStoreUtils
 
@@ -177,6 +178,8 @@ fun PolygotApp(
                     )
                 }
                 composable(PolyglotScreens.WordReviewMenuScreen.route) { WordReviewMenuScreen(navController = navController) }
+                composable(PolyglotScreens.WordReviewScreen.route) { WordReviewScreen(navController = navController) }
+
 
             }
         }

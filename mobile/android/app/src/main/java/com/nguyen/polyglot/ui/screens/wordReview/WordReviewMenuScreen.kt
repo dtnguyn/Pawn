@@ -44,7 +44,7 @@ fun WordReviewMenuScreen(navController: NavController) {
                     .fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(ReallyRed),
                 shape = RoundedCornerShape(15.dp),
-                onClick = { }) {
+                onClick = { navController.navigate("wordReview") }) {
                 Column {
                     Text(
                         text = "Quick Review",
@@ -65,7 +65,7 @@ fun WordReviewMenuScreen(navController: NavController) {
                     .fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(Blue),
                 shape = RoundedCornerShape(15.dp),
-                onClick = { }) {
+                onClick = { navController.navigate("wordReview") }) {
                 Column {
                     Text(
                         text = "Full Review",

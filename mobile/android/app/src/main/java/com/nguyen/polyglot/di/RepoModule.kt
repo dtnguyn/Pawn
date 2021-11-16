@@ -4,6 +4,7 @@ import com.nguyen.polyglot.db.PolyglotDatabase
 import com.nguyen.polyglot.repo.AuthRepository
 import com.nguyen.polyglot.repo.LanguageRepository
 import com.nguyen.polyglot.repo.WordRepository
+import com.nguyen.polyglot.repo.WordReviewRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,9 +33,9 @@ object RepoModule {
         return LanguageRepository(client, database)
     }
 
-//    @Singleton
-//    @Provides
-//    fun provideFeedRepository(client: HttpClient, database: PolygotDatabase): FeedRepository {
-//        return FeedRepository(client, database)
-//    }
+    @Singleton
+    @Provides
+    fun provideWordReviewRepo(database: PolyglotDatabase): WordReviewRepository {
+        return WordReviewRepository(database)
+    }
 }

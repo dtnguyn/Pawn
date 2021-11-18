@@ -61,7 +61,7 @@ class WordReviewRepository(
                         questions.add(
                             ReviewQuestion(
                                 word = SavedWordMapper.mapToNetworkEntity(word),
-                                question = "What is the definition of \"${word}\"",
+                                question = "What is the definition of \"${word.value}\"",
                                 answerOptions = (answerOptions + listOf(word.mainDefinition)).shuffled(),
                                 correctAnswer = word.mainDefinition,
                                 userAnswer = null,

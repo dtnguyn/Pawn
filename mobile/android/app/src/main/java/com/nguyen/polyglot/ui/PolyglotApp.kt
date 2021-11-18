@@ -36,6 +36,7 @@ import com.nguyen.polyglot.ui.screens.newsDetail.VideoDetailScreen
 import com.nguyen.polyglot.ui.screens.search.SearchViewModel
 import com.nguyen.polyglot.ui.screens.videoDetail.VideoDetailViewModel
 import com.nguyen.polyglot.ui.screens.wordReview.WordReviewScreen
+import com.nguyen.polyglot.ui.screens.wordReview.WordReviewViewModel
 import com.nguyen.polyglot.ui.theme.PawnTheme
 import com.nguyen.polyglot.util.DataStoreUtils
 
@@ -54,7 +55,8 @@ fun PolygotApp(
     sharedViewModel: SharedViewModel,
     feedViewModel: FeedViewModel,
     newsDetailViewModel: NewsDetailViewModel,
-    videoDetailViewModel: VideoDetailViewModel
+    videoDetailViewModel: VideoDetailViewModel,
+    wordReviewViewModel: WordReviewViewModel,
 ) {
 
     val navController = rememberNavController()
@@ -178,7 +180,7 @@ fun PolygotApp(
                     )
                 }
                 composable(PolyglotScreens.WordReviewMenuScreen.route) { WordReviewMenuScreen(navController = navController) }
-                composable(PolyglotScreens.WordReviewScreen.route) { WordReviewScreen(navController = navController) }
+                composable(PolyglotScreens.WordReviewScreen.route) { WordReviewScreen(navController = navController, viewModel = wordReviewViewModel, sharedViewModel = sharedViewModel) }
 
 
             }

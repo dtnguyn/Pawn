@@ -66,7 +66,10 @@ fun WordReviewResultScreen(navController: NavController, viewModel: WordReviewVi
 
 
             IconButton(
-                onClick = { navController.popBackStack() }, modifier = Modifier
+                onClick = {
+                    navController.popBackStack()
+                    viewModel.resetState()
+                }, modifier = Modifier
                     .align(
                         Alignment.TopStart
                     )
@@ -76,7 +79,10 @@ fun WordReviewResultScreen(navController: NavController, viewModel: WordReviewVi
             }
 
             if (numberOfCorrectAnswer.toFloat() / numberOfQuestions >= 0.8) {
-                WordReviewResultSuccess(score = "$numberOfCorrectAnswer/$numberOfQuestions") {
+                WordReviewResultSuccess(
+                    score = "$numberOfCorrectAnswer/$numberOfQuestions",
+                    scoreInPercentage = (numberOfCorrectAnswer.toFloat() / numberOfQuestions) * 100
+                ) {
                     navController.navigate("wordReviewMenu") {
                         popUpTo("home")
                     }

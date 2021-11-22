@@ -18,11 +18,13 @@ import com.nguyen.polyglot.R
 import com.nguyen.polyglot.ui.theme.Green
 import com.nguyen.polyglot.ui.theme.LightGreen
 import com.nguyen.polyglot.ui.theme.Typography
+import kotlin.math.roundToInt
 
 
 @Composable
 fun WordReviewResultSuccess(
     score: String,
+    scoreInPercentage: Float,
     onTryAgain: () -> Unit,
 ){
 
@@ -52,7 +54,7 @@ fun WordReviewResultSuccess(
         )
         Spacer(modifier = Modifier.padding(10.dp))
         Text(
-            text = "Congratulation! You have got 80% of the answers correct!",
+            text = "Congratulation! You have got ${scoreInPercentage.roundToInt()}% of the answers correct!",
             fontSize = 18.sp,
             style = Typography.body1,
             textAlign = TextAlign.Center

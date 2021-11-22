@@ -37,8 +37,8 @@ fun WordReviewScreen(
     navController: NavController
 ) {
 
-    val quickQuestionsUIState by viewModel.questionsUIState
-    var quickQuestions by remember { mutableStateOf(quickQuestionsUIState.value) }
+    val questionsUIState by viewModel.questionsUIState
+    var questions by remember { mutableStateOf(questionsUIState.value) }
 
     val currentLanguage by sharedViewModel.currentPickedLanguage
 
@@ -59,7 +59,7 @@ fun WordReviewScreen(
             // Answer is checked
             if (answer == question.correctAnswer)
                 return LightGreen
-            else if (currentChoice == answer) return LightRed
+            else if (question.userAnswer == answer) return LightRed
         }
         return LightGrey
 
@@ -71,8 +71,8 @@ fun WordReviewScreen(
         }
     }
 
-    LaunchedEffect(quickQuestionsUIState) {
-        when (quickQuestionsUIState) {
+    LaunchedEffect(questionsUIState) {
+        when (questionsUIState) {
 
             is UIState.Initial -> {
 
@@ -84,8 +84,8 @@ fun WordReviewScreen(
 
             }
             is UIState.Loaded -> {
-                quickQuestions = quickQuestionsUIState.value
-                Log.d("WordReviewScreen", "questions: ${quickQuestionsUIState.value?.size}")
+                questions = questionsUIState.value
+                Log.d("WordReviewScreen", "questions: ${questionsUIState.value?.size}")
             }
         }
     }
@@ -93,14 +93,15 @@ fun WordReviewScreen(
 
 
     Scaffold(backgroundColor = Color.White) {
-        if (quickQuestions == null) {
+        if (questions == null) {
 
         } else {
             Column(
                 Modifier
-                    .padding(start = 20.dp, end = 20.dp, top = 20.dp)
+                    .padding(start = 20.dp, end = 20.dp)
                     .verticalScroll(rememberScrollState())
             ) {
+                Spacer(modifier = Modifier.padding(10.dp))
                 IconButton(onClick = {
                     navController.popBackStack()
                     viewModel.resetState()
@@ -130,13 +131,13 @@ fun WordReviewScreen(
                         ) {
                             Box(
                                 Modifier
-                                    .fillMaxWidth((((wrongAnswerCount + correctAnswerCount).toFloat() / quickQuestions!!.size)))
+                                    .fillMaxWidth((((wrongAnswerCount + correctAnswerCount).toFloat() / questions!!.size)))
                                     .height(10.dp)
                                     .background(LightRed, RoundedCornerShape(10.dp))
                             )
                             Box(
                                 Modifier
-                                    .fillMaxWidth(((correctAnswerCount.toFloat() / quickQuestions!!.size)))
+                                    .fillMaxWidth(((correctAnswerCount.toFloat() / questions!!.size)))
                                     .height(10.dp)
                                     .background(LightGreen, RoundedCornerShape(10.dp))
                             )
@@ -144,16 +145,16 @@ fun WordReviewScreen(
                         }
                         Spacer(Modifier.padding(5.dp))
                         Text(
-                            text = "${currentQuestionIndex + 1}/${quickQuestions?.size}",
+                            text = "${currentQuestionIndex + 1}/${questions?.size}",
                             style = Typography.h6
                         )
 
                     }
                 }
                 Spacer(modifier = Modifier.padding(10.dp))
-                if (quickQuestions!![currentQuestionIndex].question == "What is the definition of the word in the following audio?") {
+                if (questions!![currentQuestionIndex].question == "What is the definition of the word in the following audio?") {
                     Text(
-                        text = quickQuestions!![currentQuestionIndex].question,
+                        text = questions!![currentQuestionIndex].question,
                         style = Typography.h3
                     )
                     Spacer(modifier = Modifier.padding(5.dp))
@@ -163,7 +164,7 @@ fun WordReviewScreen(
                             size = 60.dp,
                             icon = R.drawable.speaker,
                             onClick = {
-                                quickQuestions!![currentQuestionIndex].word.pronunciationAudio?.let {
+                                questions!![currentQuestionIndex].word.pronunciationAudio?.let {
                                     Log.d("WordReviewScreen", "audio: $it")
                                     val audioUrl = if ("http" in it) it else "https:$it"
                                     MediaPlayer.create(
@@ -177,45 +178,48 @@ fun WordReviewScreen(
 
                 } else {
                     Text(
-                        text = quickQuestions!![currentQuestionIndex].question,
+                        text = questions!![currentQuestionIndex].question,
                         style = Typography.h3
                     )
 
                 }
                 Spacer(modifier = Modifier.padding(5.dp))
 
-                Button(
-                    onClick = { viewModel.decrementQuestionIndex() },
-                    colors = ButtonDefaults.buttonColors(
-                        LightGrey
-                    ),
-                    shape = RoundedCornerShape(30.dp),
-                ) {
-                    Row(verticalAlignment = CenterVertically) {
-                        Icon(Icons.Filled.ArrowBack, "")
-                        Spacer(modifier = Modifier.padding(3.dp))
-                        Text(text = "Back", style = Typography.subtitle1, fontSize = 16.sp)
-                    }
+                if(currentQuestionIndex != 0){
+                    Button(
+                        onClick = { viewModel.decrementQuestionIndex() },
+                        colors = ButtonDefaults.buttonColors(
+                            LightGrey
+                        ),
+                        shape = RoundedCornerShape(30.dp),
+                    ) {
+                        Row(verticalAlignment = CenterVertically) {
+                            Icon(Icons.Filled.ArrowBack, "")
+                            Spacer(modifier = Modifier.padding(3.dp))
+                            Text(text = "Back", style = Typography.subtitle1, fontSize = 16.sp)
+                        }
 
+                    }
                 }
+
 
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
-                quickQuestions!![currentQuestionIndex].answerOptions.forEach {
+                questions!![currentQuestionIndex].answerOptions.forEach {
                     Button(
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(5f),
                         colors = ButtonDefaults.buttonColors(
                             answerColor(
-                                quickQuestions!![currentQuestionIndex],
+                                questions!![currentQuestionIndex],
                                 it
                             )
                         ),
                         shape = RoundedCornerShape(15.dp),
                         onClick = {
-                            if (quickQuestions!![currentQuestionIndex].userAnswer == null)
+                            if (questions!![currentQuestionIndex].userAnswer == null)
                                 currentChoice = it
                         }) {
                         Text(
@@ -228,7 +232,7 @@ fun WordReviewScreen(
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
-                if (quickQuestions!![currentQuestionIndex].userAnswer == null) {
+                if (questions!![currentQuestionIndex].userAnswer == null) {
 
                     Button(
                         modifier = Modifier
@@ -239,7 +243,7 @@ fun WordReviewScreen(
                         onClick = {
                             if (currentChoice != null) {
                                 viewModel.checkAnswer(
-                                    quickQuestions!![currentQuestionIndex].question,
+                                    questions!![currentQuestionIndex].word.value,
                                     currentChoice!!
                                 )
                             }
@@ -256,7 +260,7 @@ fun WordReviewScreen(
                             size = 64.dp,
                             icon = R.drawable.arrow_white_128,
                             onClick = {
-                                if (currentQuestionIndex < quickQuestions!!.size - 1) {
+                                if (currentQuestionIndex < questions!!.size - 1) {
                                     currentChoice = null
                                 } else {
                                     // Got to result screen

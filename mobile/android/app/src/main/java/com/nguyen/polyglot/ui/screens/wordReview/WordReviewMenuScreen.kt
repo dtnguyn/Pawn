@@ -3,10 +3,10 @@ package com.nguyen.polyglot.ui.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,12 +24,20 @@ import com.nguyen.polyglot.ui.theme.Typography
 fun WordReviewMenuScreen(navController: NavController) {
 
     Scaffold(backgroundColor = Color.White) {
-        Column(Modifier.padding(20.dp)) {
-
+        Column(Modifier.padding(horizontal = 20.dp)) {
+            Spacer(modifier = Modifier.padding(10.dp))
+            IconButton(onClick = {
+                navController.popBackStack()
+            }) {
+                Icon(Icons.Filled.ArrowBack, "")
+            }
+            Spacer(modifier = Modifier.padding(10.dp))
             Image(
                 painter = painterResource(id = R.drawable.quiz_icon),
                 contentDescription = null,
-                modifier = Modifier.fillMaxWidth(70f).align(Alignment.CenterHorizontally)
+                modifier = Modifier
+                    .fillMaxWidth(70f)
+                    .align(Alignment.CenterHorizontally)
             )
             Spacer(Modifier.padding(20.dp))
             Text(text = "Review your vocabulary", style = Typography.h3)

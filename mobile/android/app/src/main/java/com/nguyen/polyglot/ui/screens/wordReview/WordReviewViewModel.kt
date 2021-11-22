@@ -51,11 +51,11 @@ class WordReviewViewModel
             currentQuestionIndex.value -= 1
         }
     }
-    fun checkAnswer(question: String, answer: String) {
+    fun checkAnswer(wordOfQuestion: String, answer: String) {
         val questions = questionsUIState.value.value
         questions?.let { questionList ->
             val updatedList = questionList.map {
-                if (it.question == question) {
+                if (it.word.value == wordOfQuestion) {
                     if(it.correctAnswer != answer) wrongAnswerCount.value += 1
                     else correctAnswerCount.value += 1
                      ReviewQuestion(

@@ -1,18 +1,27 @@
 package com.nguyen.polyglot.ui.screens.wordReview
 
+import android.media.MediaPlayer
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.nguyen.polyglot.R
 import com.nguyen.polyglot.model.ReviewQuestion
@@ -28,13 +37,16 @@ fun WordReviewScreen(
     navController: NavController
 ) {
 
-    val quickQuestionsUIState by viewModel.quickQuestionsUIState
+    val quickQuestionsUIState by viewModel.questionsUIState
     var quickQuestions by remember { mutableStateOf(quickQuestionsUIState.value) }
 
     val currentLanguage by sharedViewModel.currentPickedLanguage
 
     val currentQuestionIndex by viewModel.currentQuestionIndex
+    val wrongAnswerCount by viewModel.wrongAnswerCount
+    val correctAnswerCount by viewModel.correctAnswerCount
     var currentChoice by remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
 
 
     fun answerColor(question: ReviewQuestion, answer: String): Color {
@@ -78,15 +90,23 @@ fun WordReviewScreen(
         }
     }
 
-    LaunchedEffect(currentQuestionIndex) {
-        Log.d("WordReviewScreen", "value: ${currentQuestionIndex}")
-    }
+
 
     Scaffold(backgroundColor = Color.White) {
         if (quickQuestions == null) {
 
         } else {
-            Column(Modifier.padding(20.dp)) {
+            Column(
+                Modifier
+                    .padding(start = 20.dp, end = 20.dp, top = 20.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                IconButton(onClick = {
+                    navController.popBackStack()
+                    viewModel.resetState()
+                }) {
+                    Icon(Icons.Filled.Close, "")
+                }
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -110,13 +130,13 @@ fun WordReviewScreen(
                         ) {
                             Box(
                                 Modifier
-                                    .fillMaxWidth(0.95f)
+                                    .fillMaxWidth((((wrongAnswerCount + correctAnswerCount).toFloat() / quickQuestions!!.size)))
                                     .height(10.dp)
                                     .background(LightRed, RoundedCornerShape(10.dp))
                             )
                             Box(
                                 Modifier
-                                    .fillMaxWidth(0.8f)
+                                    .fillMaxWidth(((correctAnswerCount.toFloat() / quickQuestions!!.size)))
                                     .height(10.dp)
                                     .background(LightGreen, RoundedCornerShape(10.dp))
                             )
@@ -130,16 +150,59 @@ fun WordReviewScreen(
 
                     }
                 }
-                Spacer(modifier = Modifier.padding(20.dp))
-                Text(
-                    text = quickQuestions!![currentQuestionIndex].question,
-                    style = Typography.h3
-                )
-                Spacer(modifier = Modifier.padding(20.dp))
+                Spacer(modifier = Modifier.padding(10.dp))
+                if (quickQuestions!![currentQuestionIndex].question == "What is the definition of the word in the following audio?") {
+                    Text(
+                        text = quickQuestions!![currentQuestionIndex].question,
+                        style = Typography.h3
+                    )
+                    Spacer(modifier = Modifier.padding(5.dp))
+                    Box(modifier = Modifier.align(CenterHorizontally)) {
+                        RoundButton(
+                            backgroundColor = LightGrey,
+                            size = 60.dp,
+                            icon = R.drawable.speaker,
+                            onClick = {
+                                quickQuestions!![currentQuestionIndex].word.pronunciationAudio?.let {
+                                    Log.d("WordReviewScreen", "audio: $it")
+                                    val audioUrl = if ("http" in it) it else "https:$it"
+                                    MediaPlayer.create(
+                                        context,
+                                        Uri.parse(audioUrl)
+                                    ).start()
+                                }
+
+                            })
+                    }
+
+                } else {
+                    Text(
+                        text = quickQuestions!![currentQuestionIndex].question,
+                        style = Typography.h3
+                    )
+
+                }
+                Spacer(modifier = Modifier.padding(5.dp))
+
+                Button(
+                    onClick = { viewModel.decrementQuestionIndex() },
+                    colors = ButtonDefaults.buttonColors(
+                        LightGrey
+                    ),
+                    shape = RoundedCornerShape(30.dp),
+                ) {
+                    Row(verticalAlignment = CenterVertically) {
+                        Icon(Icons.Filled.ArrowBack, "")
+                        Spacer(modifier = Modifier.padding(3.dp))
+                        Text(text = "Back", style = Typography.subtitle1, fontSize = 16.sp)
+                    }
+
+                }
+
+
+                Spacer(modifier = Modifier.padding(10.dp))
 
                 quickQuestions!![currentQuestionIndex].answerOptions.forEach {
-
-
                     Button(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -151,7 +214,10 @@ fun WordReviewScreen(
                             )
                         ),
                         shape = RoundedCornerShape(15.dp),
-                        onClick = { currentChoice = it }) {
+                        onClick = {
+                            if (quickQuestions!![currentQuestionIndex].userAnswer == null)
+                                currentChoice = it
+                        }) {
                         Text(
                             text = it,
                             style = Typography.h6,
@@ -190,12 +256,21 @@ fun WordReviewScreen(
                             size = 64.dp,
                             icon = R.drawable.arrow_white_128,
                             onClick = {
-                                currentChoice = null
+                                if (currentQuestionIndex < quickQuestions!!.size - 1) {
+                                    currentChoice = null
+                                } else {
+                                    // Got to result screen
+                                    navController.navigate("wordReviewResult") {
+                                        popUpTo("home")
+                                    }
+
+                                }
                                 viewModel.incrementQuestionIndex()
                             })
                     }
 
                 }
+                Spacer(modifier = Modifier.padding(10.dp))
             }
         }
 

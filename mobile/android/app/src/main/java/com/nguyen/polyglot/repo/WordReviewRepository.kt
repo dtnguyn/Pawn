@@ -19,13 +19,13 @@ class WordReviewRepository(
     private val questionTypesWithoutAudio = listOf("definition", "word", "audio")
 
 
-    suspend fun getQuickReviewQuestions(language: String): Flow<UIState<List<ReviewQuestion>>> {
+    suspend fun getReviewQuestions(language: String, questionCount: Int? = null): Flow<UIState<List<ReviewQuestion>>> {
         return flow {
             emit(UIState.Loading())
             val savedWords = db.savedWordDao().getMany(language).first()
 
             val randomWords =
-                savedWords.asSequence().shuffled().take(max(savedWords.size, 10)).toList()
+                savedWords.asSequence().shuffled().take(max(savedWords.size, questionCount ?: 0)).toList()
 
             val questions = arrayListOf<ReviewQuestion>()
 
@@ -77,7 +77,7 @@ class WordReviewRepository(
                         questions.add(
                             ReviewQuestion(
                                 word = SavedWordMapper.mapToNetworkEntity(word),
-                                question = "Audio: \n ${word.pronunciationAudio}",
+                                question = "What is the definition of the word in the following audio?",
                                 answerOptions = (answerOptions + listOf(word.mainDefinition)).shuffled(),
                                 correctAnswer = word.mainDefinition,
                                 userAnswer = null,

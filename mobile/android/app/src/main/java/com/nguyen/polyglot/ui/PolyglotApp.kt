@@ -35,6 +35,7 @@ import com.nguyen.polyglot.ui.screens.home.HomeViewModel
 import com.nguyen.polyglot.ui.screens.newsDetail.VideoDetailScreen
 import com.nguyen.polyglot.ui.screens.search.SearchViewModel
 import com.nguyen.polyglot.ui.screens.videoDetail.VideoDetailViewModel
+import com.nguyen.polyglot.ui.screens.wordReview.WordReviewResultScreen
 import com.nguyen.polyglot.ui.screens.wordReview.WordReviewScreen
 import com.nguyen.polyglot.ui.screens.wordReview.WordReviewViewModel
 import com.nguyen.polyglot.ui.theme.PawnTheme
@@ -124,6 +125,7 @@ fun PolygotApp(
                         sharedViewModel = sharedViewModel,
                         navController = navController
                     )
+
                 }
                 composable(PolyglotScreens.Feeds.route) {
                     FeedScreen(
@@ -155,10 +157,16 @@ fun PolygotApp(
                         navController = navController
                     )
                 }
-                composable(PolyglotScreens.ChangePassword.route) { ChangePasswordScreen(navController = navController) }
+                composable(PolyglotScreens.ChangePassword.route) {
+                    ChangePasswordScreen(
+                        navController = navController
+                    )
+                }
                 composable(PolyglotScreens.VerifyCode.route) { VerifyCodeScreen(navController = navController) }
-                composable("${PolyglotScreens.NewsDetail.route}/{feedId}/{feedUrl}",
-                arguments = listOf()) {
+                composable(
+                    "${PolyglotScreens.NewsDetail.route}/{feedId}/{feedUrl}",
+                    arguments = listOf()
+                ) {
                     NewsDetailScreen(
                         viewModel = newsDetailViewModel,
                         sharedViewModel = sharedViewModel,
@@ -179,8 +187,24 @@ fun PolygotApp(
                         videoId = it.arguments?.getString("videoId") ?: ""
                     )
                 }
-                composable(PolyglotScreens.WordReviewMenuScreen.route) { WordReviewMenuScreen(navController = navController) }
-                composable(PolyglotScreens.WordReviewScreen.route) { WordReviewScreen(navController = navController, viewModel = wordReviewViewModel, sharedViewModel = sharedViewModel) }
+                composable(PolyglotScreens.WordReviewMenuScreen.route) {
+                    WordReviewMenuScreen(
+                        navController = navController
+                    )
+                }
+                composable(PolyglotScreens.WordReviewScreen.route) {
+                    WordReviewScreen(
+                        navController = navController,
+                        viewModel = wordReviewViewModel,
+                        sharedViewModel = sharedViewModel
+                    )
+                }
+                composable(PolyglotScreens.WordReviewResultScreen.route) {
+                    WordReviewResultScreen(
+                        navController = navController,
+                        viewModel = wordReviewViewModel
+                    )
+                }
 
 
             }

@@ -5,7 +5,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nguyen.polyglot.model.Language
 import com.nguyen.polyglot.model.ReviewQuestion
 import com.nguyen.polyglot.repo.WordReviewRepository
 import com.nguyen.polyglot.util.UIState
@@ -18,31 +17,47 @@ import javax.inject.Inject
 class WordReviewViewModel
 @Inject constructor(private val repo: WordReviewRepository) : ViewModel() {
 
-    private val _quickQuestionsUIState: MutableState<UIState<List<ReviewQuestion>>> =
+    private val _questionsUIState: MutableState<UIState<List<ReviewQuestion>>> =
         mutableStateOf(UIState.Initial(null))
-    val quickQuestionsUIState: State<UIState<List<ReviewQuestion>>> = _quickQuestionsUIState
+    val questionsUIState: State<UIState<List<ReviewQuestion>>> = _questionsUIState
 
     val currentQuestionIndex = mutableStateOf(0)
+    val wrongAnswerCount = mutableStateOf(0)
+    val correctAnswerCount = mutableStateOf(0)
 
     fun getQuickQuestions(language: String) {
         viewModelScope.launch {
-            repo.getQuickReviewQuestions(language).collectLatest {
-                _quickQuestionsUIState.value = it
+            repo.getReviewQuestions(language, 10).collectLatest {
+                _questionsUIState.value = it
+            }
+        }
+    }
+
+    fun getFullQuestions(language: String) {
+        viewModelScope.launch {
+            repo.getReviewQuestions(language,).collectLatest {
+                _questionsUIState.value = it
             }
         }
     }
 
     fun incrementQuestionIndex() {
-        if (currentQuestionIndex.value < quickQuestionsUIState.value.value?.size?.minus(1) ?: 0) {
+        if (currentQuestionIndex.value < questionsUIState.value.value?.size?.minus(1) ?: 0) {
             currentQuestionIndex.value += 1
         }
     }
-
+    fun decrementQuestionIndex() {
+        if (currentQuestionIndex.value > 0) {
+            currentQuestionIndex.value -= 1
+        }
+    }
     fun checkAnswer(question: String, answer: String) {
-        val questions = quickQuestionsUIState.value.value
+        val questions = questionsUIState.value.value
         questions?.let { questionList ->
             val updatedList = questionList.map {
                 if (it.question == question) {
+                    if(it.correctAnswer != answer) wrongAnswerCount.value += 1
+                    else correctAnswerCount.value += 1
                      ReviewQuestion(
                         word = it.word,
                         question = it.question,
@@ -53,8 +68,16 @@ class WordReviewViewModel
                     )
                 } else it
             }
-            _quickQuestionsUIState.value = UIState.Loaded(updatedList)
+            _questionsUIState.value = UIState.Loaded(updatedList)
         }
+    }
+
+
+    fun resetState(){
+        _questionsUIState.value = UIState.Initial(null)
+        currentQuestionIndex.value = 0
+        wrongAnswerCount.value = 0
+        correctAnswerCount.value = 0
     }
 
 

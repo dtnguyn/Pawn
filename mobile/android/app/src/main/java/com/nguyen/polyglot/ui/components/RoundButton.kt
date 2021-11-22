@@ -28,7 +28,7 @@ fun RoundButton(
                 onClick = onClick
             ),
         backgroundColor = backgroundColor,
-        elevation = 100.dp,
+        elevation = 4.dp,
     ) {
         Image(
             painter = painterResource(icon),

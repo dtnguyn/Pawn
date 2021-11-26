@@ -561,7 +561,7 @@ fun HomeScreen(
                                                 size = 32.dp,
                                                 icon = R.drawable.review,
                                                 onClick = {
-                                                    navController.navigate(PolyglotScreens.WordReviewMenuScreen.route)
+                                                    navController.navigate(PolyglotScreens.WordReviewMenu.route)
                                                 })
                                         }
                                     }

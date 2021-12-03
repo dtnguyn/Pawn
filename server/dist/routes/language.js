@@ -32,6 +32,16 @@ router.get("/", middlewares_1.checkAuthentication, (req, res) => __awaiter(this,
         }
     }
 }));
+router.get("/report", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const userId = req.user.id;
+        const result = yield LanguageController_1.getLanguageReports(userId);
+        res.send(new ApiResponse_1.default(true, "", result));
+    }
+    catch (error) {
+        console.log(error);
+    }
+}));
 router.post("/save", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         const languages = req.body.languages;

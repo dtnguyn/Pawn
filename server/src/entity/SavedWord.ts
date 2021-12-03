@@ -25,6 +25,9 @@ export class SavedWord {
   @Column()
   language: string;
 
+  @Column()
+  topics: string;
+
   @Column("uuid")
   userId: string;
   @ManyToOne(() => User, (user) => user.savedWords)

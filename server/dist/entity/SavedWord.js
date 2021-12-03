@@ -28,6 +28,10 @@ __decorate([
     __metadata("design:type", String)
 ], SavedWord.prototype, "language", void 0);
 __decorate([
+    typeorm_1.Column(),
+    __metadata("design:type", String)
+], SavedWord.prototype, "topics", void 0);
+__decorate([
     typeorm_1.Column("uuid"),
     __metadata("design:type", String)
 ], SavedWord.prototype, "userId", void 0);

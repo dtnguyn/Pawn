@@ -25,6 +25,10 @@ __decorate([
     __metadata("design:type", String)
 ], Word.prototype, "language", void 0);
 __decorate([
+    typeorm_1.Column(),
+    __metadata("design:type", String)
+], Word.prototype, "topics", void 0);
+__decorate([
     typeorm_1.CreateDateColumn(),
     __metadata("design:type", Date)
 ], Word.prototype, "createdAt", void 0);

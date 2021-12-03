@@ -24,6 +24,10 @@ const Pronunciation_1 = require("../entity/Pronunciation");
 const SavedWord_1 = require("../entity/SavedWord");
 const Word_1 = require("../entity/Word");
 const getRandomNumber_1 = require("../utils/getRandomNumber");
+const enWordTopics_1 = require("../utils/enWordTopics");
+const esWordTopics_1 = require("../utils/esWordTopics");
+const frWordTopics_1 = require("../utils/frWordTopics");
+const deWordTopics_1 = require("../utils/deWordTopics");
 exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, void 0, function* () {
     const results = [];
     switch (language) {
@@ -102,17 +106,23 @@ exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, v
     }
     return results;
 });
-exports.getWordDetail = (word, language) => __awaiter(this, void 0, void 0, function* () {
+exports.getWordDetail = (wordString, language) => __awaiter(this, void 0, void 0, function* () {
     const res = yield superagent_1.default
-        .get(`https://api.dictionaryapi.dev/api/v2/entries/${language}/${word}`)
+        .get(`https://api.dictionaryapi.dev/api/v2/entries/${language}/${wordString}`)
         .catch(() => {
         return null;
     });
     if (res && res.body && res.body[0]) {
         const detail = res.body[0];
+        const wordInDb = yield typeorm_1.getRepository(Word_1.Word).findOne({
+            value: wordString,
+            language,
+        });
+        const topics = wordInDb ? wordInDb.topics : "unknown";
         const word = {
             value: detail.word,
             language,
+            topics,
             pronunciations: [],
             definitions: [],
         };
@@ -150,11 +160,17 @@ exports.getWordDetail = (word, language) => __awaiter(this, void 0, void 0, func
     else
         return null;
 });
-exports.getWordDetailSimplify = (word, language) => __awaiter(this, void 0, void 0, function* () {
-    const detail = yield exports.getWordDetail(word, language);
+exports.getWordDetailSimplify = (wordString, language) => __awaiter(this, void 0, void 0, function* () {
+    const detail = yield exports.getWordDetail(wordString, language);
+    const wordInDb = yield typeorm_1.getRepository(Word_1.Word).findOne({
+        value: wordString,
+        language,
+    });
+    const topics = wordInDb ? wordInDb.topics : "unknown";
     if (detail && detail.definitions.length) {
         const word = {
             value: detail.value,
+            topics,
             language: detail.language,
             mainDefinition: detail.definitions[0].meaning,
             pronunciationSymbol: detail.pronunciations.length
@@ -181,6 +197,7 @@ exports.getWordAutoCompletes = (language, text) => __awaiter(this, void 0, void 
         return {
             value: word.value,
             language,
+            topics: word.topics,
             mainDefinition: "",
             pronunciationSymbol: null,
             pronunciationAudio: null,
@@ -209,10 +226,16 @@ exports.toggleSaveWord = (word, language, userId) => __awaiter(this, void 0, voi
             try {
                 const manager = queryRunner.manager;
                 const length = yield savedWordRepo.count({ userId, language });
+                const wordInDb = yield typeorm_1.getRepository(Word_1.Word).findOne({
+                    value: word,
+                    language,
+                });
+                const topics = wordInDb ? wordInDb.topics : "unknown";
                 const savedWordDb = manager.create(SavedWord_1.SavedWord, {
                     userId,
                     value: word,
                     language,
+                    topics,
                     position: length + 1,
                 });
                 yield manager.save(SavedWord_1.SavedWord, savedWordDb);
@@ -270,6 +293,7 @@ exports.getSavedWords = (userId, language) => __awaiter(this, void 0, void 0, fu
             pronunciationAudio: word.pronunciations.length
                 ? word.pronunciations[0].audio
                 : null,
+            topics: word.topics,
         };
     });
     return simplifySavedWords;
@@ -350,39 +374,439 @@ exports.importAllWords = () => __awaiter(this, void 0, void 0, function* () {
         yield importDeWords();
     console.log("Finish import all German words");
 });
+const getEnWordTopicMap = () => {
+    const map = {};
+    for (const word of enWordTopics_1.enCommon) {
+        map[word.toLowerCase()] = "common";
+    }
+    for (const word of enWordTopics_1.enSport) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", sport";
+        }
+        else {
+            map[word.toLowerCase()] = "sport";
+        }
+    }
+    for (const word of enWordTopics_1.enNature) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", nature";
+        }
+        else {
+            map[word.toLowerCase()] = "nature";
+        }
+    }
+    for (const word of enWordTopics_1.enClothing) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", clothing";
+        }
+        else {
+            map[word.toLowerCase()] = "clothing";
+        }
+    }
+    for (const word of enWordTopics_1.enEmotion) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", emotion";
+        }
+        else {
+            map[word.toLowerCase()] = "emotion";
+        }
+    }
+    for (const word of enWordTopics_1.enFood) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", food";
+        }
+        else {
+            map[word.toLowerCase()] = "food";
+        }
+    }
+    for (const word of enWordTopics_1.enMoney) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", money";
+        }
+        else {
+            map[word.toLowerCase()] = "money";
+        }
+    }
+    for (const word of enWordTopics_1.enMovie) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", movie";
+        }
+        else {
+            map[word.toLowerCase()] = "movie";
+        }
+    }
+    for (const word of enWordTopics_1.enMusic) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] = ", music";
+        }
+        else {
+            map[word.toLowerCase()] = "music";
+        }
+    }
+    for (const word of enWordTopics_1.enScience) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", science";
+        }
+        else {
+            map[word.toLowerCase()] = "science";
+        }
+    }
+    for (const word of enWordTopics_1.enWeather) {
+        if (map[word]) {
+            map[word.toLowerCase()] += ", weather";
+        }
+        else {
+            map[word.toLowerCase()] = "weather";
+        }
+    }
+    for (const word of enWordTopics_1.enTraffic) {
+        if (map[word]) {
+            map[word.toLowerCase()] += ", traffic";
+        }
+        else {
+            map[word.toLowerCase()] = "traffic";
+        }
+    }
+    return map;
+};
+const getEsWordTopicMap = () => {
+    const map = {};
+    for (const word of esWordTopics_1.esCommon) {
+        map[word.toLowerCase()] = "common";
+    }
+    for (const word of esWordTopics_1.esSport) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", sport";
+        }
+        else {
+            map[word.toLowerCase()] = "sport";
+        }
+    }
+    for (const word of esWordTopics_1.esNature) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", nature";
+        }
+        else {
+            map[word.toLowerCase()] = "nature";
+        }
+    }
+    for (const word of esWordTopics_1.esClothing) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", clothing";
+        }
+        else {
+            map[word.toLowerCase()] = "clothing";
+        }
+    }
+    for (const word of esWordTopics_1.esEmotion) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", emotion";
+        }
+        else {
+            map[word.toLowerCase()] = "emotion";
+        }
+    }
+    for (const word of esWordTopics_1.esFood) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", food";
+        }
+        else {
+            map[word.toLowerCase()] = "food";
+        }
+    }
+    for (const word of esWordTopics_1.esMoney) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", money";
+        }
+        else {
+            map[word.toLowerCase()] = "money";
+        }
+    }
+    for (const word of esWordTopics_1.esMovie) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", movie";
+        }
+        else {
+            map[word.toLowerCase()] = "movie";
+        }
+    }
+    for (const word of esWordTopics_1.esMusic) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] = ", music";
+        }
+        else {
+            map[word.toLowerCase()] = "music";
+        }
+    }
+    for (const word of esWordTopics_1.esScience) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", science";
+        }
+        else {
+            map[word.toLowerCase()] = "science";
+        }
+    }
+    for (const word of esWordTopics_1.esWeather) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", weather";
+        }
+        else {
+            map[word.toLowerCase()] = "weather";
+        }
+    }
+    for (const word of esWordTopics_1.esTraffic) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", traffic";
+        }
+        else {
+            map[word.toLowerCase()] = "traffic";
+        }
+    }
+    return map;
+};
+const getFrWordTopicMap = () => {
+    const map = {};
+    for (const word of frWordTopics_1.frCommon) {
+        map[word.toLowerCase()] = "common";
+    }
+    for (const word of frWordTopics_1.frSport) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", sport";
+        }
+        else {
+            map[word.toLowerCase()] = "sport";
+        }
+    }
+    for (const word of frWordTopics_1.frNature) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", nature";
+        }
+        else {
+            map[word.toLowerCase()] = "nature";
+        }
+    }
+    for (const word of frWordTopics_1.frClothing) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", clothing";
+        }
+        else {
+            map[word.toLowerCase()] = "clothing";
+        }
+    }
+    for (const word of frWordTopics_1.frEmotion) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", emotion";
+        }
+        else {
+            map[word.toLowerCase()] = "emotion";
+        }
+    }
+    for (const word of frWordTopics_1.frFood) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", food";
+        }
+        else {
+            map[word.toLowerCase()] = "food";
+        }
+    }
+    for (const word of frWordTopics_1.frMoney) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", money";
+        }
+        else {
+            map[word.toLowerCase()] = "money";
+        }
+    }
+    for (const word of frWordTopics_1.frMovie) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", movie";
+        }
+        else {
+            map[word.toLowerCase()] = "movie";
+        }
+    }
+    for (const word of frWordTopics_1.frMusic) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] = ", music";
+        }
+        else {
+            map[word.toLowerCase()] = "music";
+        }
+    }
+    for (const word of frWordTopics_1.frScience) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", science";
+        }
+        else {
+            map[word.toLowerCase()] = "science";
+        }
+    }
+    for (const word of frWordTopics_1.frWeather) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", weather";
+        }
+        else {
+            map[word.toLowerCase()] = "weather";
+        }
+    }
+    for (const word of frWordTopics_1.frTraffic) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", traffic";
+        }
+        else {
+            map[word.toLowerCase()] = "traffic";
+        }
+    }
+    return map;
+};
+const getDeWordTopicMap = () => {
+    const map = {};
+    for (const word of deWordTopics_1.deCommon) {
+        map[word.toLowerCase()] = "common";
+    }
+    for (const word of deWordTopics_1.deSport) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", sport";
+        }
+        else {
+            map[word.toLowerCase()] = "sport";
+        }
+    }
+    for (const word of deWordTopics_1.deNature) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", nature";
+        }
+        else {
+            map[word.toLowerCase()] = "nature";
+        }
+    }
+    for (const word of deWordTopics_1.deClothing) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", clothing";
+        }
+        else {
+            map[word.toLowerCase()] = "clothing";
+        }
+    }
+    for (const word of deWordTopics_1.deEmotion) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", emotion";
+        }
+        else {
+            map[word.toLowerCase()] = "emotion";
+        }
+    }
+    for (const word of deWordTopics_1.deFood) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", food";
+        }
+        else {
+            map[word.toLowerCase()] = "food";
+        }
+    }
+    for (const word of deWordTopics_1.deMoney) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", money";
+        }
+        else {
+            map[word.toLowerCase()] = "money";
+        }
+    }
+    for (const word of deWordTopics_1.deMovie) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", movie";
+        }
+        else {
+            map[word.toLowerCase()] = "movie";
+        }
+    }
+    for (const word of deWordTopics_1.deMusic) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] = ", music";
+        }
+        else {
+            map[word.toLowerCase()] = "music";
+        }
+    }
+    for (const word of deWordTopics_1.deScience) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", science";
+        }
+        else {
+            map[word.toLowerCase()] = "science";
+        }
+    }
+    for (const word of deWordTopics_1.deWeather) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", weather";
+        }
+        else {
+            map[word.toLowerCase()] = "weather";
+        }
+    }
+    for (const word of deWordTopics_1.deTraffic) {
+        if (map[word.toLowerCase()]) {
+            map[word.toLowerCase()] += ", traffic";
+        }
+        else {
+            map[word.toLowerCase()] = "traffic";
+        }
+    }
+    return map;
+};
 const importEnWords = () => __awaiter(this, void 0, void 0, function* () {
     const wordRepo = typeorm_1.getRepository(Word_1.Word);
+    const map = getEnWordTopicMap();
     for (const word of an_array_of_english_words_1.default) {
+        const topics = map[word] && typeof map[word] == "string"
+            ? map[word]
+            : "unknown";
         yield wordRepo.insert({
             value: word,
             language: "en_US",
+            topics,
         });
     }
 });
 const importDeWords = () => __awaiter(this, void 0, void 0, function* () {
     const wordRepo = typeorm_1.getRepository(Word_1.Word);
+    const map = getDeWordTopicMap();
     for (const word of all_the_german_words_1.default) {
+        const topics = map[word] && typeof map[word] == "string"
+            ? map[word]
+            : "unknown";
         yield wordRepo.insert({
             value: word,
             language: "de",
+            topics,
         });
     }
 });
 const importFrWords = () => __awaiter(this, void 0, void 0, function* () {
     const wordRepo = typeorm_1.getRepository(Word_1.Word);
+    const map = getFrWordTopicMap();
     for (const word of an_array_of_french_words_1.default) {
+        const topics = map[word] && typeof map[word] == "string"
+            ? map[word]
+            : "unknown";
         yield wordRepo.insert({
             value: word,
             language: "fr",
+            topics,
         });
     }
 });
 const importEsWords = () => __awaiter(this, void 0, void 0, function* () {
     const wordRepo = typeorm_1.getRepository(Word_1.Word);
+    const map = getEsWordTopicMap();
     for (const word of an_array_of_spanish_words_1.default) {
+        const topics = map[word] && typeof map[word] == "string"
+            ? map[word]
+            : "unknown";
         yield wordRepo.insert({
             value: word,
             language: "es",
+            topics,
         });
     }
 });

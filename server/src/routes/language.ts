@@ -2,12 +2,14 @@ import { Router } from "express";
 import { Language } from "../entity/Language";
 import {
   chooseLanguages,
+  getLanguageReports,
   getLearningLanguages,
 } from "../controllers/LanguageController";
 
 import ApiResponse from "../utils/ApiResponse";
 import { checkAuthentication } from "../utils/middlewares";
 import CustomError from "../utils/CustomError";
+import { LanguageReport } from "src/utils/types";
 
 const router = Router();
 
@@ -24,6 +26,17 @@ router.get("/", checkAuthentication, async (req, res) => {
     } else {
       res.send(new ApiResponse(false, "Something went wrong", null));
     }
+  }
+});
+
+router.get("/report", checkAuthentication, async (req, res) => {
+  try {
+    const userId = (req as any).user.id;
+
+    const result = await getLanguageReports(userId);
+    res.send(new ApiResponse<Array<LanguageReport>>(true, "", result));
+  } catch (error) {
+    console.log(error);
   }
 });
 

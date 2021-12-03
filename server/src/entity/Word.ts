@@ -20,6 +20,9 @@ export class Word {
   @Column()
   language: string;
 
+  @Column()
+  topics: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

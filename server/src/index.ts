@@ -64,7 +64,12 @@ createConnection({
     //     .leftJoinAndSelect("language.learners", "learner")
     //     .getMany()
     // );
-    // console.log(await getRepository(Language).find());
+
+    // console.log(
+    //   await getRepository(Word).find({ language: "fr", topics: "common" })
+    // );
+
+    // console.log(await getRepository(SavedWord).delete({ language: "de" }));
 
     // console.log(await getRepository(User).find());
 

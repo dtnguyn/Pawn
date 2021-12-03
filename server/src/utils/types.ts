@@ -1,6 +1,7 @@
 export type WordDetailJSON = {
   value: string;
   language: string;
+  topics: string;
   pronunciations: PronunciationJSON[];
   definitions: DefinitionJSON[];
 };
@@ -8,6 +9,7 @@ export type WordDetailJSON = {
 export type WordDetailSimplifyJSON = {
   value: string;
   language: string;
+  topics: string;
   mainDefinition: string;
   pronunciationAudio: string | null;
   pronunciationSymbol: string | null;
@@ -65,4 +67,16 @@ export type SubtitlePart = {
   translatedText: string;
   lang: string;
   translatedLang: string;
+};
+
+export type LanguageReport = {
+  languageId: string;
+  savedWordCount: number;
+  wordTopicReports: Array<WordTopicReport>;
+};
+
+export type WordTopicReport = {
+  languageId: string;
+  value: string;
+  wordCount: number;
 };

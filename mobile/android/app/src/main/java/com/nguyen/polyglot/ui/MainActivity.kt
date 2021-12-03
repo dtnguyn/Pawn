@@ -14,6 +14,7 @@ import com.nguyen.polyglot.ui.screens.newsDetail.NewsDetailViewModel
 import com.nguyen.polyglot.ui.screens.feeds.FeedViewModel
 import com.nguyen.polyglot.ui.screens.home.HomeViewModel
 import com.nguyen.polyglot.ui.screens.search.SearchViewModel
+import com.nguyen.polyglot.ui.screens.stats.StatsViewModel
 import com.nguyen.polyglot.ui.screens.videoDetail.VideoDetailViewModel
 import com.nguyen.polyglot.ui.screens.wordReview.WordReviewViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,6 +33,8 @@ class MainActivity : ComponentActivity() {
     private val newsDetailViewModel: NewsDetailViewModel by viewModels()
     private val videoDetailViewModel: VideoDetailViewModel by viewModels()
     private val wordReviewViewModel: WordReviewViewModel by viewModels()
+    private val statsViewModel: StatsViewModel by viewModels()
+
 
 
     @ExperimentalFoundationApi
@@ -49,7 +52,8 @@ class MainActivity : ComponentActivity() {
                 feedViewModel = feedViewModel,
                 newsDetailViewModel = newsDetailViewModel,
                 videoDetailViewModel = videoDetailViewModel,
-                wordReviewViewModel = wordReviewViewModel
+                wordReviewViewModel = wordReviewViewModel,
+                statsViewModel = statsViewModel
             )
         }
 

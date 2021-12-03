@@ -5,6 +5,7 @@ import android.os.Build
 import android.text.Html
 import android.util.DisplayMetrics
 import androidx.compose.ui.graphics.Color
+import com.nguyen.polyglot.R
 import com.nguyen.polyglot.ui.theme.*
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -37,7 +38,7 @@ object UtilFunctions {
             SupportedLanguage.GERMANY.id -> SupportedLanguage.GERMANY.backgroundColor
             SupportedLanguage.FRENCH.id -> SupportedLanguage.FRENCH.backgroundColor
             SupportedLanguage.SPANISH.id -> SupportedLanguage.SPANISH.backgroundColor
-            else -> SupportedLanguage.ENGLISH.backgroundColor
+            else -> Color.Transparent
         }
     }
 
@@ -47,7 +48,7 @@ object UtilFunctions {
             SupportedLanguage.GERMANY.id -> SupportedLanguage.GERMANY.flag
             SupportedLanguage.FRENCH.id -> SupportedLanguage.FRENCH.flag
             SupportedLanguage.SPANISH.id -> SupportedLanguage.SPANISH.flag
-            else -> SupportedLanguage.ENGLISH.flag
+            else -> R.drawable.world
         }
     }
 

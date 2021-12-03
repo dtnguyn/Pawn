@@ -16,6 +16,9 @@ class WordDetailCacheEntity (
     @ColumnInfo(name = "value")
     val value: String,
 
+    @ColumnInfo(name = "topics")
+    val topics: String,
+
     @ColumnInfo(name = "language")
     val language: String,
 

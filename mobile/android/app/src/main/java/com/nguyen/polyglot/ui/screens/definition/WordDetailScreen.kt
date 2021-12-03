@@ -161,6 +161,7 @@ fun WordDetailScreen(
                                         Word(
                                             value = it.value,
                                             language = it.language,
+                                            topics = it.topics,
                                             mainDefinition = if (it.definitions.isNotEmpty()) it.definitions.first().meaning else "",
                                             pronunciationAudio = if (it.pronunciations.isNotEmpty()) it.pronunciations.first().audio else null,
                                             pronunciationSymbol = if (it.pronunciations.isNotEmpty()) it.pronunciations.first().symbol else null

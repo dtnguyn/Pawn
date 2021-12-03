@@ -18,6 +18,7 @@ object SavedWordMapper {
             language = word.language,
             pronunciationAudio = word.pronunciationAudio,
             pronunciationSymbol = word.pronunciationSymbol,
+            topics = word.topics,
             mainDefinition = word.mainDefinition,
             createdDate = SimpleDateFormat("yyyy.MM.dd").format(Date())
         )
@@ -28,6 +29,7 @@ object SavedWordMapper {
             value = word.value,
             language = word.language,
             mainDefinition = word.mainDefinition,
+            topics = word.topics,
             pronunciationAudio = word.pronunciationAudio,
             pronunciationSymbol = word.pronunciationSymbol
         )

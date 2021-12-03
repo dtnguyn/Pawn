@@ -8,6 +8,7 @@ import com.nguyen.polyglot.db.mapper.LanguageMapper
 //import com.nguyen.pawn.db.PawnDatabase
 //import com.nguyen.pawn.db.entity.LanguageCacheEntity
 import com.nguyen.polyglot.model.Language
+import com.nguyen.polyglot.model.LanguageReport
 import com.nguyen.polyglot.repo.utils.mainGetNetworkBoundResource
 import com.nguyen.polyglot.repo.utils.mainPostNetworkBoundResource
 import com.nguyen.polyglot.util.Constants
@@ -16,6 +17,7 @@ import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -84,6 +86,30 @@ class LanguageRepository
             },
             tag= "getLearningLanguages"
         )
+    }
 
+
+    fun getLanguageReports(accessToken: String?): Flow<UIState<List<LanguageReport>>>{
+        var languageReports: List<LanguageReport>? = null
+        return mainGetNetworkBoundResource(
+            query = {
+                flow {
+                    emit(languageReports)
+                }
+            },
+            fetch = {
+                val response: ApiResponse<List<LanguageReport>> = apiClient.get("${Constants.apiURL}/language/report") {
+                    contentType(ContentType.Application.Json)
+                    headers {
+                        append(HttpHeaders.Authorization, "Bearer $accessToken")
+                    }
+                }
+                response.data
+            },
+            saveFetchResult = {
+              languageReports = it
+            },
+            tag = "getLanguageReports"
+        )
     }
 }

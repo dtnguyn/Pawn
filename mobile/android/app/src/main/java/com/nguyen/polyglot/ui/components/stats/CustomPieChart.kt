@@ -6,11 +6,10 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,24 +17,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
-import com.nguyen.polyglot.ui.theme.Blue
 import java.lang.Integer.min
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.nguyen.polyglot.ui.theme.Typography
 import kotlin.math.atan2
 import kotlin.math.roundToInt
 
-@RequiresApi(Build.VERSION_CODES.N)
 @Composable
 fun CustomPieChart(
+    title: String = "",
+    subtitle: String = "",
     modifier: Modifier,
     progress: List<Float>,
     colors: List<Color>,
     isDonut: Boolean = false,
+    isClickable: Boolean = false,
     percentColor: Color = Color.White
 ) {
 
@@ -63,9 +66,7 @@ fun CustomPieChart(
 
     BoxWithConstraints(modifier = modifier) {
 
-        val sideSize = min(constraints.maxWidth, constraints.maxHeight)
-        val padding = (sideSize * if (isDonut) 30 else 20) / 100f
-
+        val sideSize = constraints.maxWidth
 
         val pathPortion = remember {
             Animatable(initialValue = 0f)
@@ -76,7 +77,6 @@ fun CustomPieChart(
             )
         }
 
-        val size = Size(sideSize.toFloat() - padding, sideSize.toFloat() - padding)
 
         Canvas(
             modifier = Modifier
@@ -84,7 +84,7 @@ fun CustomPieChart(
                 .height(sideSize.dp)
                 .pointerInput(true) {
 
-                    if (!isDonut)
+                    if (!isDonut || !isClickable)
                         return@pointerInput
 
                     detectTapGestures {
@@ -106,35 +106,31 @@ fun CustomPieChart(
                 }
         ) {
 
+            val canvasWidth = size.width
+
             angleProgress.forEachIndexed { index, arcProgress ->
                 drawPie(
                     colors[index],
                     startAngle,
                     arcProgress * pathPortion.value,
-                    size,
-                    padding = padding,
+                    Size(canvasWidth / 1.3f, canvasWidth / 1.3f),
+                    topLeft = Offset(canvasWidth / 9, canvasWidth / 9 - 30f),
                     isDonut = isDonut,
                     isActive = activePie == index
                 )
                 startAngle += arcProgress
             }
-
-            if (activePie != -1)
-                drawContext.canvas.nativeCanvas.apply {
-                    val fontSize = 60.toDp().toPx()
-                    drawText(
-                        "${proportions[activePie].roundToInt()}%",
-                        (sideSize / 2) + fontSize / 4, (sideSize / 2) + fontSize / 3,
-                        Paint().apply {
-                            color = percentColor.toArgb()
-                            textSize = fontSize
-                            textAlign = Paint.Align.CENTER
-                        }
-                    )
-                }
+        }
+        Column(modifier = Modifier.align(Alignment.Center)) {
+            Text(
+                text = title,
+                style = Typography.h6,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Text(text = subtitle, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         }
     }
-
 
 }
 
@@ -143,7 +139,7 @@ private fun DrawScope.drawPie(
     startAngle: Float,
     arcProgress: Float,
     size: Size,
-    padding: Float,
+    topLeft: Offset,
     isDonut: Boolean = false,
     isActive: Boolean = false
 ): Path {
@@ -158,10 +154,11 @@ private fun DrawScope.drawPie(
             style = if (isDonut) Stroke(
                 width = if (isActive) 150f else 100f,
             ) else Fill,
-            topLeft = Offset(padding / 2, padding / 2)
+            topLeft = topLeft
         )
     }
 }
+
 
 private fun convertTouchEventPointToAngle(
     width: Float,

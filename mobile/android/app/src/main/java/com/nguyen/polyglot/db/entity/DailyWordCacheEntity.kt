@@ -18,6 +18,9 @@ class DailyWordCacheEntity (
     @ColumnInfo(name = "language")
     val language: String,
 
+    @ColumnInfo(name = "topics")
+    val topics: String,
+
     @ColumnInfo(name = "display")
     val display: Boolean,
 

@@ -17,6 +17,7 @@ object DailyWordMapper {
             display = true,
             pronunciationAudio = word.pronunciationAudio,
             pronunciationSymbol = word.pronunciationSymbol,
+            topics = word.topics,
             mainDefinition = word.mainDefinition,
             createdDate = SimpleDateFormat("yyyy.MM.dd").format(Date())
         )
@@ -28,7 +29,8 @@ object DailyWordMapper {
             language = word.language,
             mainDefinition = word.mainDefinition,
             pronunciationSymbol = word.pronunciationSymbol,
-            pronunciationAudio = word.pronunciationAudio
+            pronunciationAudio = word.pronunciationAudio,
+            topics = word.topics
         )
     }
 

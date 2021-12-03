@@ -18,6 +18,9 @@ class SavedWordCacheEntity (
     @ColumnInfo(name = "language")
     val language: String,
 
+    @ColumnInfo(name = "topics")
+    val topics: String,
+
     @ColumnInfo(name = "pronunciationAudio")
     val pronunciationAudio: String?,
 

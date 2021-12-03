@@ -13,6 +13,8 @@ object WordDetailMapper {
             id = UUID.randomUUID().toString(),
             value = word.value,
             language = word.language,
+            topics = word.topics,
+
             definitions = word.definitions,
             pronunciations = word.pronunciations
         )
@@ -22,6 +24,8 @@ object WordDetailMapper {
         return WordDetail(
             value = word.value,
             language = word.language,
+            topics = word.topics,
+
             definitions = word.definitions,
             pronunciations = word.pronunciations,
         )

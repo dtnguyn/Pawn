@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import java.lang.Integer.min
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -39,7 +40,8 @@ fun CustomPieChart(
     colors: List<Color>,
     isDonut: Boolean = false,
     isClickable: Boolean = false,
-    percentColor: Color = Color.White
+    percentColor: Color = Color.White,
+    activePie: Int = -1
 ) {
 
     if (progress.isEmpty() || progress.size != colors.size) return
@@ -57,10 +59,6 @@ fun CustomPieChart(
 
     for (x in 1 until angleProgress.size)
         progressSize.add(angleProgress[x] + progressSize[x - 1])
-
-    var activePie by remember {
-        mutableStateOf(-1)
-    }
 
     var startAngle = 270f
 
@@ -80,30 +78,31 @@ fun CustomPieChart(
 
         Canvas(
             modifier = Modifier
-                .width(sideSize.dp)
-                .height(sideSize.dp)
-                .pointerInput(true) {
-
-                    if (!isDonut || !isClickable)
-                        return@pointerInput
-
-                    detectTapGestures {
-                        val clickedAngle = convertTouchEventPointToAngle(
-                            sideSize.toFloat(),
-                            sideSize.toFloat(),
-                            it.x,
-                            it.y
-                        )
-                        progressSize.forEachIndexed { index, item ->
-                            if (clickedAngle <= item) {
-                                if (activePie != index)
-                                    activePie = index
-
-                                return@detectTapGestures
-                            }
-                        }
-                    }
-                }
+                .width(constraints.maxWidth.dp)
+                .height(constraints.maxHeight.dp)
+                .clipToBounds()
+//                .pointerInput(true) {
+//
+//                    if (!isDonut || !isClickable)
+//                        return@pointerInput
+//
+//                    detectTapGestures {
+//                        val clickedAngle = convertTouchEventPointToAngle(
+//                            sideSize.toFloat(),
+//                            sideSize.toFloat(),
+//                            it.x,
+//                            it.y
+//                        )
+//                        progressSize.forEachIndexed { index, item ->
+//                            if (clickedAngle <= item) {
+//                                if (activePie != index)
+//                                    activePie = index
+//
+//                                return@detectTapGestures
+//                            }
+//                        }
+//                    }
+//                }
         ) {
 
             val canvasWidth = size.width
@@ -113,8 +112,8 @@ fun CustomPieChart(
                     colors[index],
                     startAngle,
                     arcProgress * pathPortion.value,
-                    Size(canvasWidth / 1.3f, canvasWidth / 1.3f),
-                    topLeft = Offset(canvasWidth / 9, canvasWidth / 9 - 30f),
+                    Size(canvasWidth - 160f, canvasWidth - 160f),
+                    topLeft = Offset(80f, 80f),
                     isDonut = isDonut,
                     isActive = activePie == index
                 )

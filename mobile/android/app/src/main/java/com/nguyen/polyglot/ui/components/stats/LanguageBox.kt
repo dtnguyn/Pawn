@@ -20,13 +20,18 @@ import com.nguyen.polyglot.util.UtilFunctions.generateBackgroundColorForLanguage
 import com.nguyen.polyglot.util.UtilFunctions.generateFlagForLanguage
 
 @Composable
-fun LanguageBox(language: Language, isActive: Boolean = false) {
+fun LanguageBox(language: Language?, wordCount: Int, isActive: Boolean = false, onClick: (id: String) -> Unit) {
+
+    if(language == null) return
+
     Column(
         Modifier
             .width(120.dp)
             .padding(10.dp)
             .clip(RoundedCornerShape(10.dp))
-            .clickable {  }
+            .clickable {
+                onClick(language.id)
+            }
             .background(if (isActive) LightGrey else Color.White, RoundedCornerShape(10.dp))
     ) {
         Box(modifier = Modifier
@@ -43,7 +48,7 @@ fun LanguageBox(language: Language, isActive: Boolean = false) {
             )
             Spacer(modifier = Modifier.padding(5.dp))
             Text(text = language.value, style = Typography.body1)
-            Text(text = "250 words", style = Typography.subtitle1)
+            Text(text = "$wordCount words", style = Typography.subtitle1)
         }
 
     }

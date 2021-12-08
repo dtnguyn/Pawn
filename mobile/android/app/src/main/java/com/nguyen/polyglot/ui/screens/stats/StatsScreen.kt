@@ -106,7 +106,7 @@ fun StatsScreen(
     }
 
     Scaffold(backgroundColor = Color.White) {
-        Column(Modifier.verticalScroll(rememberScrollState())) {
+        Column(Modifier.padding(bottom = 55.dp).verticalScroll(rememberScrollState())) {
             languageReports?.let {
                 Column(Modifier.padding(20.dp)) {
                     Row() {
@@ -174,13 +174,17 @@ fun StatsScreen(
                     }
                 }
                 Spacer(modifier = Modifier.padding(10.dp))
-                CustomBarChart(
-                    "Word Topic Stats",
-                    "This shows how many words in each category",
-                    it,
-                    activeLanguageId ?: "",
-                    allSavedWordsCount
-                )
+
+                if(activeLanguageIndex > -1){
+                    CustomBarChart(
+                        title = "Word Topic Stats",
+                        subtitle = "This shows how many words in each category",
+                        values = it[activeLanguageIndex].wordTopicReports.map { topic -> topic.wordCount },
+                        labels = it[activeLanguageIndex].wordTopicReports.map { topic -> topic.value},
+                        maxValue = it[activeLanguageIndex].wordTopicReports.maxOf { topic -> topic.wordCount }
+                    )
+                }
+
             }
 
         }

@@ -91,7 +91,7 @@ fun PolygotApp(
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
                 if (currentRoute in setOf("home", "feeds", "search", "stats")) {
-                    BottomNavigation {
+                    BottomNavigation(Modifier.height(55.dp)) {
                         items.forEach { screen ->
                             BottomNavigationItem(
                                 icon = {

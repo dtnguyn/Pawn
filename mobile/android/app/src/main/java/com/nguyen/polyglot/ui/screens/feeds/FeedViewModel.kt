@@ -24,8 +24,17 @@ class FeedViewModel@Inject constructor (
         private val allTopics = listOf("sports", "gaming", "business", "tech", "beauty", "movie", "politics")
     }
 
-    private val _feedItems: MutableState<UIState<List<Feed>>> = mutableStateOf(UIState.Initial(listOf()))
-    val feedItems: State<UIState<List<Feed>>> = _feedItems
+    private val _enFeedItems: MutableState<UIState<List<Feed>>> = mutableStateOf(UIState.Initial(listOf()))
+    val enFeedItems: State<UIState<List<Feed>>> = _enFeedItems
+
+    private val _esFeedItems: MutableState<UIState<List<Feed>>> = mutableStateOf(UIState.Initial(listOf()))
+    val esFeedItems: State<UIState<List<Feed>>> = _esFeedItems
+
+    private val _frFeedItems: MutableState<UIState<List<Feed>>> = mutableStateOf(UIState.Initial(listOf()))
+    val frFeedItems: State<UIState<List<Feed>>> = _frFeedItems
+
+    private val _deFeedItems: MutableState<UIState<List<Feed>>> = mutableStateOf(UIState.Initial(listOf()))
+    val deFeedItems: State<UIState<List<Feed>>> = _deFeedItems
 
     private val _topics: MutableState<UIState<String>> = mutableStateOf(UIState.Initial(""))
     val topics: State<UIState<String>> = _topics
@@ -42,15 +51,29 @@ class FeedViewModel@Inject constructor (
     }
 
 
-    fun getFeeds(accessToken: String?, language: String){
+    fun getFeed(accessToken: String?, language: String){
 
         if(accessToken == null){
-            _feedItems.value = UIState.Error("Please login to get news feeds")
+            _enFeedItems.value = UIState.Error("Please login to get news feeds")
             return
         }
         viewModelScope.launch {
             feedRepo.getFeeds(accessToken, language).collect {
-                _feedItems.value = it
+                when(language){
+                    "en_US" -> {
+                        _enFeedItems.value = it
+                    }
+                    "es" -> {
+                        _esFeedItems.value = it
+                    }
+                    "fr" -> {
+                        _frFeedItems.value = it
+                    }
+                    "de" -> {
+                        _deFeedItems.value = it
+                    }
+                }
+
             }
         }
     }

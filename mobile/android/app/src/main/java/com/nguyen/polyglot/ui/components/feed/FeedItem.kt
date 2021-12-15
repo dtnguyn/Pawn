@@ -71,7 +71,7 @@ fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
                     // shows an image with a circular revealed animation.
                     circularReveal = CircularReveal(duration = 250),
                     // shows a placeholder ImageBitmap when loading.
-                    placeHolder = ImageBitmap.imageResource(id = R.drawable.cat_loading_icon),
+//                    placeHolder = ImageBitmap.imageResource(id = R.drawable.),
                     // shows an error ImageBitmap when the request failed.
                     error = ImageBitmap.imageResource(id = R.drawable.image_loading_error),
                     modifier = Modifier
@@ -114,7 +114,7 @@ fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
                         // shows an image with a circular revealed animation.
                         circularReveal = CircularReveal(duration = 250),
                         // shows a placeholder ImageBitmap when loading.
-                        placeHolder = ImageBitmap.imageResource(id = R.drawable.cat_loading_icon),
+//                        placeHolder = ImageBitmap.imageResource(id = R.drawable.cat_loading_icon),
                         // shows an error ImageBitmap when the request failed.
                         error = ImageBitmap.imageResource(id = R.drawable.image_loading_error),
                         modifier = Modifier

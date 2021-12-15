@@ -33,6 +33,8 @@ import com.nguyen.polyglot.util.UIState
 import kotlinx.coroutines.launch
 import java.util.*
 
+
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun FeedScreen(
@@ -41,8 +43,43 @@ fun FeedScreen(
     navController: NavController
 ) {
 
-    val feedUIState: UIState<List<Feed>> by feedViewModel.feedItems
-    var feedItems by remember { mutableStateOf(feedUIState.value) }
+
+
+    val enFeedUIState: UIState<List<Feed>> by feedViewModel.enFeedItems
+    var enFeedItems by remember { mutableStateOf(enFeedUIState.value) }
+
+    val esFeedUIState: UIState<List<Feed>> by feedViewModel.esFeedItems
+    var esFeedItems by remember { mutableStateOf(esFeedUIState.value) }
+
+    val frFeedUIState: UIState<List<Feed>> by feedViewModel.frFeedItems
+    var frFeedItems by remember { mutableStateOf(frFeedUIState.value) }
+
+    val deFeedUIState: UIState<List<Feed>> by feedViewModel.deFeedItems
+    var deFeedItems by remember { mutableStateOf(deFeedUIState.value) }
+
+    fun initialFeed(languageId: String?): List<Feed>?{
+        var feed: List<Feed>? = null
+        when(languageId){
+            "en_US" -> {
+                feed = enFeedUIState.value
+            }
+            "es" -> {
+                feed = esFeedUIState.value
+            }
+            "fr" -> {
+                feed = frFeedUIState.value
+            }
+            "de" -> {
+                feed = deFeedUIState.value
+            }
+        }
+        return feed
+
+    }
+
+    var feedItems by remember { mutableStateOf(initialFeed(sharedViewModel.currentPickedLanguage.value?.id)) }
+
+
 
     val topicsUIState: UIState<String> by feedViewModel.topics
     var topics by remember { mutableStateOf(topicsUIState.value ?: "") }
@@ -97,14 +134,17 @@ fun FeedScreen(
     }
 
 
+
     LaunchedEffect(currentPickedLanguage) {
         currentPickedLanguage?.id?.let {
-            feedViewModel.getFeeds(DataStoreUtils.getAccessTokenFromDataStore(context), it)
+            feedViewModel.getFeed(DataStoreUtils.getAccessTokenFromDataStore(context), it)
         }
     }
 
-    LaunchedEffect(feedUIState) {
-        when (feedUIState) {
+
+
+    LaunchedEffect(enFeedUIState) {
+        when (enFeedUIState) {
             is UIState.Initial -> {
                 Log.d("FeedScreen", "initial")
             }
@@ -115,17 +155,104 @@ fun FeedScreen(
             }
 
             is UIState.Error -> {
-                Log.d("FeedScreen", "error ${feedUIState.errorMsg}")
+                Log.d("FeedScreen", "error ${enFeedUIState.errorMsg}")
                 isLoading = false
             }
 
             is UIState.Loaded -> {
-                Log.d("FeedScreen", "loaded: ${feedUIState.value?.size}")
-                feedItems = feedUIState.value
-                isLoading = false
+                Log.d("FeedScreen", "loaded: ${enFeedUIState.value?.size}")
+                if(currentPickedLanguage?.id == "en_US"){
+                    feedItems = enFeedUIState.value
+                    isLoading = false
+                }
             }
         }
     }
+
+    LaunchedEffect(esFeedUIState) {
+        when (esFeedUIState) {
+            is UIState.Initial -> {
+                Log.d("FeedScreen", "initial")
+            }
+
+            is UIState.Loading -> {
+                Log.d("FeedScreen", "loading")
+                isLoading = true
+            }
+
+            is UIState.Error -> {
+                Log.d("FeedScreen", "error ${esFeedUIState.errorMsg}")
+                isLoading = false
+            }
+
+            is UIState.Loaded -> {
+                Log.d("FeedScreen", "loaded: ${esFeedUIState.value?.size}")
+                Log.d("FeedScreen", "current Picked language ${currentPickedLanguage?.id}")
+                if(currentPickedLanguage?.id == "es"){
+                    feedItems = esFeedUIState.value
+                    isLoading = false
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(frFeedUIState) {
+        when (frFeedUIState) {
+            is UIState.Initial -> {
+                Log.d("FeedScreen", "initial")
+            }
+
+            is UIState.Loading -> {
+                Log.d("FeedScreen", "loading")
+                isLoading = true
+            }
+
+            is UIState.Error -> {
+                Log.d("FeedScreen", "error ${frFeedUIState.errorMsg}")
+                isLoading = false
+            }
+
+            is UIState.Loaded -> {
+                Log.d("FeedScreen", "loaded: ${frFeedUIState.value?.size}")
+                if(currentPickedLanguage?.id == "fr"){
+                    feedViewModel.currentFeedIndex = 0
+                    feedViewModel.currentFeedOffset = 0
+                    feedItems = frFeedUIState.value
+                    isLoading = false
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(deFeedUIState) {
+        when (deFeedUIState) {
+            is UIState.Initial -> {
+                Log.d("FeedScreen", "initial")
+            }
+
+            is UIState.Loading -> {
+                Log.d("FeedScreen", "loading")
+                isLoading = true
+            }
+
+            is UIState.Error -> {
+                Log.d("FeedScreen", "error ${deFeedUIState.errorMsg}")
+                isLoading = false
+            }
+
+            is UIState.Loaded -> {
+                Log.d("FeedScreen", "loaded: ${deFeedUIState.value?.size}")
+                if(currentPickedLanguage?.id == "de"){
+                    feedViewModel.currentFeedIndex = 0
+                    feedViewModel.currentFeedOffset = 0
+                    feedItems = deFeedUIState.value
+                    isLoading = false
+                }
+            }
+        }
+    }
+
+
 
 
     ModalBottomSheetLayout(
@@ -186,6 +313,8 @@ fun FeedScreen(
                                 languages = languages,
                                 currentPickedLanguage = language,
                                 onPickLanguage = {
+                                    feedViewModel.currentFeedIndex = 0
+                                    feedViewModel.currentFeedOffset = 0
                                     sharedViewModel.changeCurrentPickedLanguage(
                                         it
                                     )

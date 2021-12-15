@@ -13,10 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.HorizontalPagerIndicator
-import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.*
 import com.nguyen.polyglot.R
 import com.nguyen.polyglot.model.Word
 import com.nguyen.polyglot.ui.components.home.DailyWordCard
@@ -29,16 +26,16 @@ private const val TAG = "DailyWordSection"
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun DailyWordSection(
-    pagerState: PagerState,
     navController: NavController,
     words: List<Word>,
     isLoading: Boolean,
     onDailyWordClick: (wordValue: String) -> Unit,
     onToggleSaveWord: (word: Word) -> Unit,
-    onRemoveWord: () -> Unit,
+    onRemoveWord: (wordValue: String) -> Unit,
     checkIsSaved: (wordValue: String) -> Boolean
 ) {
 
+    val pagerState = rememberPagerState(pageCount = words.size)
 
     val coroutineScope = rememberCoroutineScope()
     val isSaved = remember { mutableStateOf(false) }
@@ -46,39 +43,47 @@ fun DailyWordSection(
     Log.d(TAG, "isLoadingDailyWords: $isLoading")
 //    if (words.size > 0 || isLoading) {
     Column {
-        Text(
-            text = "Daily words",
-            modifier = Modifier.padding(
-                horizontal = 30.dp,
-                vertical = 20.dp
-            ),
-            style = Typography.h6,
-            fontSize = 18.sp
+        if (isLoading) {
+            Text(
+                text = "Daily words",
+                modifier = Modifier.padding(
+                    horizontal = 30.dp,
+                    vertical = 20.dp
+                ),
+                style = Typography.h6,
+                fontSize = 18.sp
 
-        )
-        if (words.isNotEmpty()) {
-            if (isLoading) {
+            )
+            DailyWordCard(
+                isLoading = isLoading,
+                word = "",
+                definition = "",
+                onClick = {}
+            )
+        } else if (words.isNotEmpty()) {
+            Text(
+                text = "Daily words",
+                modifier = Modifier.padding(
+                    horizontal = 30.dp,
+                    vertical = 20.dp
+                ),
+                style = Typography.h6,
+                fontSize = 18.sp
+
+            )
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxWidth()
+            ) { page ->
                 DailyWordCard(
                     isLoading = isLoading,
-                    word = "",
-                    definition = "",
-                    onClick = {}
+                    word = words[page].value,
+                    definition = words[page].mainDefinition,
+                    pronunciationSymbol = words[page].pronunciationSymbol,
+                    onClick = {
+                        onDailyWordClick(words[page].value)
+                    }
                 )
-            } else {
-                HorizontalPager(
-                    state = pagerState,
-                    modifier = Modifier.fillMaxWidth()
-                ) { page ->
-                    DailyWordCard(
-                        isLoading = isLoading,
-                        word = words[page].value,
-                        definition = words[page].mainDefinition,
-                        pronunciationSymbol = words[page].pronunciationSymbol,
-                        onClick = {
-                            onDailyWordClick(words[page].value)
-                        }
-                    )
-                }
             }
             HorizontalPagerIndicator(
                 pagerState = pagerState,
@@ -100,21 +105,14 @@ fun DailyWordSection(
                     }
                 })
                 RoundedSquareButton(Grey, R.drawable.trash) {
-//                    viewModel.removeDailyWords(words[pagerState.currentPage].id)
+                    onRemoveWord(words[pagerState.currentPage].value)
                 }
-
-//                if(checkIsSaved(words[pagerState.currentPage].value)){
-//                    RoundedSquareButton(LightRed, R.drawable.heart_red, onClick = {
-//                        onToggleSaveWord(words[pagerState.currentPage])
-//                    })
-//                } else {
-//                    RoundedSquareButton(LightRed, R.drawable.heart, onClick = {
-//                        onToggleSaveWord(words[pagerState.currentPage])
-//                    })
-//                }
-                RoundedSquareButton(LightRed, icon = if(checkIsSaved(words[pagerState.currentPage].value)) R.drawable.heart_red else R.drawable.heart, onClick = {
-                    onToggleSaveWord(words[pagerState.currentPage])
-                })
+                RoundedSquareButton(
+                    LightRed,
+                    icon = if (checkIsSaved(words[pagerState.currentPage].value)) R.drawable.heart_red else R.drawable.heart,
+                    onClick = {
+                        onToggleSaveWord(words[pagerState.currentPage])
+                    })
 
 
                 RoundedSquareButton(LightOrange, R.drawable.next2_right, onClick = {
@@ -124,14 +122,8 @@ fun DailyWordSection(
                         pagerState.animateScrollToPage(nextPage)
                     }
                 })
+
             }
-        } else {
-            DailyWordCard(
-                isLoading = true,
-                word = "",
-                definition = "",
-                onClick = {}
-            )
         }
 
 

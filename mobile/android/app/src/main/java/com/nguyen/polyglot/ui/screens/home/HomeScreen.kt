@@ -105,7 +105,7 @@ fun HomeScreen(
     /** Compose state */
     val coroutineScope = rememberCoroutineScope()
     val homeScaffoldState: ScaffoldState = rememberScaffoldState()
-    val pagerState = rememberPagerState(pageCount = dailyWordCount ?: 3)
+//    val pagerState = rememberPagerState(pageCount = dailyWordCount ?: 3)
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(
             initialValue = BottomSheetValue.Collapsed,
@@ -518,7 +518,6 @@ fun HomeScreen(
                                 item {
                                     DailyWordSection(
                                         isLoading = isLoadingDailyWords,
-                                        pagerState = pagerState,
                                         navController = navController,
                                         words = dailyWords() ?: listOf(),
                                         onDailyWordClick = {
@@ -539,7 +538,9 @@ fun HomeScreen(
                                                 currentPickedLanguage?.id
                                             )
                                         },
-                                        onRemoveWord = {}
+                                        onRemoveWord = {wordValue ->
+                                            homeViewModel.removeDailyWords(wordValue, currentPickedLanguage?.id)
+                                        }
                                     )
                                 }
                                 stickyHeader {

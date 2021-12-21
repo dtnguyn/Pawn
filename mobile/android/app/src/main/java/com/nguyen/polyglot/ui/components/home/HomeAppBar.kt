@@ -43,7 +43,7 @@ fun HomeAppBar(navController: NavController, user: User?, onLogout: (refreshToke
             Column( modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .padding(10.dp)) {
-                Text(text = "Welcome to Pawn!", color = Color.White, style = Typography.h6)
+                Text(text = "Welcome to Polyglot!", color = Color.White, style = Typography.h6)
                 Button(onClick = { navController.navigate("auth") }, colors = ButtonDefaults.buttonColors(ReallyRed), shape = RoundedCornerShape(20.dp)) {
                     Text(text = "Login", color = Color.White, style = Typography.h6)
                 }

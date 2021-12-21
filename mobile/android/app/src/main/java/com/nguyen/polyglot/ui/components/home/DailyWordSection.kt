@@ -80,6 +80,7 @@ fun DailyWordSection(
                     word = words[page].value,
                     definition = words[page].mainDefinition,
                     pronunciationSymbol = words[page].pronunciationSymbol,
+                    pronunciationAudio = words[page].pronunciationAudio,
                     onClick = {
                         onDailyWordClick(words[page].value)
                     }

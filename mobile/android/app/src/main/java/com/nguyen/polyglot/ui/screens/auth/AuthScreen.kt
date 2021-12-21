@@ -209,7 +209,7 @@ fun AuthScreen(
                         )
                     } else {
                         Text(
-                            text = "Welcome to Pawn!",
+                            text = "Welcome to Polyglot!",
                             style = Typography.h2,
                             color = Color.White,
                         )

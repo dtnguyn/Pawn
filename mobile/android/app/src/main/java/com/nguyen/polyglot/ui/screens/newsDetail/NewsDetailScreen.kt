@@ -254,7 +254,7 @@ fun NewsDetailScreen(
                         imageModel = newsDetail?.thumbnail ?: "",
                         contentScale = ContentScale.FillWidth,
                         circularReveal = CircularReveal(duration = 250),
-                        placeHolder = ImageBitmap.imageResource(id = R.drawable.cat_loading_icon),
+//                        placeHolder = ImageBitmap.imageResource(id = R.drawable.cat_loading_icon),
                         error = ImageBitmap.imageResource(R.drawable.image_loading_error),
                         modifier = Modifier
                             .fillMaxWidth()

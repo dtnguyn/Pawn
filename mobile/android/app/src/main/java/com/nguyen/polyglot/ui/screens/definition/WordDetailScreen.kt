@@ -1,5 +1,7 @@
 package com.nguyen.polyglot.ui.screens
 
+import android.media.MediaPlayer
+import android.net.Uri
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -149,8 +151,21 @@ fun WordDetailScreen(
                             backgroundColor = LightGrey,
                             size = 70.dp,
                             icon = R.drawable.speaker,
-                            padding = 10.dp
-                        ) {}
+                            padding = 10.dp,
+                            onClick = {
+                                if(wordDetail?.pronunciations?.isEmpty() != false) {
+
+                                } else {
+                                    wordDetail?.pronunciations?.get(0)?.audio?.let{
+                                        val audioUrl = if ("http" in it) it else "https:$it"
+                                        MediaPlayer.create(
+                                            context,
+                                            Uri.parse(audioUrl)
+                                        ).start()
+                                    }
+                                }
+                            }
+                        )
                         RoundedSquareButton(
                             backgroundColor = LightRed,
                             icon = if (isSaved) R.drawable.heart_red else R.drawable.heart

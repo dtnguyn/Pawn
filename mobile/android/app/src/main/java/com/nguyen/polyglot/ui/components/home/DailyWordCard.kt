@@ -1,5 +1,7 @@
 package com.nguyen.polyglot.ui.components.home
 
+import android.media.MediaPlayer
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -10,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.nguyen.polyglot.R
 import com.nguyen.polyglot.ui.components.RoundButton
@@ -28,6 +31,8 @@ fun DailyWordCard(
     pronunciationAudio: String? = null,
     onClick: () -> Unit
 ) {
+
+    val context = LocalContext.current
 
     Box(Modifier.padding(horizontal = 30.dp)) {
         Card(
@@ -73,7 +78,18 @@ fun DailyWordCard(
                             backgroundColor = Color.White,
                             size = 45.dp,
                             icon = R.drawable.speaker,
-                            onClick = {})
+                            onClick = {
+                                if(pronunciationAudio == null) {
+
+                                } else {
+                                    val audioUrl = if ("http" in pronunciationAudio) pronunciationAudio else "https:$pronunciationAudio"
+                                    MediaPlayer.create(
+                                        context,
+                                        Uri.parse(audioUrl)
+                                    ).start()
+                                }
+                            }
+                        )
                     }
                     Spacer(Modifier.padding(5.dp))
                     Text(text = definition, style = Typography.body1, color = Color.White)

@@ -26,7 +26,7 @@ import com.nguyen.polyglot.util.DataStoreUtils.saveRefreshTokenToAuthDataStore
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeAppBar(navController: NavController, user: User?, onLogout: (refreshToken: String?) -> Unit){
+fun HomeAppBar(navController: NavController, user: User?, onAccountClick: () -> Unit, onLogout: (refreshToken: String?) -> Unit){
 
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -57,7 +57,9 @@ fun HomeAppBar(navController: NavController, user: User?, onLogout: (refreshToke
                     modifier = Modifier
                         .size(64.dp)
                         .clip(CircleShape)
-                        .clickable(onClick = {})
+                        .clickable(onClick = {
+                            onAccountClick()
+                        })
                 )
                 Column( modifier = Modifier
                     .align(Alignment.CenterVertically)

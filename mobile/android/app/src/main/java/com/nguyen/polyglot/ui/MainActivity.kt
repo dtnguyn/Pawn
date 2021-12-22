@@ -8,6 +8,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.nguyen.polyglot.ui.screens.account.AccountViewModel
 import com.nguyen.polyglot.ui.screens.auth.AuthViewModel
 import com.nguyen.polyglot.ui.screens.definition.WordDetailViewModel
 import com.nguyen.polyglot.ui.screens.newsDetail.NewsDetailViewModel
@@ -34,6 +35,7 @@ class MainActivity : ComponentActivity() {
     private val videoDetailViewModel: VideoDetailViewModel by viewModels()
     private val wordReviewViewModel: WordReviewViewModel by viewModels()
     private val statsViewModel: StatsViewModel by viewModels()
+    private val accountViewModel: AccountViewModel by viewModels()
 
 
 
@@ -53,7 +55,8 @@ class MainActivity : ComponentActivity() {
                 newsDetailViewModel = newsDetailViewModel,
                 videoDetailViewModel = videoDetailViewModel,
                 wordReviewViewModel = wordReviewViewModel,
-                statsViewModel = statsViewModel
+                statsViewModel = statsViewModel,
+                accountViewModel = accountViewModel,
             )
         }
 

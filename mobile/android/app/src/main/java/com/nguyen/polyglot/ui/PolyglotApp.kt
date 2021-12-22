@@ -24,6 +24,8 @@ import com.nguyen.polyglot.model.AuthStatus
 import com.nguyen.polyglot.model.Token
 import com.nguyen.polyglot.ui.navigation.PolyglotScreens
 import com.nguyen.polyglot.ui.screens.*
+import com.nguyen.polyglot.ui.screens.account.AccountScreen
+import com.nguyen.polyglot.ui.screens.account.AccountViewModel
 import com.nguyen.polyglot.ui.screens.auth.AuthViewModel
 import com.nguyen.polyglot.ui.screens.auth.ChangePasswordScreen
 import com.nguyen.polyglot.ui.screens.auth.VerifyCodeScreen
@@ -61,6 +63,7 @@ fun PolygotApp(
     videoDetailViewModel: VideoDetailViewModel,
     wordReviewViewModel: WordReviewViewModel,
     statsViewModel: StatsViewModel,
+    accountViewModel: AccountViewModel
 ) {
 
     val navController = rememberNavController()
@@ -211,6 +214,11 @@ fun PolygotApp(
 
                 composable(PolyglotScreens.Stats.route) {
                    StatsScreen(navController = navController, sharedViewModel = sharedViewModel, viewModel = statsViewModel)
+
+                }
+
+                composable(PolyglotScreens.Account.route) {
+                    AccountScreen(navController = navController, sharedViewModel = sharedViewModel, viewModel = accountViewModel)
 
                 }
             }

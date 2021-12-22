@@ -1,10 +1,7 @@
 package com.nguyen.polyglot.di
 
 import com.nguyen.polyglot.db.PolyglotDatabase
-import com.nguyen.polyglot.repo.AuthRepository
-import com.nguyen.polyglot.repo.LanguageRepository
-import com.nguyen.polyglot.repo.WordRepository
-import com.nguyen.polyglot.repo.WordReviewRepository
+import com.nguyen.polyglot.repo.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,5 +34,11 @@ object RepoModule {
     @Provides
     fun provideWordReviewRepo(database: PolyglotDatabase): WordReviewRepository {
         return WordReviewRepository(database)
+    }
+
+    @Singleton
+    @Provides
+    fun provideUserRepo(client: HttpClient, database: PolyglotDatabase): UserRepository {
+        return UserRepository(client, database)
     }
 }

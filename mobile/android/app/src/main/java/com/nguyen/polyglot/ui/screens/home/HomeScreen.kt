@@ -63,7 +63,7 @@ fun HomeScreen(
     var user by remember { mutableStateOf(authStatusUIState.value?.user) }
 
     // Daily word count from user settings
-    var dailyWordCount by remember { mutableStateOf(if(user == null) 3 else user?.dailyWordCount) }
+    var dailyWordCount by remember { mutableStateOf(if (user == null) 3 else user?.dailyWordCount) }
     // User's picked learning languages
     val pickedLanguagesUIState: UIState<List<Language>> by sharedViewModel.pickedLanguagesUIState
     var pickedLanguages by remember { mutableStateOf(pickedLanguagesUIState.value) }
@@ -122,7 +122,7 @@ fun HomeScreen(
      * picked learning languages */
     LaunchedEffect(true) {
 
-        if(authStatusUIState !is UIState.Loaded){
+        if (authStatusUIState !is UIState.Loaded) {
             sharedViewModel.checkAuthStatus(
                 getAccessTokenFromDataStore(context),
                 getRefreshTokenFromDataStore(context)
@@ -159,7 +159,7 @@ fun HomeScreen(
                 }
 
                 // Only get the picked learning languages from network when initial load
-                if((pickedLanguagesUIState !is UIState.Loaded)){
+                if ((pickedLanguagesUIState !is UIState.Loaded)) {
                     Log.d(TAG, "Getting here")
                     sharedViewModel.getPickedLanguages(authStatusUIState.value?.token?.accessToken)
                 }
@@ -183,7 +183,7 @@ fun HomeScreen(
             }
 
             is UIState.Loaded -> {
-                pickedLanguagesUIState.value?.let {languages ->
+                pickedLanguagesUIState.value?.let { languages ->
                     // Update UI
                     pickedLanguages = languages
                     homeViewModel.setAddLanguagesMenu(languages.isEmpty())
@@ -538,8 +538,11 @@ fun HomeScreen(
                                                 currentPickedLanguage?.id
                                             )
                                         },
-                                        onRemoveWord = {wordValue ->
-                                            homeViewModel.removeDailyWords(wordValue, currentPickedLanguage?.id)
+                                        onRemoveWord = { wordValue ->
+                                            homeViewModel.removeDailyWords(
+                                                wordValue,
+                                                currentPickedLanguage?.id
+                                            )
                                         }
                                     )
                                 }
@@ -592,10 +595,14 @@ fun HomeScreen(
                 },
                 scaffoldState = bottomSheetScaffoldState,
                 topBar = {
-                    HomeAppBar(navController, user, onLogout = {
-                        sharedViewModel.logout(it)
-                        sharedViewModel.getPickedLanguages(null)
-                    })
+                    HomeAppBar(navController, user,
+                        onAccountClick = {
+                            navController.navigate("account")
+                        },
+                        onLogout = {
+                            sharedViewModel.logout(it)
+                            sharedViewModel.getPickedLanguages(null)
+                        })
                 },
 
                 sheetPeekHeight = (convertHeightToDp(

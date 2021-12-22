@@ -63,7 +63,8 @@ object DataStoreUtils{
                     avatar = if (user.avatar.isBlank()) null else user.avatar,
                     dailyWordCount = user.dailyWordCount,
                     nativeLanguageId = user.nativeLanguageId,
-                    notificationEnabled = user.notificationEnabled
+                    notificationEnabled = user.notificationEnabled,
+                    createdAt = user.createdAt
                 )
             }
         }.first()
@@ -91,6 +92,7 @@ object DataStoreUtils{
                 .setDailyWordCount(user.dailyWordCount)
                 .setNotificationEnabled(user.notificationEnabled)
                 .setNativeLanguageId(user.nativeLanguageId)
+                .setCreatedAt(user.createdAt)
                 .build()
         }
     }

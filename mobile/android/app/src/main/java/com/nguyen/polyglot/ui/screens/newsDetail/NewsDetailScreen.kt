@@ -1,6 +1,5 @@
 package com.nguyen.polyglot.ui.screens.newsDetail
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
@@ -40,11 +39,9 @@ import com.nguyen.polyglot.ui.navigation.PolyglotScreens
 import com.nguyen.polyglot.ui.theme.Typography
 import com.nguyen.polyglot.util.DataStoreUtils
 import com.nguyen.polyglot.util.UIState
-import com.nguyen.polyglot.util.UtilFunctions.reformatDateString
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 
 
 @ExperimentalMaterialApi

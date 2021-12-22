@@ -1,5 +1,6 @@
 package com.nguyen.polyglot.ui.screens.stats
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
@@ -36,8 +37,13 @@ import com.nguyen.polyglot.ui.components.stats.CustomBarChart
 import com.nguyen.polyglot.util.DataStoreUtils
 import com.nguyen.polyglot.util.UIState
 import com.nguyen.polyglot.util.UtilFunctions.generateBackgroundColorForLanguage
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 
+@SuppressLint("SimpleDateFormat", "WeekBasedYear")
 @Composable
 fun StatsScreen(
     navController: NavController,
@@ -57,6 +63,8 @@ fun StatsScreen(
     var activeLanguageIndex by remember { mutableStateOf(-1) }
     var pieTitle by remember { mutableStateOf("All saved words") }
     var pieSubtitle by remember { mutableStateOf("$allSavedWordsCount words") }
+
+    val currentUser = sharedViewModel.authStatusUIState.value.value?.user
 
     fun findLanguage(id: String): Language? {
         val result = languages?.filter {
@@ -106,7 +114,10 @@ fun StatsScreen(
     }
 
     Scaffold(backgroundColor = Color.White) {
-        Column(Modifier.padding(bottom = 55.dp).verticalScroll(rememberScrollState())) {
+        Column(
+            Modifier
+                .padding(bottom = 55.dp)
+                .verticalScroll(rememberScrollState())) {
             languageReports?.let {
                 Column(Modifier.padding(20.dp)) {
                     Row() {
@@ -121,12 +132,21 @@ fun StatsScreen(
                         )
                         Spacer(modifier = Modifier.padding(3.dp))
                         Column(Modifier.align(CenterVertically)) {
-                            Text(text = "Adron", style = Typography.h3)
-                            Text(
-                                text = "Joined since 2020",
-                                style = Typography.body1,
-                                fontSize = 18.sp
-                            )
+                            Text(text = currentUser?.username ?: "unknown", style = Typography.h3)
+                            if (currentUser?.createdAt != null) {
+                                Text(
+                                    text = "Joined since ${
+                                        SimpleDateFormat("MMM, YYYY").format(
+                                            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(
+                                                currentUser?.createdAt!!
+                                            )!!
+                                        )
+                                    }",
+                                    style = Typography.body1,
+                                    fontSize = 18.sp
+                                )
+                            }
+
                         }
 
                     }
@@ -175,12 +195,12 @@ fun StatsScreen(
                 }
                 Spacer(modifier = Modifier.padding(10.dp))
 
-                if(activeLanguageIndex > -1){
+                if (activeLanguageIndex > -1) {
                     CustomBarChart(
                         title = "Word Topic Stats",
                         subtitle = "This shows how many words in each category",
                         values = it[activeLanguageIndex].wordTopicReports.map { topic -> topic.wordCount },
-                        labels = it[activeLanguageIndex].wordTopicReports.map { topic -> topic.value},
+                        labels = it[activeLanguageIndex].wordTopicReports.map { topic -> topic.value },
                         maxValue = it[activeLanguageIndex].wordTopicReports.maxOf { topic -> topic.wordCount }
                     )
                 }

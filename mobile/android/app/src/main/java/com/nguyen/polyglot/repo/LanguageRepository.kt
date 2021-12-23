@@ -35,7 +35,6 @@ class LanguageRepository
 
         return mainPostNetworkBoundResource(
             submit = {
-                Log.d(TAG, "Here1")
                 val languagesString = languages.map { language ->
                     language.id
                 }
@@ -46,7 +45,6 @@ class LanguageRepository
                         append(HttpHeaders.Authorization, "Bearer $accessToken")
                     }
                 }
-                Log.d(TAG, "Here2")
                 languages
             },
             shouldSave = {

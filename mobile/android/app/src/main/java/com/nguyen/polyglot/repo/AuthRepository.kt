@@ -6,6 +6,7 @@ import com.nguyen.polyglot.model.AuthStatus
 import com.nguyen.polyglot.model.Token
 import com.nguyen.polyglot.model.User
 import com.nguyen.polyglot.repo.utils.mainGetNetworkBoundResource
+import com.nguyen.polyglot.repo.utils.mainPostNetworkBoundResource
 import com.nguyen.polyglot.util.Constants
 import com.nguyen.polyglot.util.CustomAppException
 import com.nguyen.polyglot.util.UIState
@@ -169,6 +170,42 @@ class AuthRepository
             },
             saveFetchResult = {},
             tag = TAG
+        )
+    }
+
+    suspend fun updateUser(
+        accessToken: String,
+        username: String,
+        email: String,
+        nativeLanguageId: String,
+        avatar: String?,
+        dailyWordCount: Int,
+        notificationEnabled: Boolean,
+        currentAuthStatus: AuthStatus
+    ): Flow<UIState<AuthStatus>>{
+        return mainPostNetworkBoundResource(
+            submit = {
+                Log.d("AccountScreen", "Debug Account Screen 4")
+
+                val response: ApiResponse<User?> = apiClient.put("${Constants.apiURL}/auth/user") {
+                    contentType(ContentType.Application.Json)
+                    body = UpdateUserBody(username, email, nativeLanguageId, avatar, dailyWordCount, notificationEnabled)
+                    headers {
+                        append(HttpHeaders.Authorization, "Bearer $accessToken")
+                    }
+                }
+                Log.d("AccountScreen", "Debug Account Screen 5 ${response}")
+
+                var newUser: User? = null
+                if(response.status) newUser = response.data
+                else throw CustomAppException(response.message)
+                val newAuthStatus = AuthStatus(currentAuthStatus.token, newUser)
+                newAuthStatus
+            },
+            shouldSave = {
+                 false
+            },
+            saveSubmitResult = {}
         )
     }
 

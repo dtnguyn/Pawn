@@ -20,3 +20,12 @@ data class RegisterRequestBody (
     val username: String,
     val nativeLanguage: String,
 )
+
+data class UpdateUserBody (
+    val username: String,
+    val email: String,
+    val nativeLanguageId: String,
+    val avatar: String?,
+    val dailyWordCount: Int,
+    val notificationEnabled: Boolean,
+)

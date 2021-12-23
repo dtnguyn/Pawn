@@ -33,7 +33,8 @@ class SharedViewModel
     /** ---STATES--- */
 
     /** This is the current user (null when no user is logged in) */
-    private val _authStatusUIState: MutableState<UIState<AuthStatus>> = mutableStateOf(UIState.Initial(AuthStatus(Token(null, null), null)))
+    private val _authStatusUIState: MutableState<UIState<AuthStatus>> =
+        mutableStateOf(UIState.Initial(AuthStatus(Token(null, null), null)))
     val authStatusUIState: State<UIState<AuthStatus>> = _authStatusUIState
 
     /** The current language that the app is on */
@@ -41,27 +42,32 @@ class SharedViewModel
     val currentPickedLanguage: State<Language?> = _currentPickedLanguage
 
     /** The list of languages that user wants to learn */
-    private val _pickedLanguagesUIState: MutableState<UIState<List<Language>>> = mutableStateOf(UIState.Initial(null))
+    private val _pickedLanguagesUIState: MutableState<UIState<List<Language>>> =
+        mutableStateOf(UIState.Initial(null))
     val pickedLanguagesUIState: State<UIState<List<Language>>> = _pickedLanguagesUIState
 
 
     /** This is a list of words that user saved */
-    private val _savedEnWordsUIState: MutableState<UIState<List<Word>>> = mutableStateOf(UIState.Initial(listOf()))
+    private val _savedEnWordsUIState: MutableState<UIState<List<Word>>> =
+        mutableStateOf(UIState.Initial(listOf()))
     val savedEnWordsUIState: State<UIState<List<Word>>> = _savedEnWordsUIState
     private val savedEnWordMap = HashMap<String, Boolean>()
 
     /** This is a list of words that user saved */
-    private val _savedEsWordsUIState: MutableState<UIState<List<Word>>> = mutableStateOf(UIState.Initial(listOf()))
+    private val _savedEsWordsUIState: MutableState<UIState<List<Word>>> =
+        mutableStateOf(UIState.Initial(listOf()))
     val savedEsWordsUIState: State<UIState<List<Word>>> = _savedEsWordsUIState
     private val savedEsWordMap = HashMap<String, Boolean>()
 
     /** This is a list of words that user saved */
-    private val _savedFrWordsUIState: MutableState<UIState<List<Word>>> = mutableStateOf(UIState.Initial(listOf()))
+    private val _savedFrWordsUIState: MutableState<UIState<List<Word>>> =
+        mutableStateOf(UIState.Initial(listOf()))
     val savedFrWordsUIState: State<UIState<List<Word>>> = _savedFrWordsUIState
     private val savedFrWordMap = HashMap<String, Boolean>()
 
     /** This is a list of words that user saved */
-    private val _savedDeWordsUIState: MutableState<UIState<List<Word>>> = mutableStateOf(UIState.Initial(listOf()))
+    private val _savedDeWordsUIState: MutableState<UIState<List<Word>>> =
+        mutableStateOf(UIState.Initial(listOf()))
     val savedDeWordsUIState: State<UIState<List<Word>>> = _savedDeWordsUIState
     private val savedDeWordMap = HashMap<String, Boolean>()
 
@@ -74,7 +80,7 @@ class SharedViewModel
 
     /** Auth intents*/
 
-    fun initializeAuthStatus(initialAuthStatus: AuthStatus){
+    fun initializeAuthStatus(initialAuthStatus: AuthStatus) {
         _authStatusUIState.value = UIState.Loaded(initialAuthStatus)
         Log.d("TAG", "test this1 ${initialAuthStatus}")
     }
@@ -87,7 +93,7 @@ class SharedViewModel
 //            return
 //        }
         viewModelScope.launch {
-            authRepo.checkAuthStatus(accessToken, refreshToken).collectLatest {userState ->
+            authRepo.checkAuthStatus(accessToken, refreshToken).collectLatest { userState ->
                 _authStatusUIState.value = userState
             }
         }
@@ -127,7 +133,7 @@ class SharedViewModel
     /** Get the current picked languages either
      *  from network or room database */
     fun getPickedLanguages(accessToken: String?) {
-        if(accessToken == null){
+        if (accessToken == null) {
             _pickedLanguagesUIState.value = UIState.Loaded(listOf())
             return
         }
@@ -136,7 +142,7 @@ class SharedViewModel
             languageRepo.getLearningLanguages(accessToken).collectLatest {
                 Log.d(TAG, "getLearningLanguages result ${it.value}")
                 _pickedLanguagesUIState.value = it
-                if(it is UIState.Loaded && it.value != null){
+                if (it is UIState.Loaded && it.value != null) {
                     val languages = it.value
                     val currentLanguageId = _currentPickedLanguage.value?.id
                     var currentInList = false
@@ -160,7 +166,7 @@ class SharedViewModel
         viewModelScope.launch {
             languageRepo.pickLearningLanguages(languages, accessToken).collectLatest {
                 _pickedLanguagesUIState.value = it
-                if(it is UIState.Loaded && it.value != null){
+                if (it is UIState.Loaded && it.value != null) {
                     if (_currentPickedLanguage.value == null) {
                         if (languages.isNotEmpty()) {
                             _currentPickedLanguage.value = languages.first()
@@ -189,23 +195,24 @@ class SharedViewModel
     fun toggleSavedWord(word: Word, accessToken: String?, targetLanguage: String?) {
         Log.d("SharedViewModel", "Toggle Saved Word")
         viewModelScope.launch {
-            if(accessToken == null){
+            if (accessToken == null) {
                 return@launch
             }
-            if(targetLanguage == null){
+            if (targetLanguage == null) {
                 return@launch
             }
             currentSavedWordList(targetLanguage)?.let { currentSavedWordList ->
-                wordRepo.toggleSavedWord(word, targetLanguage, currentSavedWordList, accessToken).collectLatest {
-                    updateSavedWordList(targetLanguage, it)
-                }
+                wordRepo.toggleSavedWord(word, targetLanguage, currentSavedWordList, accessToken)
+                    .collectLatest {
+                        updateSavedWordList(targetLanguage, it)
+                    }
             }
         }
     }
 
-    fun getSavedWords(accessToken: String?, targetLanguage: Language?){
+    fun getSavedWords(accessToken: String?, targetLanguage: Language?) {
         viewModelScope.launch {
-            if(accessToken == null){
+            if (accessToken == null) {
                 return@launch
             }
             targetLanguage?.let { language ->
@@ -221,7 +228,7 @@ class SharedViewModel
     /** A helper function to check if the word is in the map */
     fun checkIsSaved(wordValue: String, targetLanguage: String?): Boolean {
         return if (targetLanguage != null) {
-            when(targetLanguage){
+            when (targetLanguage) {
                 SupportedLanguage.ENGLISH.id -> {
                     savedEnWordMap[wordValue] == true
                 }
@@ -241,8 +248,43 @@ class SharedViewModel
         } else false
     }
 
-    private fun updateSavedWordList(language: String, wordsUIState: UIState<List<Word>>){
-        when(language) {
+    fun updateUser(
+        accessToken: String?,
+        username: String,
+        email: String,
+        nativeLanguageId: String,
+        avatar: String?,
+        dailyWordCount: Int,
+        notificationEnabled: Boolean,
+        currentAuthStatus: AuthStatus
+    ) {
+
+        if(accessToken == null) {
+            _authStatusUIState.value = UIState.Error("Please log in first!")
+            return
+        }
+
+        viewModelScope.launch {
+            Log.d("AccountScreen", "Debug Account Screen 3")
+
+            authRepo.updateUser(
+                accessToken!!,
+                username,
+                email,
+                nativeLanguageId,
+                avatar,
+                dailyWordCount,
+                notificationEnabled,
+                currentAuthStatus
+            ).collectLatest {
+                Log.d("AccountScreen", "Debug Account Screen 6")
+                _authStatusUIState.value = it
+            }
+        }
+    }
+
+    private fun updateSavedWordList(language: String, wordsUIState: UIState<List<Word>>) {
+        when (language) {
             SupportedLanguage.ENGLISH.id -> {
                 _savedEnWordsUIState.value = wordsUIState
                 if (wordsUIState is UIState.Loaded) {
@@ -282,7 +324,7 @@ class SharedViewModel
         }
     }
 
-    private fun currentSavedWordList(currentLanguage: String?): List<Word>?{
+    private fun currentSavedWordList(currentLanguage: String?): List<Word>? {
         if (currentLanguage == null) return listOf()
         return when (currentLanguage) {
             SupportedLanguage.ENGLISH.id -> {

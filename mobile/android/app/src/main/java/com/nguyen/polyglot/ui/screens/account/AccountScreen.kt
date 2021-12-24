@@ -27,6 +27,7 @@ import com.nguyen.polyglot.ui.theme.TextFieldGrey
 import com.nguyen.polyglot.ui.theme.Typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import com.nguyen.polyglot.ui.components.account.AvatarBottomSheetContent
 import com.nguyen.polyglot.ui.components.auth.LanguageBottomSheetContent
 import com.nguyen.polyglot.util.Constants
 import com.nguyen.polyglot.util.DataStoreUtils
@@ -52,6 +53,11 @@ fun AccountScreen(
     var user by remember { mutableStateOf(authStatusUIState.value?.user) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    var bottomSheetMenu by remember { mutableStateOf("avatar") }
+    val resources = LocalContext.current.resources
+    var currentPickedAvatar by remember { mutableStateOf(user?.avatar ?: "human1") }
+
+
 
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(
@@ -61,8 +67,8 @@ fun AccountScreen(
 
     suspend fun updateUsername(newUsername: String) {
         Log.d("AccountScreen", "Debug Account Screen 1")
-        if(authStatusUIState.value == null) return
-        if(user == null) return
+        if (authStatusUIState.value == null) return
+        if (user == null) return
         Log.d("AccountScreen", "Debug Account Screen 2")
 
         sharedViewModel.updateUser(
@@ -78,8 +84,8 @@ fun AccountScreen(
     }
 
     suspend fun updateEmail(newEmail: String) {
-        if(authStatusUIState.value == null) return
-        if(user == null) return
+        if (authStatusUIState.value == null) return
+        if (user == null) return
 
         sharedViewModel.updateUser(
             accessToken = DataStoreUtils.getAccessTokenFromDataStore(context),
@@ -94,8 +100,8 @@ fun AccountScreen(
     }
 
     suspend fun updateNativeLanguage(newNativeLanguageId: String) {
-        if(authStatusUIState.value == null) return
-        if(user == null) return
+        if (authStatusUIState.value == null) return
+        if (user == null) return
 
         sharedViewModel.updateUser(
             accessToken = DataStoreUtils.getAccessTokenFromDataStore(context),
@@ -106,6 +112,22 @@ fun AccountScreen(
             dailyWordCount = user!!.dailyWordCount,
             notificationEnabled = user!!.notificationEnabled,
             nativeLanguageId = newNativeLanguageId
+        )
+    }
+
+    suspend fun updateAvatar(newAvatar: String?) {
+        if (authStatusUIState.value == null) return
+        if (user == null) return
+
+        sharedViewModel.updateUser(
+            accessToken = DataStoreUtils.getAccessTokenFromDataStore(context),
+            currentAuthStatus = authStatusUIState.value!!,
+            username = user!!.username,
+            email = user!!.email,
+            avatar = newAvatar,
+            dailyWordCount = user!!.dailyWordCount,
+            notificationEnabled = user!!.notificationEnabled,
+            nativeLanguageId = user!!.nativeLanguageId
         )
     }
 
@@ -145,20 +167,41 @@ fun AccountScreen(
         }
     }
 
+    LaunchedEffect(bottomSheetScaffoldState.bottomSheetState.isCollapsed){
+        if(bottomSheetScaffoldState.bottomSheetState.isCollapsed){
+            currentPickedAvatar = user?.avatar ?: "human1"
+        }
+    }
+
 
     BottomSheetScaffold(
         backgroundColor = Color.White,
         sheetPeekHeight = 0.dp,
         sheetContent = {
-            LanguageBottomSheetContent(
-                languages = Constants.allLanguages,
-                onLanguageClick = { language ->
-                    coroutineScope.launch {
-                        updateNativeLanguage(language)
+            if (bottomSheetMenu == "avatar") {
+                AvatarBottomSheetContent(
+                    currentAvatar = currentPickedAvatar,
+                    onPickAvatar = {
+                       currentPickedAvatar = it
+                    },
+                    onSave = {
+                        coroutineScope.launch {
+                            updateAvatar(currentPickedAvatar)
+                        }
+                        toggleBottomSheet()
                     }
-                    toggleBottomSheet()
-                }
-            )
+                )
+            } else {
+                LanguageBottomSheetContent(
+                    languages = Constants.allLanguages,
+                    onLanguageClick = { language ->
+                        coroutineScope.launch {
+                            updateNativeLanguage(language)
+                        }
+                        toggleBottomSheet()
+                    }
+                )
+            }
         },
         scaffoldState = bottomSheetScaffoldState,
         sheetShape = RoundedCornerShape(topStart = 60.dp, topEnd = 60.dp),
@@ -196,14 +239,15 @@ fun AccountScreen(
             }
             Spacer(modifier = Modifier.padding(10.dp))
             Image(
-                painter = painterResource(R.drawable.me),
+                painter = painterResource(resources.getIdentifier(user?.avatar ?: "human1", "drawable", "com.nguyen.polyglot")),
                 contentDescription = "avatar",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(150.dp)
                     .clip(CircleShape)
                     .clickable(onClick = {
-
+                        bottomSheetMenu = "avatar"
+                        toggleBottomSheet()
                     })
                     .align(Alignment.CenterHorizontally)
             )
@@ -290,7 +334,10 @@ fun AccountScreen(
                     .fillMaxWidth()
                     .aspectRatio(5f)
                     .clip(RoundedCornerShape(20.dp))
-                    .clickable { toggleBottomSheet() },
+                    .clickable {
+                        bottomSheetMenu = "language"
+                        toggleBottomSheet()
+                    },
                 backgroundColor = TextFieldGrey
             ) {
 
@@ -309,7 +356,7 @@ fun AccountScreen(
 
             }
         }
-        updateInfo?.let{info ->
+        updateInfo?.let { info ->
             UpdateDialog(
                 title = "Update account",
                 content = info.label,
@@ -320,7 +367,7 @@ fun AccountScreen(
                 },
                 onAction = {
                     coroutineScope.launch {
-                        when(info.label){
+                        when (info.label) {
                             "Username" -> updateUsername(it)
                             "Email" -> updateEmail(it)
                             else -> updateNativeLanguage(it)

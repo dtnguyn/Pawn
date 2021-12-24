@@ -51,7 +51,7 @@ fun HomeAppBar(navController: NavController, user: User?, onAccountClick: () -> 
         } else {
             Row {
                 Image(
-                    painter = painterResource(R.drawable.me),
+                    painter = painterResource(context.resources.getIdentifier(user.avatar ?: "human1", "drawable", "com.nguyen.polyglot")),
                     contentDescription = "avatar",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier

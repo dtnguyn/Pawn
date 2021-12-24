@@ -3,44 +3,32 @@ package com.nguyen.polyglot.ui.screens.stats
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.nguyen.polyglot.R
 import com.nguyen.polyglot.model.Language
 import com.nguyen.polyglot.ui.SharedViewModel
+import com.nguyen.polyglot.ui.components.stats.CustomBarChart
 import com.nguyen.polyglot.ui.components.stats.CustomPieChart
 import com.nguyen.polyglot.ui.components.stats.LanguageBox
-import com.nguyen.polyglot.ui.theme.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment.Companion.Center
-import androidx.compose.ui.platform.LocalContext
-import com.nguyen.polyglot.ui.components.stats.CustomBarChart
+import com.nguyen.polyglot.ui.theme.Typography
 import com.nguyen.polyglot.util.DataStoreUtils
 import com.nguyen.polyglot.util.UIState
 import com.nguyen.polyglot.util.UtilFunctions.generateBackgroundColorForLanguage
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.*
 
 
 @SuppressLint("SimpleDateFormat", "WeekBasedYear")
@@ -122,7 +110,7 @@ fun StatsScreen(
                 Column(Modifier.padding(20.dp)) {
                     Row() {
                         Image(
-                            painter = painterResource(R.drawable.me),
+                            painter = painterResource(context.resources.getIdentifier(currentUser?.avatar ?: "human1", "drawable", "com.nguyen.polyglot")),
                             contentDescription = "avatar",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
@@ -138,7 +126,7 @@ fun StatsScreen(
                                     text = "Joined since ${
                                         SimpleDateFormat("MMM, YYYY").format(
                                             SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(
-                                                currentUser?.createdAt!!
+                                                currentUser.createdAt
                                             )!!
                                         )
                                     }",

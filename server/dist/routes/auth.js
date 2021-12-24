@@ -179,6 +179,23 @@ router.patch("/password", (req, res) => __awaiter(this, void 0, void 0, function
         }
     }
 }));
+router.put("/user", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    console.log("Updating User!!!");
+    try {
+        const userId = req.user.id;
+        const newUser = yield UserController_1.updateUser(req.user.id, req.body.username, req.body.email, req.body.avatar, req.body.dailyWordCount, req.body.notificationEnabled, req.body.nativeLanguageId);
+        console.log("Update user successfully!");
+        return res.send(new ApiResponse_1.default(true, "", newUser));
+    }
+    catch (error) {
+        if (error instanceof CustomError_1.default) {
+            return res.send(new ApiResponse_1.default(false, error.message, null));
+        }
+        else {
+            return res.send(new ApiResponse_1.default(false, "Something went wrong", null));
+        }
+    }
+}));
 router.post("/token", (req, res) => {
     try {
         const refreshToken = req.body.token;

@@ -143,3 +143,30 @@ export const changePassword = async (
     await userRepo.update({ email }, { password: hashPW });
   } else throw new CustomError("Invalid verification code!");
 };
+
+export const updateUser = async (
+  userId: string,
+  username: string,
+  email: string,
+  avatar: string | undefined,
+  dailyWordCount: number,
+  notificationEnabled: boolean,
+  nativeLanguageId: string
+) => {
+  const userRepo = getRepository(User);
+
+  await userRepo.update(
+    { id: userId },
+    {
+      username,
+      email,
+      avatar,
+      dailyWordCount,
+      notificationEnabled,
+      nativeLanguageId,
+    }
+  );
+
+  const newUser = await userRepo.findOne({ id: userId });
+  return newUser;
+};

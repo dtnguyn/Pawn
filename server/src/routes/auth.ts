@@ -18,10 +18,12 @@ import {
   getOneUser,
   saveRefreshToken,
   sendVerificationCode,
+  updateUser,
   verifyCode,
 } from "../controllers/UserController";
 import ApiResponse from "../utils/ApiResponse";
 import CustomError from "../utils/CustomError";
+import { User } from "../entity/User";
 dotenv.config();
 
 const router = Router();
@@ -208,6 +210,36 @@ router.patch("/password", async (req, res) => {
     await changePassword(email, code, hashPW);
 
     return res.send(new ApiResponse(true, "", null));
+  } catch (error) {
+    if (error instanceof CustomError) {
+      return res.send(new ApiResponse(false, error.message, null));
+    } else {
+      return res.send(new ApiResponse(false, "Something went wrong", null));
+    }
+  }
+});
+
+router.put("/user", checkAuthentication, async (req, res) => {
+  console.log("Updating User!!!");
+  try {
+    const userId = (req as any).user.id;
+    // if (!userId) {
+    //   throw new CustomError("Please login first!");
+    // }
+
+    const newUser = await updateUser(
+      (req.user as User).id,
+      req.body.username,
+      req.body.email,
+      req.body.avatar,
+      req.body.dailyWordCount,
+      req.body.notificationEnabled,
+      req.body.nativeLanguageId
+    );
+
+    console.log("Update user successfully!");
+
+    return res.send(new ApiResponse(true, "", newUser));
   } catch (error) {
     if (error instanceof CustomError) {
       return res.send(new ApiResponse(false, error.message, null));

@@ -27,6 +27,8 @@ import com.nguyen.polyglot.ui.theme.TextFieldGrey
 import com.nguyen.polyglot.ui.theme.Typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import com.nguyen.polyglot.ui.components.auth.LanguageBottomSheetContent
+import com.nguyen.polyglot.util.Constants
 import com.nguyen.polyglot.util.DataStoreUtils
 import com.nguyen.polyglot.util.UIState
 import kotlinx.coroutines.launch
@@ -36,6 +38,7 @@ data class UpdateInfo(
     val currentValue: String,
 )
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AccountScreen(
     navController: NavController,
@@ -49,6 +52,12 @@ fun AccountScreen(
     var user by remember { mutableStateOf(authStatusUIState.value?.user) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+
+    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = rememberBottomSheetState(
+            initialValue = BottomSheetValue.Collapsed,
+        )
+    )
 
     suspend fun updateUsername(newUsername: String) {
         Log.d("AccountScreen", "Debug Account Screen 1")
@@ -100,6 +109,16 @@ fun AccountScreen(
         )
     }
 
+    fun toggleBottomSheet() {
+        coroutineScope.launch {
+            if (bottomSheetScaffoldState.bottomSheetState.isCollapsed) {
+                bottomSheetScaffoldState.bottomSheetState.expand()
+            } else {
+                bottomSheetScaffoldState.bottomSheetState.collapse()
+            }
+        }
+    }
+
     LaunchedEffect(authStatusUIState) {
         when (authStatusUIState) {
             is UIState.Initial -> {
@@ -126,15 +145,33 @@ fun AccountScreen(
         }
     }
 
-    Scaffold(backgroundColor = Color.White) {
+
+    BottomSheetScaffold(
+        backgroundColor = Color.White,
+        sheetPeekHeight = 0.dp,
+        sheetContent = {
+            LanguageBottomSheetContent(
+                languages = Constants.allLanguages,
+                onLanguageClick = { language ->
+                    coroutineScope.launch {
+                        updateNativeLanguage(language)
+                    }
+                    toggleBottomSheet()
+                }
+            )
+        },
+        scaffoldState = bottomSheetScaffoldState,
+        sheetShape = RoundedCornerShape(topStart = 60.dp, topEnd = 60.dp),
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .fillMaxHeight()
                 .padding(20.dp)
         ) {
             Box(modifier = Modifier.fillMaxWidth()) {
                 IconButton(
-                    onClick = { /*TODO*/ },
+                    onClick = { navController.popBackStack() },
                     content = {
                         Image(
                             painter = painterResource(id = R.drawable.back_32_black),
@@ -253,7 +290,7 @@ fun AccountScreen(
                     .fillMaxWidth()
                     .aspectRatio(5f)
                     .clip(RoundedCornerShape(20.dp))
-                    .clickable { },
+                    .clickable { toggleBottomSheet() },
                 backgroundColor = TextFieldGrey
             ) {
 
@@ -264,7 +301,7 @@ fun AccountScreen(
                         .padding(15.dp), contentAlignment = Alignment.CenterStart
                 ) {
                     Text(
-                        text = "Vietnamese",
+                        text = "${user?.nativeLanguageId}",
                         style = Typography.body1,
                         color = Color.Black
                     )
@@ -295,4 +332,5 @@ fun AccountScreen(
             )
         }
     }
+
 }

@@ -102,13 +102,15 @@ class SharedViewModel
     /** Call api to get rid of the refresh token,
      * then set the current user to null */
     fun logout(refreshToken: String?) {
+        _pickedLanguagesUIState.value = UIState.Loaded(listOf())
         viewModelScope.launch {
             if (refreshToken != null) {
                 authRepo.logout(refreshToken).collectLatest {
                     if (it is UIState.Error) {
                         _authStatusUIState.value = UIState.Error(it.errorMsg ?: "")
                     } else if (it is UIState.Loaded) {
-                        _authStatusUIState.value = UIState.Loaded(null)
+                        Log.d(TAG, "logout state ${it.value}")
+                        _authStatusUIState.value = UIState.Loaded(AuthStatus(Token(null,null), null))
                     }
                 }
             } else _authStatusUIState.value = UIState.Loaded(null)

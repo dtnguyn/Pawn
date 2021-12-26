@@ -23,13 +23,12 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.platform.LocalContext
 import com.nguyen.polyglot.ui.theme.Blue
+import com.nguyen.polyglot.util.Constants.animalIcons
 import com.nguyen.polyglot.util.Constants.humanIcons
 
 
 @Composable
 fun AvatarBottomSheetContent(currentAvatar: String?, onPickAvatar: (icon: String) -> Unit,onSave: () -> Unit) {
-
-
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -73,7 +72,24 @@ fun AvatarBottomSheetContent(currentAvatar: String?, onPickAvatar: (icon: String
                 onPickAvatar(it)
             }
         )
+        Spacer(modifier = Modifier.padding(10.dp))
 
+        Text(
+            text = "Animal",
+            style = Typography.h6,
+            color = Color.Black,
+            fontSize = 18.sp,
+            modifier = Modifier.align(Start)
+        )
+        Spacer(modifier = Modifier.padding(5.dp))
+
+        AvatarRows(
+            icons = animalIcons,
+            current = currentAvatar ?: "human1",
+            onClick = {
+                onPickAvatar(it)
+            }
+        )
 
     }
 }

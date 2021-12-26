@@ -235,7 +235,15 @@ fun AccountScreen(
                     color = Color.Red,
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
-                        .clickable { })
+                        .clickable {
+                            coroutineScope.launch {
+                                val refreshToken = DataStoreUtils.getRefreshTokenFromDataStore(context)
+                                DataStoreUtils.saveAccessTokenToAuthDataStore(context, null)
+                                DataStoreUtils.saveRefreshTokenToAuthDataStore(context, null)
+                                sharedViewModel.logout(refreshToken)
+                                navController.popBackStack("home", false)
+                            }
+                        })
             }
             Spacer(modifier = Modifier.padding(10.dp))
             Image(

@@ -148,15 +148,17 @@ fun HomeScreen(
                 Log.d(TAG, "authStatusUIState Loaded ${authStatusUIState.value}")
                 isLoadingUser = false
 
-                authStatusUIState.value?.user?.let {
+                if(authStatusUIState.value?.user != null){
                     //Update daily word count state
-                    dailyWordCount = it.dailyWordCount
-                    user = it
-
-                    // Store the state to DataStore
-                    DataStoreUtils.saveTokenToDataStore(context, authStatusUIState.value!!.token)
-                    DataStoreUtils.saveUserToDataStore(context, it)
+                    dailyWordCount = authStatusUIState.value?.user!!.dailyWordCount
+                    user = authStatusUIState.value?.user
+                } else {
+                    user = null
                 }
+
+                // Store the state to DataStore
+                DataStoreUtils.saveTokenToDataStore(context, authStatusUIState.value!!.token)
+                DataStoreUtils.saveUserToDataStore(context, authStatusUIState.value!!.user)
 
                 // Only get the picked learning languages from network when initial load
                 if ((pickedLanguagesUIState !is UIState.Loaded)) {
@@ -197,6 +199,7 @@ fun HomeScreen(
     LaunchedEffect(currentPickedLanguage) {
         if (currentPickedLanguage != null) {
             isLoadingDailyWords = false
+            Log.d("get access token", "token ${getAccessTokenFromDataStore(context)}")
 
             homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, currentPickedLanguage!!.id)
             sharedViewModel.getSavedWords(
@@ -600,8 +603,6 @@ fun HomeScreen(
                             navController.navigate("account")
                         },
                         onLogout = {
-                            sharedViewModel.logout(it)
-                            sharedViewModel.getPickedLanguages(null)
                         })
                 },
 

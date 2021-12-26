@@ -1,6 +1,7 @@
 package com.nguyen.polyglot.util
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -31,7 +32,6 @@ object DataStoreUtils{
         val token =  context.tokenDataStore.data.map {tokenDs ->
             tokenDs.accessToken
         }.first()
-
         return if(token == "") null
         else token
     }
@@ -71,30 +71,45 @@ object DataStoreUtils{
     }
 
     suspend fun saveTokenToDataStore(context: Context, token: Token){
-        context.tokenDataStore.updateData { currentToken ->
-            currentToken.toBuilder()
-                .setAccessToken(token.accessToken)
-                .setRefreshToken(token.refreshToken)
-                .build()
+        if(token.accessToken == null || token.refreshToken == null){
+            context.tokenDataStore.updateData { currentToken ->
+                currentToken.toBuilder().clear().build()
+            }
+        } else {
+            context.tokenDataStore.updateData { currentToken ->
+                currentToken.toBuilder()
+                    .setAccessToken(token.accessToken)
+                    .setRefreshToken(token.refreshToken)
+                    .build()
+            }
         }
+
     }
 
-    suspend fun saveUserToDataStore(context: Context, user: User){
-        val oauthId = user.oauthId ?: ""
-        val avatar = user.avatar ?: ""
-        context.userDataStore.updateData { currentToken ->
-            currentToken.toBuilder()
-                .setId(user.id)
-                .setOauthId(oauthId)
-                .setUsername(user.username)
-                .setEmail(user.email)
-                .setAvatar(avatar)
-                .setDailyWordCount(user.dailyWordCount)
-                .setNotificationEnabled(user.notificationEnabled)
-                .setNativeLanguageId(user.nativeLanguageId)
-                .setCreatedAt(user.createdAt)
-                .build()
+    suspend fun saveUserToDataStore(context: Context, user: User?){
+        if(user == null){
+            context.userDataStore.updateData { currentUser ->
+                currentUser.toBuilder().clear().build()
+            }
+
+        } else {
+            val oauthId = user.oauthId ?: ""
+            val avatar = user.avatar ?: ""
+            context.userDataStore.updateData { currentUser ->
+                currentUser.toBuilder()
+                    .setId(user.id)
+                    .setOauthId(oauthId)
+                    .setUsername(user.username)
+                    .setEmail(user.email)
+                    .setAvatar(avatar)
+                    .setDailyWordCount(user.dailyWordCount)
+                    .setNotificationEnabled(user.notificationEnabled)
+                    .setNativeLanguageId(user.nativeLanguageId)
+                    .setCreatedAt(user.createdAt)
+                    .build()
+            }
         }
+
     }
 
 }

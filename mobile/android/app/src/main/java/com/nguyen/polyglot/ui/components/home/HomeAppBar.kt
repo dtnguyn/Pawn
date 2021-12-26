@@ -72,10 +72,7 @@ fun HomeAppBar(navController: NavController, user: User?, onAccountClick: () -> 
         }
         RoundButton(backgroundColor = Color.White, size = 55.dp, icon = R.drawable.settings, padding = 12.dp, onClick = {
             coroutineScope.launch {
-                val refreshToken = getRefreshTokenFromDataStore(context)
-                saveAccessTokenToAuthDataStore(context, null)
-                saveRefreshTokenToAuthDataStore(context, null)
-                onLogout(refreshToken)
+
             }
         })
 

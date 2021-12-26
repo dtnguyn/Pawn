@@ -26,7 +26,7 @@ import com.nguyen.polyglot.util.DataStoreUtils.saveRefreshTokenToAuthDataStore
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeAppBar(navController: NavController, user: User?, onAccountClick: () -> Unit, onLogout: (refreshToken: String?) -> Unit){
+fun HomeAppBar(navController: NavController, user: User?, onAccountClick: () -> Unit, onSettingClick: () -> Unit){
 
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -71,9 +71,7 @@ fun HomeAppBar(navController: NavController, user: User?, onAccountClick: () -> 
 
         }
         RoundButton(backgroundColor = Color.White, size = 55.dp, icon = R.drawable.settings, padding = 12.dp, onClick = {
-            coroutineScope.launch {
-
-            }
+            onSettingClick()
         })
 
     }

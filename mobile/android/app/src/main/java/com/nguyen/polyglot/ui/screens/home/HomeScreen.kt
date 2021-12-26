@@ -602,7 +602,8 @@ fun HomeScreen(
                         onAccountClick = {
                             navController.navigate("account")
                         },
-                        onLogout = {
+                        onSettingClick = {
+                            navController.navigate("setting")
                         })
                 },
 

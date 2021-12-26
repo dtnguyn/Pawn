@@ -36,6 +36,7 @@ import com.nguyen.polyglot.ui.screens.feeds.FeedViewModel
 import com.nguyen.polyglot.ui.screens.home.HomeViewModel
 import com.nguyen.polyglot.ui.screens.newsDetail.VideoDetailScreen
 import com.nguyen.polyglot.ui.screens.search.SearchViewModel
+import com.nguyen.polyglot.ui.screens.setting.SettingScreen
 import com.nguyen.polyglot.ui.screens.stats.StatsScreen
 import com.nguyen.polyglot.ui.screens.stats.StatsViewModel
 import com.nguyen.polyglot.ui.screens.videoDetail.VideoDetailViewModel
@@ -219,7 +220,9 @@ fun PolygotApp(
 
                 composable(PolyglotScreens.Account.route) {
                     AccountScreen(navController = navController, sharedViewModel = sharedViewModel, viewModel = accountViewModel)
-
+                }
+                composable(PolyglotScreens.Setting.route) {
+                    SettingScreen(navController = navController, sharedViewModel = sharedViewModel)
                 }
             }
         }

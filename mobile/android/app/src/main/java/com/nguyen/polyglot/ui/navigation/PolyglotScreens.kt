@@ -18,6 +18,7 @@ sealed class PolyglotScreens(val route: String, @DrawableRes val icon: Int?) {
     object WordReviewResult : PolyglotScreens("wordReviewResult", null)
     object Stats : PolyglotScreens("stats", R.drawable.stats)
     object Account : PolyglotScreens("account", null)
+    object Setting : PolyglotScreens("setting", null)
 
 
 }

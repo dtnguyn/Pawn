@@ -9,12 +9,12 @@ import java.util.*
 object DailyWordMapper {
 
     @SuppressLint("SimpleDateFormat")
-    fun mapToCacheEntity(word: Word): DailyWordCacheEntity {
+    fun mapToCacheEntity(word: Word, display: Boolean = true): DailyWordCacheEntity {
         return DailyWordCacheEntity(
             id = UUID.randomUUID().toString(),
             value = word.value,
             language = word.language,
-            display = true,
+            display = display,
             pronunciationAudio = word.pronunciationAudio,
             pronunciationSymbol = word.pronunciationSymbol,
             topics = word.topics,

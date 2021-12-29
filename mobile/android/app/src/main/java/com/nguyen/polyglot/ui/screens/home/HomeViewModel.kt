@@ -84,7 +84,13 @@ class HomeViewModel
         }
     }
 
-    fun removeDailyWords(wordValue: String, languageId: String?) {
+    fun removeDailyWords(word: Word, languageId: String?) {
+        if(languageId == null) return
+        val wordValue = word.value
+
+        viewModelScope.launch {
+            wordRepo.hideWord(word, languageId)
+        }
 
         _dailyEnWordsUIState.value = UIState.Loaded(
             when (languageId) {
@@ -111,6 +117,7 @@ class HomeViewModel
     fun setAddLanguagesMenu(open: Boolean) {
         _showAddLanguagesMenu.value = open
     }
+
 
 
 }

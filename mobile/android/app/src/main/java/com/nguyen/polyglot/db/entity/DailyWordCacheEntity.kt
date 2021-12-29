@@ -22,7 +22,7 @@ class DailyWordCacheEntity (
     val topics: String,
 
     @ColumnInfo(name = "display")
-    val display: Boolean,
+    var display: Boolean,
 
     @ColumnInfo(name = "pronunciationAudio")
     val pronunciationAudio: String?,

@@ -40,7 +40,14 @@ class WordRepository
         return mainGetNetworkBoundResource(
             query = {
                 db.dailyWordDao().getMany(SimpleDateFormat("yyyy.MM.dd").format(Date()), language)
-                    .map { if (it.isEmpty()) null else DailyWordMapper.mapToListNetworkEntity(it) }
+                    .map {
+                        it.forEach { word ->
+                            Log.d(TAG, "daily word:  ${word.display}")
+
+                        }
+
+                        if (it.isEmpty()) null else DailyWordMapper.mapToListNetworkEntity(it)
+                    }
             },
             fetch = {
                 Log.d(TAG, "get random words")
@@ -172,6 +179,15 @@ class WordRepository
                 autoCompleteWords = it
             }
         )
+    }
+
+    suspend fun hideWord(word: Word, language: String){
+        val words = db.dailyWordDao().getWordByValue(language, word.value)
+        Log.d(TAG, "wordCache ${words.size}")
+        val wordCache = if(words.isNotEmpty()) words[0] else return
+        wordCache.display = false
+        Log.d(TAG, "wordCache ${wordCache.display}")
+        db.dailyWordDao().updateDailyWord(wordCache)
     }
 
 }

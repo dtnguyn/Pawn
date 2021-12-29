@@ -38,7 +38,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel) {
 
-    var notificationEnabled by remember { mutableStateOf(true) }
     val authStatusUIState by sharedViewModel.authStatusUIState
     var user by remember { mutableStateOf(authStatusUIState.value?.user) }
     val context = LocalContext.current
@@ -76,6 +75,40 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
             notificationEnabled = user!!.notificationEnabled,
             nativeLanguageId = user!!.nativeLanguageId,
             appLanguageId = newLanguage
+        )
+    }
+
+    suspend fun updateNotificationEnabled(newStatus: Boolean) {
+        if (authStatusUIState.value == null) return
+        if (user == null) return
+
+        sharedViewModel.updateUser(
+            accessToken = DataStoreUtils.getAccessTokenFromDataStore(context),
+            currentAuthStatus = authStatusUIState.value!!,
+            username = user!!.username,
+            email = user!!.email,
+            avatar = user!!.avatar,
+            dailyWordCount = user!!.dailyWordCount,
+            notificationEnabled = newStatus,
+            nativeLanguageId = user!!.nativeLanguageId,
+            appLanguageId = user!!.appLanguageId
+        )
+    }
+
+    suspend fun updateDailyWordCount(newDailyWordCount: Int) {
+        if (authStatusUIState.value == null) return
+        if (user == null) return
+
+        sharedViewModel.updateUser(
+            accessToken = DataStoreUtils.getAccessTokenFromDataStore(context),
+            currentAuthStatus = authStatusUIState.value!!,
+            username = user!!.username,
+            email = user!!.email,
+            avatar = user!!.avatar,
+            dailyWordCount = newDailyWordCount,
+            notificationEnabled = user!!.notificationEnabled,
+            nativeLanguageId = user!!.nativeLanguageId,
+            appLanguageId = user!!.appLanguageId
         )
     }
 
@@ -300,7 +333,11 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                     Column(Modifier.padding(10.dp)) {
                         Text(text = "App language", style = Typography.h6)
                         Spacer(modifier = Modifier.padding(5.dp))
-                        Text(text = fromLanguageId(user?.appLanguageId ?: "en") ?: "English", style = Typography.body1, color = Color.Black)
+                        Text(
+                            text = fromLanguageId(user?.appLanguageId ?: "en") ?: "English",
+                            style = Typography.body1,
+                            color = Color.Black
+                        )
                     }
                 }
             }
@@ -319,8 +356,12 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                     Box(Modifier.fillMaxWidth()) {
                         Text(text = "Notifications", style = Typography.h6)
                         Switch(
-                            checked = notificationEnabled,
-                            onCheckedChange = { notificationEnabled = it },
+                            checked = user?.notificationEnabled ?: true,
+                            onCheckedChange = {
+                                coroutineScope.launch {
+                                    updateNotificationEnabled(it)
+                                }
+                            },
                             modifier = Modifier.align(CenterEnd)
                         )
                     }
@@ -330,7 +371,6 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                         style = Typography.body1,
                         color = Color.Black
                     )
-
                 }
             }
 
@@ -359,7 +399,10 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                         Spacer(modifier = Modifier.padding(5.dp))
                         Slider(
                             value = dailyWordCount,
-                            onValueChange = { dailyWordCount = it },
+                            onValueChange = { coroutineScope.launch {
+                                dailyWordCount = it
+                                updateDailyWordCount(it.toInt())
+                            }},
                             valueRange = 0f..5f,
                             steps = 4
                         )

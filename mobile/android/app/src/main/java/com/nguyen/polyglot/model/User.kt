@@ -9,5 +9,6 @@ data class User(
     val dailyWordCount: Int,
     val notificationEnabled: Boolean,
     val nativeLanguageId: String,
+    val appLanguageId: String,
     val createdAt: String
 )

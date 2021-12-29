@@ -25,6 +25,7 @@ data class UpdateUserBody (
     val username: String,
     val email: String,
     val nativeLanguageId: String,
+    val appLanguageId: String,
     val avatar: String?,
     val dailyWordCount: Int,
     val notificationEnabled: Boolean,

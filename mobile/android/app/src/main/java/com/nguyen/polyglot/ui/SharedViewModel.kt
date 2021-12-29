@@ -255,6 +255,7 @@ class SharedViewModel
         username: String,
         email: String,
         nativeLanguageId: String,
+        appLanguageId: String,
         avatar: String?,
         dailyWordCount: Int,
         notificationEnabled: Boolean,
@@ -270,10 +271,11 @@ class SharedViewModel
             Log.d("AccountScreen", "Debug Account Screen 3")
 
             authRepo.updateUser(
-                accessToken!!,
+                accessToken,
                 username,
                 email,
                 nativeLanguageId,
+                appLanguageId,
                 avatar,
                 dailyWordCount,
                 notificationEnabled,

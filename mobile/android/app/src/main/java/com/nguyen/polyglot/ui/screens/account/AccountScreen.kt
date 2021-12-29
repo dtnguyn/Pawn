@@ -79,7 +79,8 @@ fun AccountScreen(
             avatar = user!!.avatar,
             dailyWordCount = user!!.dailyWordCount,
             notificationEnabled = user!!.notificationEnabled,
-            nativeLanguageId = user!!.nativeLanguageId
+            nativeLanguageId = user!!.nativeLanguageId,
+            appLanguageId = user!!.appLanguageId
         )
     }
 
@@ -95,7 +96,9 @@ fun AccountScreen(
             avatar = user!!.avatar,
             dailyWordCount = user!!.dailyWordCount,
             notificationEnabled = user!!.notificationEnabled,
-            nativeLanguageId = user!!.nativeLanguageId
+            nativeLanguageId = user!!.nativeLanguageId,
+            appLanguageId = user!!.appLanguageId
+
         )
     }
 
@@ -111,7 +114,8 @@ fun AccountScreen(
             avatar = user!!.avatar,
             dailyWordCount = user!!.dailyWordCount,
             notificationEnabled = user!!.notificationEnabled,
-            nativeLanguageId = newNativeLanguageId
+            nativeLanguageId = newNativeLanguageId,
+            appLanguageId = user!!.appLanguageId
         )
     }
 
@@ -127,7 +131,8 @@ fun AccountScreen(
             avatar = newAvatar,
             dailyWordCount = user!!.dailyWordCount,
             notificationEnabled = user!!.notificationEnabled,
-            nativeLanguageId = user!!.nativeLanguageId
+            nativeLanguageId = user!!.nativeLanguageId,
+            appLanguageId = user!!.appLanguageId
         )
     }
 

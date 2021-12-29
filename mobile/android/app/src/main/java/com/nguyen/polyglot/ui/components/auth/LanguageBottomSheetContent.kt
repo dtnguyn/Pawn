@@ -11,11 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.nguyen.polyglot.model.Language
 import com.nguyen.polyglot.ui.theme.LightGrey
 import com.nguyen.polyglot.ui.theme.Typography
 
 @Composable
-fun LanguageBottomSheetContent(languages: List<String>, onLanguageClick: (language: String) -> Unit) {
+fun LanguageBottomSheetContent(languages: List<Language>, onLanguageClick: (languageId: String) -> Unit) {
 
     Box(
         Modifier
@@ -39,12 +40,12 @@ fun LanguageBottomSheetContent(languages: List<String>, onLanguageClick: (langua
                         .height(100.dp)
                         .padding(vertical = 10.dp)
                         .clip(RoundedCornerShape(20.dp))
-                        .clickable { onLanguageClick(language) },
+                        .clickable { onLanguageClick(language.id) },
                     shape = RoundedCornerShape(20.dp),
                     backgroundColor = LightGrey,
                 ) {
                     Box(Modifier.fillMaxWidth().fillMaxHeight(), contentAlignment = Alignment.CenterStart) {
-                        Text(text = language, style = Typography.body1, color = Color.Gray, modifier = Modifier.padding(20.dp))
+                        Text(text = language.value, style = Typography.body1, color = Color.Gray, modifier = Modifier.padding(20.dp))
                     }
                 }
             }

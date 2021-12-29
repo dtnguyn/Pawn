@@ -1,5 +1,6 @@
 package com.nguyen.polyglot.ui.screens.setting
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,16 +24,104 @@ import com.nguyen.polyglot.ui.SharedViewModel
 import com.nguyen.polyglot.ui.theme.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.platform.LocalContext
+import com.nguyen.polyglot.model.User
+import com.nguyen.polyglot.ui.components.account.AvatarBottomSheetContent
+import com.nguyen.polyglot.ui.components.auth.LanguageBottomSheetContent
+import com.nguyen.polyglot.util.Constants
+import com.nguyen.polyglot.util.DataStoreUtils
+import com.nguyen.polyglot.util.UIState
+import com.nguyen.polyglot.util.UtilFunctions.fromLanguageId
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel) {
 
     var notificationEnabled by remember { mutableStateOf(true) }
+    val authStatusUIState by sharedViewModel.authStatusUIState
+    var user by remember { mutableStateOf(authStatusUIState.value?.user) }
+    val context = LocalContext.current
+    var dailyWordCount by remember {
+        mutableStateOf(
+            sharedViewModel.authStatusUIState.value.value?.user?.dailyWordCount?.toFloat() ?: 3f
+        )
+    }
 
-    var dailyWordCount by remember { mutableStateOf(sharedViewModel.authStatusUIState.value.value?.user?.dailyWordCount?.toFloat() ?: 3f) }
+    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
 
-    Scaffold(backgroundColor = Color.White) {
+
+    fun toggleBottomSheet() {
+        coroutineScope.launch {
+            if (bottomSheetScaffoldState.bottomSheetState.isCollapsed) {
+                bottomSheetScaffoldState.bottomSheetState.expand()
+            } else {
+                bottomSheetScaffoldState.bottomSheetState.collapse()
+            }
+        }
+    }
+
+    suspend fun updateAppLanguage(newLanguage: String) {
+        if (authStatusUIState.value == null) return
+        if (user == null) return
+
+        sharedViewModel.updateUser(
+            accessToken = DataStoreUtils.getAccessTokenFromDataStore(context),
+            currentAuthStatus = authStatusUIState.value!!,
+            username = user!!.username,
+            email = user!!.email,
+            avatar = user!!.avatar,
+            dailyWordCount = user!!.dailyWordCount,
+            notificationEnabled = user!!.notificationEnabled,
+            nativeLanguageId = user!!.nativeLanguageId,
+            appLanguageId = newLanguage
+        )
+    }
+
+    LaunchedEffect(authStatusUIState) {
+        when (authStatusUIState) {
+            is UIState.Initial -> {
+
+            }
+
+            is UIState.Error -> {
+
+            }
+            is UIState.Loading -> {
+
+            }
+            is UIState.Loaded -> {
+                Log.d("AccountScreen", "authStatus Loaded ${authStatusUIState.value}")
+
+                authStatusUIState.value?.user?.let {
+                    user = it
+
+                    // Store the state to DataStore
+                    DataStoreUtils.saveTokenToDataStore(context, authStatusUIState.value!!.token)
+                    DataStoreUtils.saveUserToDataStore(context, it)
+                }
+            }
+        }
+    }
+
+    BottomSheetScaffold(
+        backgroundColor = Color.White,
+        sheetPeekHeight = 0.dp,
+        sheetContent = {
+            LanguageBottomSheetContent(
+                languages = Constants.allLanguages,
+                onLanguageClick = { language ->
+                    coroutineScope.launch {
+                        updateAppLanguage(language)
+                    }
+                    toggleBottomSheet()
+                }
+            )
+        },
+        scaffoldState = bottomSheetScaffoldState,
+        sheetShape = RoundedCornerShape(topStart = 60.dp, topEnd = 60.dp),
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -199,7 +288,9 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                 shape = RoundedCornerShape(15.dp),
                 backgroundColor = LightGrey,
                 elevation = 4.dp,
-                onClick = {},
+                onClick = {
+                    toggleBottomSheet()
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp)
@@ -209,7 +300,7 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                     Column(Modifier.padding(10.dp)) {
                         Text(text = "App language", style = Typography.h6)
                         Spacer(modifier = Modifier.padding(5.dp))
-                        Text(text = "English", style = Typography.body1, color = Color.Black)
+                        Text(text = fromLanguageId(user?.appLanguageId ?: "en") ?: "English", style = Typography.body1, color = Color.Black)
                     }
                 }
             }
@@ -260,18 +351,36 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                         Text(text = "Daily word", style = Typography.h6)
                         Spacer(modifier = Modifier.padding(5.dp))
                         Text(text = "Daily word count", style = Typography.h6, fontSize = 16.sp)
-                        Text(text = "This will determine how many daily words you receive", style = Typography.body1, color = Color.Black)
+                        Text(
+                            text = "This will determine how many daily words you receive",
+                            style = Typography.body1,
+                            color = Color.Black
+                        )
                         Spacer(modifier = Modifier.padding(5.dp))
-                        Slider(value = dailyWordCount, onValueChange = { dailyWordCount = it }, valueRange = 0f..5f, steps = 4)
+                        Slider(
+                            value = dailyWordCount,
+                            onValueChange = { dailyWordCount = it },
+                            valueRange = 0f..5f,
+                            steps = 4
+                        )
                         Spacer(modifier = Modifier.padding(2.dp))
-                        Text(text = "${dailyWordCount.toInt()} words", style = Typography.body1, color = Color.Black, modifier = Modifier.align(CenterHorizontally))
+                        Text(
+                            text = "${dailyWordCount.toInt()} words",
+                            style = Typography.body1,
+                            color = Color.Black,
+                            modifier = Modifier.align(CenterHorizontally)
+                        )
                         Spacer(modifier = Modifier.padding(5.dp))
-                        Text(text = "Daily word topics", style = Typography.body1, color = Color.Black, modifier = Modifier.align(CenterHorizontally))
+                        Text(
+                            text = "Daily word topics",
+                            style = Typography.body1,
+                            color = Color.Black,
+                            modifier = Modifier.align(CenterHorizontally)
+                        )
                     }
                 }
             }
 
         }
     }
-
 }

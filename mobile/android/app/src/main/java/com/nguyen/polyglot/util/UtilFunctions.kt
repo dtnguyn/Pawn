@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import android.os.Build
 import android.text.Html
 import android.util.DisplayMetrics
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import com.nguyen.polyglot.R
 import com.nguyen.polyglot.ui.theme.*
+import com.nguyen.polyglot.util.Constants.allLanguages
 import java.text.ParseException
 import java.text.SimpleDateFormat
 
@@ -26,6 +28,14 @@ object UtilFunctions {
             pastelMap[word] = color
             color
         }
+    }
+
+    fun fromLanguageId(id: String): String? {
+        Log.d("debug", "id $id")
+        val languageId = id.subSequence(0,2)
+        val languages = allLanguages.filter { it.id == languageId }
+        return if(languages.isEmpty()) null
+        else languages[0].value
     }
 
     fun convertHeightToDp(pixel: Int, displayMetrics: DisplayMetrics): Int {

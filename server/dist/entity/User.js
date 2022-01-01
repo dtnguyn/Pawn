@@ -37,7 +37,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
-    typeorm_1.Column({ nullable: true }),
+    typeorm_1.Column({ nullable: true, default: "human1" }),
     __metadata("design:type", String)
 ], User.prototype, "avatar", void 0);
 __decorate([
@@ -48,6 +48,10 @@ __decorate([
     typeorm_1.Column({ default: "" }),
     __metadata("design:type", String)
 ], User.prototype, "feedTopics", void 0);
+__decorate([
+    typeorm_1.Column({ default: "random" }),
+    __metadata("design:type", String)
+], User.prototype, "dailyWordTopic", void 0);
 __decorate([
     typeorm_1.Column({ default: true }),
     __metadata("design:type", Boolean)
@@ -73,6 +77,10 @@ __decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)
 ], User.prototype, "nativeLanguageId", void 0);
+__decorate([
+    typeorm_1.Column(),
+    __metadata("design:type", String)
+], User.prototype, "appLanguageId", void 0);
 __decorate([
     typeorm_1.ManyToMany(() => Language_1.Language, (language) => language.learners, {
         cascade: ["insert"],

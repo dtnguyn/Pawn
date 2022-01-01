@@ -19,6 +19,7 @@ export async function createUser(
     email,
     password,
     nativeLanguageId,
+    appLanguageId: nativeLanguageId,
     avatar,
   });
 }
@@ -151,10 +152,11 @@ export const updateUser = async (
   avatar: string | undefined,
   dailyWordCount: number,
   notificationEnabled: boolean,
-  nativeLanguageId: string
+  nativeLanguageId: string,
+  appLanguageId: string
 ) => {
   const userRepo = getRepository(User);
-
+  console.log("app: ", appLanguageId);
   await userRepo.update(
     { id: userId },
     {
@@ -164,6 +166,7 @@ export const updateUser = async (
       dailyWordCount,
       notificationEnabled,
       nativeLanguageId,
+      appLanguageId,
     }
   );
 

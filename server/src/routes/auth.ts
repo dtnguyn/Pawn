@@ -146,7 +146,7 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   // Authenticate User
-  console.log("logging in");
+  console.log("logging in", req.body.usernameOrEmail);
   try {
     //Check user input
     if (!req.body.usernameOrEmail)
@@ -155,6 +155,8 @@ router.post("/login", async (req, res) => {
 
     //Check if user is registered
     const user = await getOneUser(req.body.usernameOrEmail);
+    console.log("user found", user);
+
     if (!user)
       throw new CustomError(
         "No user found with the given username or password!"
@@ -220,21 +222,21 @@ router.patch("/password", async (req, res) => {
 });
 
 router.put("/user", checkAuthentication, async (req, res) => {
-  console.log("Updating User!!!");
   try {
     const userId = (req as any).user.id;
-    // if (!userId) {
-    //   throw new CustomError("Please login first!");
-    // }
+    if (!userId) {
+      throw new CustomError("Please login first!");
+    }
 
     const newUser = await updateUser(
-      (req.user as User).id,
+      userId,
       req.body.username,
       req.body.email,
       req.body.avatar,
       req.body.dailyWordCount,
       req.body.notificationEnabled,
-      req.body.nativeLanguageId
+      req.body.nativeLanguageId,
+      req.body.appLanguageId
     );
 
     console.log("Update user successfully!");

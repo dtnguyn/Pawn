@@ -28,6 +28,7 @@ const enWordTopics_1 = require("../utils/enWordTopics");
 const esWordTopics_1 = require("../utils/esWordTopics");
 const frWordTopics_1 = require("../utils/frWordTopics");
 const deWordTopics_1 = require("../utils/deWordTopics");
+const User_1 = require("../entity/User");
 exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, void 0, function* () {
     const results = [];
     switch (language) {
@@ -184,6 +185,10 @@ exports.getWordDetailSimplify = (wordString, language) => __awaiter(this, void 0
     }
     else
         return null;
+});
+exports.updateDailyWordTopic = (userId, newTopicString) => __awaiter(this, void 0, void 0, function* () {
+    const userRepo = typeorm_1.getRepository(User_1.User);
+    yield userRepo.update({ id: userId }, { dailyWordTopic: newTopicString });
 });
 exports.getWordAutoCompletes = (language, text) => __awaiter(this, void 0, void 0, function* () {
     const wordRepo = typeorm_1.getRepository(Word_1.Word);

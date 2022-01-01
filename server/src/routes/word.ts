@@ -8,6 +8,7 @@ import {
   rearrangeDefinition,
   rearrangeSavedWords,
   toggleSaveWord,
+  updateDailyWordTopic,
 } from "../controllers/WordController";
 import { checkAuthentication } from "../utils/middlewares";
 import CustomError from "../utils/CustomError";
@@ -145,6 +146,31 @@ router.patch("/definition/rearrange", checkAuthentication, async (req, res) => {
       return res.send(new ApiResponse(false, error.message, null));
     } else {
       return res.send(new ApiResponse(false, "Something went wrong", null));
+    }
+  }
+});
+
+router.post("/topics", checkAuthentication, async (req, res) => {
+  try {
+    const userId = (req as any).user.id as string;
+    if (!userId) {
+      throw new CustomError("Please login first!");
+    }
+
+    const newTopicsString = req.body.newTopics;
+
+    if (!newTopicsString) {
+      throw new CustomError("Invalid input for updating topics!");
+    }
+
+    await updateDailyWordTopic(userId, newTopicsString);
+    res.send(new ApiResponse(true, "", newTopicsString));
+  } catch (error) {
+    if (error instanceof CustomError) {
+      res.send(new ApiResponse(false, error.message, null));
+    } else {
+      console.log("update daily word topic error ", error.message);
+      res.send(new ApiResponse(false, "Something went wrong", null));
     }
   }
 });

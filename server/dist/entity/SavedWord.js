@@ -36,7 +36,10 @@ __decorate([
     __metadata("design:type", String)
 ], SavedWord.prototype, "userId", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => User_1.User, (user) => user.savedWords),
+    typeorm_1.ManyToOne(() => User_1.User, (user) => user.savedWords, {
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+    }),
     typeorm_1.JoinColumn({ name: "userId" }),
     __metadata("design:type", User_1.User)
 ], SavedWord.prototype, "user", void 0);

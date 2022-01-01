@@ -30,7 +30,10 @@ export class SavedWord {
 
   @Column("uuid")
   userId: string;
-  @ManyToOne(() => User, (user) => user.savedWords)
+  @ManyToOne(() => User, (user) => user.savedWords, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
   @JoinColumn({ name: "userId" })
   user: User;
 

@@ -25,6 +25,7 @@ function createUser(username, nativeLanguageId, email, password, avatar) {
             email,
             password,
             nativeLanguageId,
+            appLanguageId: nativeLanguageId,
             avatar,
         });
     });
@@ -136,8 +137,9 @@ exports.changePassword = (email, code, hashPW) => __awaiter(this, void 0, void 0
     else
         throw new CustomError_1.default("Invalid verification code!");
 });
-exports.updateUser = (userId, username, email, avatar, dailyWordCount, notificationEnabled, nativeLanguageId) => __awaiter(this, void 0, void 0, function* () {
+exports.updateUser = (userId, username, email, avatar, dailyWordCount, notificationEnabled, nativeLanguageId, appLanguageId) => __awaiter(this, void 0, void 0, function* () {
     const userRepo = typeorm_1.getRepository(User_1.User);
+    console.log("app: ", appLanguageId);
     yield userRepo.update({ id: userId }, {
         username,
         email,
@@ -145,6 +147,7 @@ exports.updateUser = (userId, username, email, avatar, dailyWordCount, notificat
         dailyWordCount,
         notificationEnabled,
         nativeLanguageId,
+        appLanguageId,
     });
     const newUser = yield userRepo.findOne({ id: userId });
     return newUser;

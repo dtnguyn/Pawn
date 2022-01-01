@@ -37,7 +37,7 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, default: "human1" })
   avatar: string;
 
   @Column({ default: 3 })
@@ -45,6 +45,9 @@ export class User {
 
   @Column({ default: "" })
   feedTopics: string;
+
+  @Column({ default: "random" })
+  dailyWordTopic: string;
 
   @Column({ default: true })
   notificationEnabled: boolean;
@@ -64,6 +67,9 @@ export class User {
 
   @Column()
   nativeLanguageId: string;
+
+  @Column()
+  appLanguageId: string;
 
   @ManyToMany(() => Language, (language) => language.learners, {
     cascade: ["insert"],

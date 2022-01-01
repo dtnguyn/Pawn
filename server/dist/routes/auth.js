@@ -118,13 +118,14 @@ router.post("/register", (req, res) => __awaiter(this, void 0, void 0, function*
     }
 }));
 router.post("/login", (req, res) => __awaiter(this, void 0, void 0, function* () {
-    console.log("logging in");
+    console.log("logging in", req.body.usernameOrEmail);
     try {
         if (!req.body.usernameOrEmail)
             throw new CustomError_1.default("Please provide username or email!");
         if (!req.body.password)
             throw new CustomError_1.default("Please provide password");
         const user = yield UserController_1.getOneUser(req.body.usernameOrEmail);
+        console.log("user found", user);
         if (!user)
             throw new CustomError_1.default("No user found with the given username or password!");
         const result = yield bcrypt_1.default.compare(req.body.password, user.password);
@@ -180,10 +181,12 @@ router.patch("/password", (req, res) => __awaiter(this, void 0, void 0, function
     }
 }));
 router.put("/user", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
-    console.log("Updating User!!!");
     try {
         const userId = req.user.id;
-        const newUser = yield UserController_1.updateUser(req.user.id, req.body.username, req.body.email, req.body.avatar, req.body.dailyWordCount, req.body.notificationEnabled, req.body.nativeLanguageId);
+        if (!userId) {
+            throw new CustomError_1.default("Please login first!");
+        }
+        const newUser = yield UserController_1.updateUser(userId, req.body.username, req.body.email, req.body.avatar, req.body.dailyWordCount, req.body.notificationEnabled, req.body.nativeLanguageId, req.body.appLanguageId);
         console.log("Update user successfully!");
         return res.send(new ApiResponse_1.default(true, "", newUser));
     }

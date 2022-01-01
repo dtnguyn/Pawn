@@ -71,8 +71,16 @@ createConnection({
 
     // console.log(await getRepository(SavedWord).delete({ language: "de" }));
 
-    // console.log(await getRepository(User).find());
-
+    // console.log(
+    //   await getRepository(User)
+    //     .createQueryBuilder("user")
+    //     .leftJoinAndSelect("user.learningLanguages", "learningLanguages")
+    //     .where("user.username = :username", { username: "adron2" })
+    //     .orWhere("user.email = :email", { email: "adron2" })
+    //     .getOne()
+    // );
+    console.log(await getRepository(User).find());
+    // await getRepository(User).delete({ nativeLanguageId: "vi" });
     app.listen(4000, () => {
       console.log("Server is running on port 4000");
     });

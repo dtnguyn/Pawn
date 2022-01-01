@@ -68,6 +68,7 @@ import {
   deTraffic,
   deWeather,
 } from "../utils/deWordTopics";
+import { User } from "../entity/User";
 
 export const getDailyRandomWords = async (
   wordCount: number,
@@ -234,6 +235,15 @@ export const getWordDetailSimplify = async (
 
     return word;
   } else return null;
+};
+
+export const updateDailyWordTopic = async (
+  userId: string,
+  newTopicString: string
+) => {
+  const userRepo = getRepository(User);
+
+  await userRepo.update({ id: userId }, { dailyWordTopic: newTopicString });
 };
 
 export const getWordAutoCompletes = async (language: string, text: string) => {

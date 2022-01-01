@@ -62,6 +62,7 @@ typeorm_1.createConnection({
     app.use("/word", word_1.default);
     app.use("/language", language_1.default);
     app.use("/feed", feed_1.default);
+    console.log(yield typeorm_1.getRepository(User_1.User).find());
     app.listen(4000, () => {
         console.log("Server is running on port 4000");
     });

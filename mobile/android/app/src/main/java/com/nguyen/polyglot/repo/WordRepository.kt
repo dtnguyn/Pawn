@@ -41,12 +41,8 @@ class WordRepository
             query = {
                 db.dailyWordDao().getMany(SimpleDateFormat("yyyy.MM.dd").format(Date()), language)
                     .map {
-                        it.forEach { word ->
-                            Log.d(TAG, "daily word:  ${word.display}")
-
-                        }
-
-                        if (it.isEmpty()) null else DailyWordMapper.mapToListNetworkEntity(it)
+                        val filteredList = it.filter { word -> word.display }
+                        if (it.isEmpty()) null else DailyWordMapper.mapToListNetworkEntity(filteredList)
                     }
             },
             fetch = {
@@ -64,7 +60,7 @@ class WordRepository
                 }
             },
             shouldFetch = {
-                it.isNullOrEmpty()
+                it == null
             },
             tag = TAG
         )

@@ -16,8 +16,8 @@ interface DailyWordCacheDao {
     @Update(entity = DailyWordCacheEntity::class)
     suspend fun updateDailyWord(dailyWord: DailyWordCacheEntity)
 
-    @Query("SELECT * FROM dailyWords WHERE createdDate = :date AND language = :language AND display = :display")
-    fun getMany(date: String, language: String, display: Boolean = true): Flow<List<DailyWordCacheEntity>>
+    @Query("SELECT * FROM dailyWords WHERE createdDate = :date AND language = :language")
+    fun getMany(date: String, language: String): Flow<List<DailyWordCacheEntity>>
 
     @Query("SELECT * FROM dailyWords WHERE language = :language AND value = :wordValue")
     suspend fun getWordByValue(language: String, wordValue: String): List<DailyWordCacheEntity>

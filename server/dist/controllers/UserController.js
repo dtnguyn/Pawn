@@ -137,9 +137,9 @@ exports.changePassword = (email, code, hashPW) => __awaiter(this, void 0, void 0
     else
         throw new CustomError_1.default("Invalid verification code!");
 });
-exports.updateUser = (userId, username, email, avatar, dailyWordCount, notificationEnabled, nativeLanguageId, appLanguageId) => __awaiter(this, void 0, void 0, function* () {
+exports.updateUser = (userId, username, email, avatar, dailyWordCount, notificationEnabled, nativeLanguageId, appLanguageId, dailyWordTopic, feedTopics) => __awaiter(this, void 0, void 0, function* () {
     const userRepo = typeorm_1.getRepository(User_1.User);
-    console.log("app: ", appLanguageId);
+    console.log("app: ", dailyWordTopic);
     yield userRepo.update({ id: userId }, {
         username,
         email,
@@ -148,6 +148,8 @@ exports.updateUser = (userId, username, email, avatar, dailyWordCount, notificat
         notificationEnabled,
         nativeLanguageId,
         appLanguageId,
+        dailyWordTopic,
+        feedTopics,
     });
     const newUser = yield userRepo.findOne({ id: userId });
     return newUser;

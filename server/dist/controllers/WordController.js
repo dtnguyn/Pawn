@@ -28,82 +28,67 @@ const enWordTopics_1 = require("../utils/enWordTopics");
 const esWordTopics_1 = require("../utils/esWordTopics");
 const frWordTopics_1 = require("../utils/frWordTopics");
 const deWordTopics_1 = require("../utils/deWordTopics");
-const User_1 = require("../entity/User");
-exports.getDailyRandomWords = (wordCount, language) => __awaiter(this, void 0, void 0, function* () {
+exports.getDailyRandomWords = (count, topic, language) => __awaiter(this, void 0, void 0, function* () {
     const results = [];
-    switch (language) {
-        case "en_US": {
-            let i = 0;
-            const arr = [];
-            while (i < wordCount) {
-                const num = getRandomNumber_1.getRandomNumber(0, 274936);
-                const word = an_array_of_english_words_1.default[num];
-                if (!arr.includes(word)) {
-                    const detail = yield exports.getWordDetailSimplify(word, language);
-                    if (detail) {
-                        results.push(detail);
-                        arr.push(word);
-                        i++;
-                    }
-                }
+    let wordCount = count;
+    let allWords = [];
+    if (topic === "random") {
+        switch (language) {
+            case "en_US": {
+                allWords = an_array_of_english_words_1.default;
+                break;
             }
-            console.log("tries: ", i);
-            break;
-        }
-        case "de": {
-            let i = 0;
-            const arr = [];
-            while (i < wordCount) {
-                const num = getRandomNumber_1.getRandomNumber(0, 1680837);
-                const word = all_the_german_words_1.default[num];
-                if (!arr.includes(word)) {
-                    const detail = yield exports.getWordDetailSimplify(word, language);
-                    if (detail) {
-                        results.push(detail);
-                        arr.push(word);
-                        i++;
-                    }
-                }
+            case "de": {
+                allWords = all_the_german_words_1.default;
+                break;
             }
-            break;
-        }
-        case "fr": {
-            let i = 0;
-            const arr = [];
-            while (i < wordCount) {
-                const num = getRandomNumber_1.getRandomNumber(0, 336523);
-                const word = an_array_of_french_words_1.default[num];
-                if (!arr.includes(word)) {
-                    const detail = yield exports.getWordDetailSimplify(word, language);
-                    if (detail) {
-                        results.push(detail);
-                        arr.push(word);
-                        i++;
-                    }
-                }
+            case "fr": {
+                allWords = an_array_of_french_words_1.default;
+                break;
             }
-            break;
-        }
-        case "es": {
-            let i = 0;
-            const arr = [];
-            while (i < wordCount) {
-                const num = getRandomNumber_1.getRandomNumber(0, 636597);
-                const word = an_array_of_spanish_words_1.default[num];
-                if (!arr.includes(word)) {
-                    const detail = yield exports.getWordDetailSimplify(word, language);
-                    if (detail) {
-                        results.push(detail);
-                        arr.push(word);
-                        i++;
-                    }
-                }
+            case "es": {
+                allWords = an_array_of_spanish_words_1.default;
+                break;
             }
-            break;
+            default: {
+                allWords = [];
+            }
         }
-        default: {
-            throw new CustomError_1.default("Please provide supported language!");
+    }
+    else {
+        allWords = (yield typeorm_1.getRepository(Word_1.Word)
+            .createQueryBuilder("word")
+            .where("LOWER(word.topics) LIKE LOWER(:topic)", { topic: `%${topic}%` })
+            .andWhere("word.language = :language", { language })
+            .getMany()).map((word) => word.value);
+    }
+    console.log("all words results: ", allWords);
+    const arr = [];
+    while (results.length < wordCount) {
+        let i = 0;
+        const promises = [];
+        while (i < wordCount) {
+            const num = getRandomNumber_1.getRandomNumber(0, allWords.length);
+            const word = allWords[num];
+            if (!arr.includes(word)) {
+                arr.push(word);
+                promises.push(exports.getWordDetailSimplify(word, language));
+                i++;
+            }
         }
+        yield Promise.all(promises)
+            .then((details) => {
+            details.forEach((detail) => {
+                if (detail != null) {
+                    results.push(detail);
+                    wordCount--;
+                }
+            });
+        })
+            .catch((error) => {
+            console.log("Error getting daily word: ", error.message);
+            throw new CustomError_1.default("Something went wrong!");
+        });
     }
     return results;
 });
@@ -185,10 +170,6 @@ exports.getWordDetailSimplify = (wordString, language) => __awaiter(this, void 0
     }
     else
         return null;
-});
-exports.updateDailyWordTopic = (userId, newTopicString) => __awaiter(this, void 0, void 0, function* () {
-    const userRepo = typeorm_1.getRepository(User_1.User);
-    yield userRepo.update({ id: userId }, { dailyWordTopic: newTopicString });
 });
 exports.getWordAutoCompletes = (language, text) => __awaiter(this, void 0, void 0, function* () {
     const wordRepo = typeorm_1.getRepository(Word_1.Word);

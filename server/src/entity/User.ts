@@ -46,7 +46,7 @@ export class User {
   @Column({ default: "" })
   feedTopics: string;
 
-  @Column({ default: "random" })
+  @Column({ default: "Random" })
   dailyWordTopic: string;
 
   @Column({ default: true })

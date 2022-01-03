@@ -186,7 +186,7 @@ router.put("/user", middlewares_1.checkAuthentication, (req, res) => __awaiter(t
         if (!userId) {
             throw new CustomError_1.default("Please login first!");
         }
-        const newUser = yield UserController_1.updateUser(userId, req.body.username, req.body.email, req.body.avatar, req.body.dailyWordCount, req.body.notificationEnabled, req.body.nativeLanguageId, req.body.appLanguageId);
+        const newUser = yield UserController_1.updateUser(userId, req.body.username, req.body.email, req.body.avatar, req.body.dailyWordCount, req.body.notificationEnabled, req.body.nativeLanguageId, req.body.appLanguageId, req.body.dailyWordTopic, req.body.feedTopics);
         console.log("Update user successfully!");
         return res.send(new ApiResponse_1.default(true, "", newUser));
     }

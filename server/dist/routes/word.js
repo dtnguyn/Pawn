@@ -25,9 +25,12 @@ router.get("/daily", (req, res) => __awaiter(this, void 0, void 0, function* () 
             dailyWordCount = parseInt(req.query.dailyWordCount);
         }
         const language = req.query.language;
+        const topic = req.query.topic == ""
+            ? "Random"
+            : req.query.topic;
         if (!language)
             return res.send(new ApiResponse_1.default(false, "Please provide the target language!", null));
-        const words = yield WordController_1.getDailyRandomWords(dailyWordCount, language);
+        const words = yield WordController_1.getDailyRandomWords(dailyWordCount, topic.toLowerCase(), language);
         return res.send(new ApiResponse_1.default(true, "", words));
     }
     catch (error) {
@@ -141,29 +144,6 @@ router.patch("/definition/rearrange", middlewares_1.checkAuthentication, (req, r
         }
         else {
             return res.send(new ApiResponse_1.default(false, "Something went wrong", null));
-        }
-    }
-}));
-router.post("/topics", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
-    try {
-        const userId = req.user.id;
-        if (!userId) {
-            throw new CustomError_1.default("Please login first!");
-        }
-        const newTopicsString = req.body.newTopics;
-        if (!newTopicsString) {
-            throw new CustomError_1.default("Invalid input for updating topics!");
-        }
-        yield WordController_1.updateDailyWordTopic(userId, newTopicsString);
-        res.send(new ApiResponse_1.default(true, "", newTopicsString));
-    }
-    catch (error) {
-        if (error instanceof CustomError_1.default) {
-            res.send(new ApiResponse_1.default(false, error.message, null));
-        }
-        else {
-            console.log("update daily word topic error ", error.message);
-            res.send(new ApiResponse_1.default(false, "Something went wrong", null));
         }
     }
 }));

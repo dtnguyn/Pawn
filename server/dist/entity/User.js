@@ -49,7 +49,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "feedTopics", void 0);
 __decorate([
-    typeorm_1.Column({ default: "random" }),
+    typeorm_1.Column({ default: "Random" }),
     __metadata("design:type", String)
 ], User.prototype, "dailyWordTopic", void 0);
 __decorate([

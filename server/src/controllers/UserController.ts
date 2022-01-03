@@ -153,10 +153,12 @@ export const updateUser = async (
   dailyWordCount: number,
   notificationEnabled: boolean,
   nativeLanguageId: string,
-  appLanguageId: string
+  appLanguageId: string,
+  dailyWordTopic: string,
+  feedTopics: string
 ) => {
   const userRepo = getRepository(User);
-  console.log("app: ", appLanguageId);
+  console.log("app: ", dailyWordTopic);
   await userRepo.update(
     { id: userId },
     {
@@ -167,6 +169,8 @@ export const updateUser = async (
       notificationEnabled,
       nativeLanguageId,
       appLanguageId,
+      dailyWordTopic,
+      feedTopics,
     }
   );
 

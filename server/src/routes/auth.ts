@@ -236,7 +236,9 @@ router.put("/user", checkAuthentication, async (req, res) => {
       req.body.dailyWordCount,
       req.body.notificationEnabled,
       req.body.nativeLanguageId,
-      req.body.appLanguageId
+      req.body.appLanguageId,
+      req.body.dailyWordTopic,
+      req.body.feedTopics
     );
 
     console.log("Update user successfully!");

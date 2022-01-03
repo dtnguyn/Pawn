@@ -68,90 +68,156 @@ import {
   deTraffic,
   deWeather,
 } from "../utils/deWordTopics";
-import { User } from "../entity/User";
 
 export const getDailyRandomWords = async (
-  wordCount: number,
+  count: number,
+  topic: string,
   language: string
 ) => {
   const results: WordDetailSimplifyJSON[] = [];
-
-  switch (language) {
-    case "en_US": {
-      let i = 0;
-      const arr: any[] = [];
-      while (i < wordCount) {
-        const num = getRandomNumber(0, 274936);
-        const word = enWords[num];
-        if (!arr.includes(word)) {
-          const detail = await getWordDetailSimplify(word, language);
-          if (detail) {
-            results.push(detail);
-            arr.push(word);
-            i++;
-          }
-        }
+  let wordCount = count;
+  let allWords: Array<string> = [];
+  if (topic === "random") {
+    switch (language) {
+      case "en_US": {
+        allWords = enWords;
+        break;
       }
-      console.log("tries: ", i);
-      break;
-    }
-    case "de": {
-      let i = 0;
-      const arr: any[] = [];
-      while (i < wordCount) {
-        const num = getRandomNumber(0, 1680837);
-        const word = deWords[num];
-        if (!arr.includes(word)) {
-          const detail = await getWordDetailSimplify(word, language);
-          if (detail) {
-            results.push(detail);
-            arr.push(word);
-            i++;
-          }
-        }
+      case "de": {
+        allWords = deWords;
+        break;
       }
-      break;
-    }
-    case "fr": {
-      let i = 0;
-      const arr: any[] = [];
-      while (i < wordCount) {
-        const num = getRandomNumber(0, 336523);
-        const word = (frWords as string[])[num];
-        if (!arr.includes(word)) {
-          const detail = await getWordDetailSimplify(word, language);
-          if (detail) {
-            results.push(detail);
-            arr.push(word);
-            i++;
-          }
-        }
+      case "fr": {
+        allWords = frWords as Array<string>;
+        break;
       }
-      break;
-    }
-    case "es": {
-      let i = 0;
-      const arr: any[] = [];
-      while (i < wordCount) {
-        const num = getRandomNumber(0, 636597);
-        const word = (esWords as string[])[num];
-        if (!arr.includes(word)) {
-          const detail = await getWordDetailSimplify(word, language);
-          if (detail) {
-            results.push(detail);
-            arr.push(word);
-            i++;
-          }
-        }
+      case "es": {
+        allWords = esWords as Array<string>;
+        break;
       }
-      break;
+      default: {
+        allWords = [];
+      }
     }
-    default: {
-      throw new CustomError("Please provide supported language!");
-    }
+  } else {
+    allWords = (
+      await getRepository(Word)
+        .createQueryBuilder("word")
+        .where("LOWER(word.topics) LIKE LOWER(:topic)", { topic: `%${topic}%` })
+        .andWhere("word.language = :language", { language })
+        .getMany()
+    ).map((word) => word.value);
   }
 
+  console.log("all words results: ", allWords);
+
+  const arr: any[] = [];
+  while (results.length < wordCount) {
+    let i = 0;
+    const promises: Array<Promise<WordDetailSimplifyJSON | null>> = [];
+    while (i < wordCount) {
+      const num = getRandomNumber(0, allWords.length);
+      const word = allWords[num];
+      if (!arr.includes(word)) {
+        arr.push(word);
+        promises.push(getWordDetailSimplify(word, language));
+        i++;
+      }
+    }
+
+    await Promise.all(promises)
+      .then((details) => {
+        details.forEach((detail) => {
+          if (detail != null) {
+            results.push(detail);
+            wordCount--;
+          }
+        });
+      })
+      .catch((error) => {
+        console.log("Error getting daily word: ", error.message);
+        throw new CustomError("Something went wrong!");
+      });
+  }
+
+  // console.log("daily word results: ", results);
+
   return results;
+
+  // switch (language) {
+  //   case "en_US": {
+  //     let i = 0;
+  //     const arr: any[] = [];
+  //     while (i < wordCount) {
+  //       const num = getRandomNumber(0, 274936);
+  //       const word = enWords[num];
+  //       if (!arr.includes(word)) {
+  //         const detail = await getWordDetailSimplify(word, language);
+  //         if (detail) {
+  //           results.push(detail);
+  //           arr.push(word);
+  //           i++;
+  //         }
+  //       }
+  //     }
+  //     console.log("tries: ", i);
+  //     break;
+  //   }
+  //   case "de": {
+  //     let i = 0;
+  //     const arr: any[] = [];
+  //     while (i < wordCount) {
+  //       const num = getRandomNumber(0, 1680837);
+  //       const word = deWords[num];
+  //       if (!arr.includes(word)) {
+  //         const detail = await getWordDetailSimplify(word, language);
+  //         if (detail) {
+  //           results.push(detail);
+  //           arr.push(word);
+  //           i++;
+  //         }
+  //       }
+  //     }
+  //     break;
+  //   }
+  //   case "fr": {
+  //     let i = 0;
+  //     const arr: any[] = [];
+  //     while (i < wordCount) {
+  //       const num = getRandomNumber(0, 336523);
+  //       const word = (frWords as string[])[num];
+  //       if (!arr.includes(word)) {
+  //         const detail = await getWordDetailSimplify(word, language);
+  //         if (detail) {
+  //           results.push(detail);
+  //           arr.push(word);
+  //           i++;
+  //         }
+  //       }
+  //     }
+  //     break;
+  //   }
+  //   case "es": {
+  //     let i = 0;
+  //     const arr: any[] = [];
+  //     while (i < wordCount) {
+  //       const num = getRandomNumber(0, 636597);
+  //       const word = (esWords as string[])[num];
+  //       if (!arr.includes(word)) {
+  //         const detail = await getWordDetailSimplify(word, language);
+  //         if (detail) {
+  //           results.push(detail);
+  //           arr.push(word);
+  //           i++;
+  //         }
+  //       }
+  //     }
+  //     break;
+  //   }
+  //   default: {
+  //     throw new CustomError("Please provide supported language!");
+  //   }
+  // }
 };
 
 export const getWordDetail = async (wordString: string, language: string) => {
@@ -235,15 +301,6 @@ export const getWordDetailSimplify = async (
 
     return word;
   } else return null;
-};
-
-export const updateDailyWordTopic = async (
-  userId: string,
-  newTopicString: string
-) => {
-  const userRepo = getRepository(User);
-
-  await userRepo.update({ id: userId }, { dailyWordTopic: newTopicString });
 };
 
 export const getWordAutoCompletes = async (language: string, text: string) => {

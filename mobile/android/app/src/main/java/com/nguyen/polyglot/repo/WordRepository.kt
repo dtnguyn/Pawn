@@ -36,19 +36,25 @@ class WordRepository
     }
 
     @SuppressLint("SimpleDateFormat")
-    fun getRandomDailyWord(wordCount: Int, language: String): Flow<UIState<List<Word>>> {
+    fun getRandomDailyWord(
+        wordCount: Int,
+        language: String,
+        topic: String
+    ): Flow<UIState<List<Word>>> {
         return mainGetNetworkBoundResource(
             query = {
                 db.dailyWordDao().getMany(SimpleDateFormat("yyyy.MM.dd").format(Date()), language)
                     .map {
                         val filteredList = it.filter { word -> word.display }
-                        if (it.isEmpty()) null else DailyWordMapper.mapToListNetworkEntity(filteredList)
+                        if (it.isEmpty()) null else DailyWordMapper.mapToListNetworkEntity(
+                            filteredList
+                        )
                     }
             },
             fetch = {
                 Log.d(TAG, "get random words")
                 val response: ApiResponse<ArrayList<Word>?> =
-                    apiClient.get("${apiURL}/word/daily?language=${language}&dailyWordCount=${wordCount}")
+                    apiClient.get("${apiURL}/word/daily?language=${language}&dailyWordCount=${wordCount}&topic=${topic}")
                 Log.d(TAG, "response: $response")
                 if (response.status) response.data
                 else throw CustomAppException(response.message)
@@ -60,7 +66,8 @@ class WordRepository
                 }
             },
             shouldFetch = {
-                it == null
+//                it == null
+                true
             },
             tag = TAG
         )
@@ -105,19 +112,21 @@ class WordRepository
 
         return mainGetNetworkBoundResource(
             query = {
-                db.savedWordDao().getMany(language).map { SavedWordMapper.mapToListNetworkEntity(it) }
+                db.savedWordDao().getMany(language)
+                    .map { SavedWordMapper.mapToListNetworkEntity(it) }
             },
             fetch = {
                 Log.d(TAG, "saved words pre response")
 
-                val response: ApiResponse<List<Word>> = apiClient.get("${apiURL}/word/save?language=${language}") {
-                    headers {
-                        append(HttpHeaders.Authorization, "Bearer $accessToken")
+                val response: ApiResponse<List<Word>> =
+                    apiClient.get("${apiURL}/word/save?language=${language}") {
+                        headers {
+                            append(HttpHeaders.Authorization, "Bearer $accessToken")
+                        }
+                        contentType(ContentType.Application.Json)
                     }
-                    contentType(ContentType.Application.Json)
-                }
                 Log.d(TAG, "saved words response: ${response}")
-                if(response.status) response.data
+                if (response.status) response.data
                 else throw CustomAppException(response.message)
             },
             saveFetchResult = { savedWords ->
@@ -129,22 +138,23 @@ class WordRepository
         )
     }
 
-    fun getWordDetail(wordValue: String, language: String): Flow<UIState<WordDetail>>{
+    fun getWordDetail(wordValue: String, language: String): Flow<UIState<WordDetail>> {
         return mainGetNetworkBoundResource(
             query = {
-                db.wordDetailDao().getOne(wordValue, language).map {wordDetailCache ->
+                db.wordDetailDao().getOne(wordValue, language).map { wordDetailCache ->
                     wordDetailCache?.let {
                         WordDetailMapper.mapToNetworkEntity(it)
                     }
                 }
             },
             fetch = {
-                val response: ApiResponse<WordDetail> = apiClient.get("${apiURL}/word/detail?word=${wordValue}&language=${language}")
+                val response: ApiResponse<WordDetail> =
+                    apiClient.get("${apiURL}/word/detail?word=${wordValue}&language=${language}")
 
-                if(response.status) response.data
+                if (response.status) response.data
                 else throw CustomAppException(response.message)
             },
-            saveFetchResult = {wordDetail ->
+            saveFetchResult = { wordDetail ->
                 wordDetail?.let {
                     db.wordDetailDao().clear(wordValue, language)
                     db.wordDetailDao().insertOne(WordDetailMapper.mapToCacheEntity(it))
@@ -158,7 +168,7 @@ class WordRepository
         )
     }
 
-    fun getAutoCompleteWords(search: String, language: String): Flow<UIState<List<Word>>>{
+    fun getAutoCompleteWords(search: String, language: String): Flow<UIState<List<Word>>> {
         var autoCompleteWords: List<Word>? = null
         return mainGetNetworkBoundResource(
             query = {
@@ -166,9 +176,10 @@ class WordRepository
             },
             fetch = {
                 Log.d(TAG, "Fetching word detail")
-                val response: ApiResponse<List<Word>> = apiClient.get("${apiURL}/word/autocomplete?text=${search}&language=${language}")
+                val response: ApiResponse<List<Word>> =
+                    apiClient.get("${apiURL}/word/autocomplete?text=${search}&language=${language}")
                 Log.d(TAG, "auto complete words response $response")
-                if(response.status) response.data
+                if (response.status) response.data
                 else throw CustomAppException(response.message)
             },
             saveFetchResult = {
@@ -177,10 +188,10 @@ class WordRepository
         )
     }
 
-    suspend fun hideWord(word: Word, language: String){
+    suspend fun hideWord(word: Word, language: String) {
         val words = db.dailyWordDao().getWordByValue(language, word.value)
         Log.d(TAG, "wordCache ${words.size}")
-        val wordCache = if(words.isNotEmpty()) words[0] else return
+        val wordCache = if (words.isNotEmpty()) words[0] else return
         wordCache.display = false
         Log.d(TAG, "wordCache ${wordCache.display}")
         db.dailyWordDao().updateDailyWord(wordCache)

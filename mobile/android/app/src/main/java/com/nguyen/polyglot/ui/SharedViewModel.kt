@@ -259,6 +259,8 @@ class SharedViewModel
         avatar: String?,
         dailyWordCount: Int,
         notificationEnabled: Boolean,
+        dailyWordTopic: String,
+        feedTopics: String,
         currentAuthStatus: AuthStatus
     ) {
 
@@ -279,6 +281,8 @@ class SharedViewModel
                 avatar,
                 dailyWordCount,
                 notificationEnabled,
+                dailyWordTopic,
+                feedTopics,
                 currentAuthStatus
             ).collectLatest {
                 Log.d("AccountScreen", "Debug Account Screen 6")

@@ -58,7 +58,6 @@ fun AccountScreen(
     var currentPickedAvatar by remember { mutableStateOf(user?.avatar ?: "human1") }
 
 
-
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(
             initialValue = BottomSheetValue.Collapsed,
@@ -80,7 +79,9 @@ fun AccountScreen(
             dailyWordCount = user!!.dailyWordCount,
             notificationEnabled = user!!.notificationEnabled,
             nativeLanguageId = user!!.nativeLanguageId,
-            appLanguageId = user!!.appLanguageId
+            appLanguageId = user!!.appLanguageId,
+            dailyWordTopic = user!!.dailyWordTopic,
+            feedTopics = user!!.feedTopics
         )
     }
 
@@ -97,8 +98,9 @@ fun AccountScreen(
             dailyWordCount = user!!.dailyWordCount,
             notificationEnabled = user!!.notificationEnabled,
             nativeLanguageId = user!!.nativeLanguageId,
-            appLanguageId = user!!.appLanguageId
-
+            appLanguageId = user!!.appLanguageId,
+            dailyWordTopic = user!!.dailyWordTopic,
+            feedTopics = user!!.feedTopics
         )
     }
 
@@ -115,7 +117,9 @@ fun AccountScreen(
             dailyWordCount = user!!.dailyWordCount,
             notificationEnabled = user!!.notificationEnabled,
             nativeLanguageId = newNativeLanguageId,
-            appLanguageId = user!!.appLanguageId
+            appLanguageId = user!!.appLanguageId,
+            dailyWordTopic = user!!.dailyWordTopic,
+            feedTopics = user!!.feedTopics
         )
     }
 
@@ -132,7 +136,9 @@ fun AccountScreen(
             dailyWordCount = user!!.dailyWordCount,
             notificationEnabled = user!!.notificationEnabled,
             nativeLanguageId = user!!.nativeLanguageId,
-            appLanguageId = user!!.appLanguageId
+            appLanguageId = user!!.appLanguageId,
+            dailyWordTopic = user!!.dailyWordTopic,
+            feedTopics = user!!.feedTopics
         )
     }
 
@@ -172,8 +178,8 @@ fun AccountScreen(
         }
     }
 
-    LaunchedEffect(bottomSheetScaffoldState.bottomSheetState.isCollapsed){
-        if(bottomSheetScaffoldState.bottomSheetState.isCollapsed){
+    LaunchedEffect(bottomSheetScaffoldState.bottomSheetState.isCollapsed) {
+        if (bottomSheetScaffoldState.bottomSheetState.isCollapsed) {
             currentPickedAvatar = user?.avatar ?: "human1"
         }
     }
@@ -187,7 +193,7 @@ fun AccountScreen(
                 AvatarBottomSheetContent(
                     currentAvatar = currentPickedAvatar,
                     onPickAvatar = {
-                       currentPickedAvatar = it
+                        currentPickedAvatar = it
                     },
                     onSave = {
                         coroutineScope.launch {
@@ -242,7 +248,8 @@ fun AccountScreen(
                         .align(Alignment.CenterEnd)
                         .clickable {
                             coroutineScope.launch {
-                                val refreshToken = DataStoreUtils.getRefreshTokenFromDataStore(context)
+                                val refreshToken =
+                                    DataStoreUtils.getRefreshTokenFromDataStore(context)
                                 DataStoreUtils.saveAccessTokenToAuthDataStore(context, null)
                                 DataStoreUtils.saveRefreshTokenToAuthDataStore(context, null)
                                 sharedViewModel.logout(refreshToken)
@@ -252,7 +259,13 @@ fun AccountScreen(
             }
             Spacer(modifier = Modifier.padding(10.dp))
             Image(
-                painter = painterResource(resources.getIdentifier(user?.avatar ?: "human1", "drawable", "com.nguyen.polyglot")),
+                painter = painterResource(
+                    resources.getIdentifier(
+                        user?.avatar ?: "human1",
+                        "drawable",
+                        "com.nguyen.polyglot"
+                    )
+                ),
                 contentDescription = "avatar",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

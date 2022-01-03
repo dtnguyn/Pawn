@@ -182,20 +182,20 @@ class AuthRepository
         avatar: String?,
         dailyWordCount: Int,
         notificationEnabled: Boolean,
+        dailyWordTopic: String,
+        feedTopics: String,
         currentAuthStatus: AuthStatus
     ): Flow<UIState<AuthStatus>>{
         return mainPostNetworkBoundResource(
             submit = {
-                Log.d("AccountScreen", "Debug Account Screen 4")
 
                 val response: ApiResponse<User?> = apiClient.put("${Constants.apiURL}/auth/user") {
                     contentType(ContentType.Application.Json)
-                    body = UpdateUserBody(username, email, nativeLanguageId, appLanguageId, avatar, dailyWordCount, notificationEnabled)
+                    body = UpdateUserBody(username, email, nativeLanguageId, appLanguageId, avatar, dailyWordCount, notificationEnabled, dailyWordTopic, feedTopics)
                     headers {
                         append(HttpHeaders.Authorization, "Bearer $accessToken")
                     }
                 }
-                Log.d("AccountScreen", "Debug Account Screen 5 ${response}")
 
                 var newUser: User? = null
                 if(response.status) newUser = response.data

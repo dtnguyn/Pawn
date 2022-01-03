@@ -46,12 +46,12 @@ class HomeViewModel
     val showAddLanguagesMenu: State<Boolean?> = _showAddLanguagesMenu
 
 
-    fun getDailyWords(dailyWordCount: Int, languageId: String) {
+    fun getDailyWords(dailyWordCount: Int, languageId: String, topic: String) {
         viewModelScope.launch {
             when (languageId) {
                 SupportedLanguage.ENGLISH.id -> {
                     if (_dailyEnWordsUIState.value.value == null) {
-                        wordRepo.getRandomDailyWord(dailyWordCount, languageId).collectLatest {
+                        wordRepo.getRandomDailyWord(dailyWordCount, languageId, topic).collectLatest {
                             _dailyEnWordsUIState.value = it
                         }
                     }
@@ -59,7 +59,7 @@ class HomeViewModel
 
                 SupportedLanguage.SPANISH.id -> {
                     if (_dailyEsWordsUIState.value.value == null) {
-                        wordRepo.getRandomDailyWord(dailyWordCount, languageId).collectLatest {
+                        wordRepo.getRandomDailyWord(dailyWordCount, languageId, topic).collectLatest {
                             _dailyEsWordsUIState.value = it
                         }
                     }
@@ -67,7 +67,7 @@ class HomeViewModel
 
                 SupportedLanguage.FRENCH.id -> {
                     if (_dailyFrWordsUIState.value.value == null) {
-                        wordRepo.getRandomDailyWord(dailyWordCount, languageId).collectLatest {
+                        wordRepo.getRandomDailyWord(dailyWordCount, languageId, topic).collectLatest {
                             _dailyFrWordsUIState.value = it
                         }
                     }
@@ -75,7 +75,7 @@ class HomeViewModel
 
                 SupportedLanguage.GERMANY.id -> {
                     if (_dailyDeWordsUIState.value.value == null) {
-                        wordRepo.getRandomDailyWord(dailyWordCount, languageId).collectLatest {
+                        wordRepo.getRandomDailyWord(dailyWordCount, languageId, topic).collectLatest {
                             _dailyDeWordsUIState.value = it
                         }
                     }

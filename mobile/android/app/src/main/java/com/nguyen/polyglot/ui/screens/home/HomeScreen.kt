@@ -201,7 +201,7 @@ fun HomeScreen(
             isLoadingDailyWords = false
             Log.d("get access token", "token ${getAccessTokenFromDataStore(context)}")
 
-            homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, currentPickedLanguage!!.id)
+            homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, currentPickedLanguage!!.id, user?.dailyWordTopic ?: "Random")
             sharedViewModel.getSavedWords(
                 getAccessTokenFromDataStore(context),
                 currentPickedLanguage

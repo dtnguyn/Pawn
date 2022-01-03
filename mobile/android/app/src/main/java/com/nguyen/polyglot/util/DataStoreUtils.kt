@@ -65,7 +65,9 @@ object DataStoreUtils{
                     nativeLanguageId = user.nativeLanguageId,
                     notificationEnabled = user.notificationEnabled,
                     createdAt = user.createdAt,
-                    appLanguageId = user.appLanguageId
+                    appLanguageId = user.appLanguageId,
+                    feedTopics = user.feedTopics,
+                    dailyWordTopic = user.dailyWordTopic
                 )
             }
         }.first()
@@ -108,6 +110,8 @@ object DataStoreUtils{
                     .setNativeLanguageId(user.nativeLanguageId)
                     .setCreatedAt(user.createdAt)
                     .setAppLanguageId(user.appLanguageId)
+                    .setDailyWordTopic(user.dailyWordTopic)
+                    .setFeedTopics(user.feedTopics)
                     .build()
             }
         }

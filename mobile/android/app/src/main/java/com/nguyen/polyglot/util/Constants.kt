@@ -15,6 +15,8 @@ object Constants {
 
     const val apiURL = "http://192.168.0.239:4000"
 
+    val dailyWordTopics = listOf("Random", "Common", "Food", "Traffic", "Weather", "Sport", "Science", "Nature", "Music", "Movie", "Money", "Emotion", "Clothing")
+
     val humanIcons = listOf(
         "human1",
         "human2",

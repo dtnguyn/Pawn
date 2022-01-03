@@ -29,4 +29,6 @@ data class UpdateUserBody (
     val avatar: String?,
     val dailyWordCount: Int,
     val notificationEnabled: Boolean,
+    val dailyWordTopic: String,
+    val feedTopics: String,
 )

@@ -14,5 +14,6 @@ message UserDs {
   string nativeLanguageId = 8;
   string createdAt = 9;
   string appLanguageId = 10;
-
+  string feedTopics = 11;
+  string dailyWordTopic = 12;
 }

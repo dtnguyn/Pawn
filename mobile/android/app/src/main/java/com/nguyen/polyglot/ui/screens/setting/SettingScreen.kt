@@ -1,12 +1,9 @@
 package com.nguyen.polyglot.ui.screens.setting
 
 import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,11 +21,9 @@ import androidx.navigation.NavController
 import com.nguyen.polyglot.R
 import com.nguyen.polyglot.ui.SharedViewModel
 import com.nguyen.polyglot.ui.components.auth.LanguageBottomSheetContent
-import com.nguyen.polyglot.ui.theme.DarkBlue
-import com.nguyen.polyglot.ui.theme.LightGrey
-import com.nguyen.polyglot.ui.theme.ReallyRed
-import com.nguyen.polyglot.ui.theme.Typography
+import com.nguyen.polyglot.ui.theme.*
 import com.nguyen.polyglot.util.Constants
+import com.nguyen.polyglot.util.Constants.dailyWordTopics
 import com.nguyen.polyglot.util.DataStoreUtils
 import com.nguyen.polyglot.util.UIState
 import com.nguyen.polyglot.util.UtilFunctions.fromLanguageId
@@ -46,6 +41,7 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
             sharedViewModel.authStatusUIState.value.value?.user?.dailyWordCount?.toFloat() ?: 3f
         )
     }
+    var topicMenuExpanded by remember { mutableStateOf(false) }
 
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
     val coroutineScope = rememberCoroutineScope()
@@ -74,7 +70,9 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
             dailyWordCount = user!!.dailyWordCount,
             notificationEnabled = user!!.notificationEnabled,
             nativeLanguageId = user!!.nativeLanguageId,
-            appLanguageId = newLanguage
+            appLanguageId = newLanguage,
+            dailyWordTopic = user!!.dailyWordTopic,
+            feedTopics = user!!.feedTopics
         )
     }
 
@@ -91,7 +89,9 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
             dailyWordCount = user!!.dailyWordCount,
             notificationEnabled = newStatus,
             nativeLanguageId = user!!.nativeLanguageId,
-            appLanguageId = user!!.appLanguageId
+            appLanguageId = user!!.appLanguageId,
+            dailyWordTopic = user!!.dailyWordTopic,
+            feedTopics = user!!.feedTopics
         )
     }
 
@@ -108,7 +108,28 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
             dailyWordCount = newDailyWordCount,
             notificationEnabled = user!!.notificationEnabled,
             nativeLanguageId = user!!.nativeLanguageId,
-            appLanguageId = user!!.appLanguageId
+            appLanguageId = user!!.appLanguageId,
+            dailyWordTopic = user!!.dailyWordTopic,
+            feedTopics = user!!.feedTopics
+        )
+    }
+
+    suspend fun updateDailyWordTopic(newTopic: String) {
+        if (authStatusUIState.value == null) return
+        if (user == null) return
+
+        sharedViewModel.updateUser(
+            accessToken = DataStoreUtils.getAccessTokenFromDataStore(context),
+            currentAuthStatus = authStatusUIState.value!!,
+            username = user!!.username,
+            email = user!!.email,
+            avatar = user!!.avatar,
+            dailyWordCount = user!!.dailyWordCount,
+            notificationEnabled = user!!.notificationEnabled,
+            nativeLanguageId = user!!.nativeLanguageId,
+            appLanguageId = user!!.appLanguageId,
+            dailyWordTopic = newTopic,
+            feedTopics = user!!.feedTopics
         )
     }
 
@@ -125,7 +146,7 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
 
             }
             is UIState.Loaded -> {
-                Log.d("AccountScreen", "authStatus Loaded ${authStatusUIState.value}")
+                Log.d("SettingScreen", "authStatus Loaded ${authStatusUIState.value}")
 
                 authStatusUIState.value?.user?.let {
                     user = it
@@ -380,7 +401,6 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                 shape = RoundedCornerShape(15.dp),
                 backgroundColor = LightGrey,
                 elevation = 4.dp,
-                onClick = {},
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp)
@@ -414,12 +434,44 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                             modifier = Modifier.align(CenterHorizontally)
                         )
                         Spacer(modifier = Modifier.padding(5.dp))
-                        Text(
-                            text = "Daily word topics",
-                            style = Typography.body1,
-                            color = Color.Black,
-                            modifier = Modifier.align(CenterHorizontally)
-                        )
+                        Text(text = "Daily word topic", style = Typography.h6, fontSize = 16.sp)
+                        Spacer(modifier = Modifier.padding(3.dp))
+
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .fillMaxWidth()
+                                .background(Grey, RoundedCornerShape(10.dp))
+                                .clickable {
+                                    topicMenuExpanded = !topicMenuExpanded
+                                }
+                                .padding(15.dp)
+
+                        ) {
+                            Text("${user?.dailyWordTopic}")
+                            DropdownMenu(
+                                expanded = topicMenuExpanded,
+                                onDismissRequest = {
+                                    topicMenuExpanded = false
+                                },
+                                modifier = Modifier.fillMaxWidth(0.8f)
+                            ) {
+                                dailyWordTopics.forEach {topic ->
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            coroutineScope.launch {
+                                                updateDailyWordTopic(topic)
+                                                topicMenuExpanded = false
+                                            }
+                                        },
+                                        modifier = Modifier.background(color = if (topic == user?.dailyWordTopic) Grey else Color.White)
+                                    ) {
+                                        Text(text = topic, style = Typography.body1, fontSize = 18.sp)
+                                    }
+                                }
+
+                            }
+                        }
                     }
                 }
             }

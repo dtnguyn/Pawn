@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nguyen.polyglot.R
@@ -40,10 +41,10 @@ fun WordReviewMenuScreen(navController: NavController) {
                     .align(Alignment.CenterHorizontally)
             )
             Spacer(Modifier.padding(20.dp))
-            Text(text = "Review your vocabulary", style = Typography.h3)
+            Text(text = stringResource(id = R.string.review_title), style = Typography.h3)
             Spacer(Modifier.padding(5.dp))
             Text(
-                text = "Feel confident about your vocabulary? Take a quick or full review of all your saved words!",
+                text = stringResource(id = R.string.review_subtitle),
                 style = Typography.body1
             )
             Spacer(Modifier.padding(20.dp))
@@ -55,12 +56,12 @@ fun WordReviewMenuScreen(navController: NavController) {
                 onClick = { navController.navigate("wordReview") }) {
                 Column {
                     Text(
-                        text = "Quick Review",
+                        text = stringResource(id = R.string.quick_review),
                         color = Color.White,
                         style = Typography.h5,
                     )
                     Text(
-                        text = "Take a short quiz (10 questions or less) to review your vocabulary",
+                        text = stringResource(id = R.string.quick_review_subtitle),
                         color = Color.White,
                         style = Typography.body1,
                     )
@@ -76,12 +77,12 @@ fun WordReviewMenuScreen(navController: NavController) {
                 onClick = { navController.navigate("wordReview") }) {
                 Column {
                     Text(
-                        text = "Full Review",
+                        text = stringResource(id = R.string.full_review),
                         color = Color.White,
                         style = Typography.h5,
                     )
                     Text(
-                        text = "Take a full review of all your saved words. You will feel more confident in your vocabulary",
+                        text = stringResource(id = R.string.login_title),
                         color = Color.White,
                         style = Typography.body1,
                     )

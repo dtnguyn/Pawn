@@ -22,6 +22,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.nguyen.polyglot.R
 import com.nguyen.polyglot.ui.theme.Blue
 import com.nguyen.polyglot.util.Constants.animalIcons
 import com.nguyen.polyglot.util.Constants.humanIcons
@@ -40,24 +42,27 @@ fun AvatarBottomSheetContent(currentAvatar: String?, onPickAvatar: (icon: String
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "Pick your avatar",
+                text = stringResource(id = R.string.pick_your_avatar),
                 style = Typography.h5,
                 color = Color.Black,
                 modifier = Modifier.align(Center)
             )
             Text(
-                text = "Save",
+                text = stringResource(id = R.string.save),
                 style = Typography.body1,
                 color = Blue,
-                modifier = Modifier.align(CenterEnd).padding(end = 5.dp).clickable {
-                    onSave()
-                }
+                modifier = Modifier
+                    .align(CenterEnd)
+                    .padding(end = 5.dp)
+                    .clickable {
+                        onSave()
+                    }
             )
         }
 
         Spacer(modifier = Modifier.padding(10.dp))
         Text(
-            text = "Human",
+            text = stringResource(id = R.string.animal),
             style = Typography.h6,
             color = Color.Black,
             fontSize = 18.sp,
@@ -75,7 +80,7 @@ fun AvatarBottomSheetContent(currentAvatar: String?, onPickAvatar: (icon: String
         Spacer(modifier = Modifier.padding(10.dp))
 
         Text(
-            text = "Animal",
+            text = stringResource(id = R.string.animal),
             style = Typography.h6,
             color = Color.Black,
             fontSize = 18.sp,

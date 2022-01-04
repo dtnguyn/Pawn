@@ -9,8 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nguyen.polyglot.R
 import com.nguyen.polyglot.model.Definition
 import com.nguyen.polyglot.ui.theme.Typography
 import com.nguyen.polyglot.util.UtilFunctions.generateRandomPastelColor
@@ -32,12 +34,12 @@ fun DefinitionItem(index: Int, definition: Definition) {
         Column(
             Modifier.padding(15.dp)
         ) {
-            Text(text = "Definitions ${index + 1}", style = Typography.h6, fontSize = 18.sp)
+            Text(text = "${stringResource(id = R.string.definition)} ${index + 1}", style = Typography.h6, fontSize = 18.sp)
             Text(text = definition.partOfSpeech ?: "", style = Typography.subtitle1)
             Spacer(modifier = Modifier.padding(5.dp))
             Text(text = definition.meaning, style = Typography.h6)
             Spacer(modifier = Modifier.padding(10.dp))
-            Text(text = "Example: ", style = Typography.h6, fontSize = 18.sp)
+            Text(text = stringResource(id = R.string.example), style = Typography.h6, fontSize = 18.sp)
             Text(text = definition.example ?: "", style = Typography.body1, fontSize = 18.sp)
         }
     }

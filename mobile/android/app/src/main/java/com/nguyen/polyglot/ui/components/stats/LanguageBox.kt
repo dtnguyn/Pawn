@@ -11,7 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.nguyen.polyglot.R
 import com.nguyen.polyglot.model.Language
 import com.nguyen.polyglot.ui.theme.Grey
 import com.nguyen.polyglot.ui.theme.LightGrey
@@ -48,7 +50,7 @@ fun LanguageBox(language: Language?, wordCount: Int, isActive: Boolean = false, 
             )
             Spacer(modifier = Modifier.padding(5.dp))
             Text(text = language.value, style = Typography.body1)
-            Text(text = "$wordCount words", style = Typography.subtitle1)
+            Text(text = "$wordCount ${stringResource(id = R.string.words)}", style = Typography.subtitle1)
         }
 
     }

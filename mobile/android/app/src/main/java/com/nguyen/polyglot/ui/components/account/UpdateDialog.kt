@@ -21,7 +21,7 @@ import com.nguyen.polyglot.ui.theme.Typography
 import androidx.compose.runtime.*
 
 @Composable
-fun UpdateDialog(title: String, content: String, currentValue: String, actionButtonText: String, onAction: (value: String) -> Unit, onDismiss: () -> Unit) {
+fun UpdateDialog(title: String, placeholder: String, content: String, currentValue: String, actionButtonText: String, onAction: (value: String) -> Unit, onDismiss: () -> Unit) {
 
     var value by remember { mutableStateOf(currentValue) }
 
@@ -66,7 +66,7 @@ fun UpdateDialog(title: String, content: String, currentValue: String, actionBut
                     value = value,
                     onValueChange = { newValue -> value = newValue },
                     placeholder = {
-                        Text(text = "Enter your email", style = Typography.body2, color = Color.Gray)
+                        Text(text = placeholder, style = Typography.body2, color = Color.Gray)
                     },
                     singleLine = true,
                     colors = TextFieldDefaults.textFieldColors(

@@ -13,8 +13,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -41,6 +43,8 @@ import com.nguyen.polyglot.util.UIState
 import com.nguyen.polyglot.util.UtilFunctions.convertHeightToDp
 import com.nguyen.polyglot.util.UtilFunctions.generateFlagForLanguage
 import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.collections.ArrayList
 
 private const val TAG = "HomeScreen"
 
@@ -152,6 +156,7 @@ fun HomeScreen(
                     //Update daily word count state
                     dailyWordCount = authStatusUIState.value?.user!!.dailyWordCount
                     user = authStatusUIState.value?.user
+
                 } else {
                     user = null
                 }
@@ -557,7 +562,7 @@ fun HomeScreen(
                                             .fillMaxWidth()
                                     ) {
                                         Text(
-                                            text = "Your saved words",
+                                            text = stringResource(id = R.string.your_saved_words),
                                             style = Typography.h6,
                                             fontSize = 18.sp
                                         )

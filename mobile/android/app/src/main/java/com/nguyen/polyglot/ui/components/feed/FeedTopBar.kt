@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nguyen.polyglot.R
 import com.nguyen.polyglot.ui.components.RoundButton
@@ -23,9 +24,9 @@ fun FeedTopBar(onClickTopicMenu: () -> Unit){
             .padding(vertical = 20.dp, horizontal = 20.dp)
     ) {
         Column(Modifier.weight(3f)) {
-            Text(text = "Your feed", style = Typography.h3)
+            Text(text = stringResource(id = R.string.your_feed), style = Typography.h3)
             Text(
-                text = "News and videos generated from your saved words",
+                text = stringResource(id = R.string.feed_subtitle),
                 style = Typography.body2
             )
         }

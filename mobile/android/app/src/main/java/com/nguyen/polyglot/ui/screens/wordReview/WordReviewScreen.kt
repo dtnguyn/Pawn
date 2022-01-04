@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -152,7 +153,7 @@ fun WordReviewScreen(
                     }
                 }
                 Spacer(modifier = Modifier.padding(10.dp))
-                if (questions!![currentQuestionIndex].question == "What is the definition of the word in the following audio?") {
+                if (questions!![currentQuestionIndex].question == stringResource(id = R.string.question)) {
                     Text(
                         text = questions!![currentQuestionIndex].question,
                         style = Typography.h3
@@ -196,7 +197,7 @@ fun WordReviewScreen(
                         Row(verticalAlignment = CenterVertically) {
                             Icon(Icons.Filled.ArrowBack, "")
                             Spacer(modifier = Modifier.padding(3.dp))
-                            Text(text = "Back", style = Typography.subtitle1, fontSize = 16.sp)
+                            Text(text = stringResource(id = R.string.back), style = Typography.subtitle1, fontSize = 16.sp)
                         }
 
                     }
@@ -249,7 +250,7 @@ fun WordReviewScreen(
                             }
                         }) {
                         Text(
-                            text = "Check Answer",
+                            text = stringResource(id = R.string.check_answer),
                             style = Typography.h5,
                         )
                     }

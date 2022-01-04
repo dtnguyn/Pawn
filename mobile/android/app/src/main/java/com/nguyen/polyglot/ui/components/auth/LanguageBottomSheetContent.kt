@@ -10,7 +10,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.nguyen.polyglot.R
 import com.nguyen.polyglot.model.Language
 import com.nguyen.polyglot.ui.theme.LightGrey
 import com.nguyen.polyglot.ui.theme.Typography
@@ -28,7 +30,7 @@ fun LanguageBottomSheetContent(languages: List<Language>, onLanguageClick: (lang
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Pick a language",
+                text = stringResource(id = R.string.pick_a_language),
                 style = Typography.h5,
                 color = Color.Black,
                 modifier = Modifier.padding(10.dp)

@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nguyen.polyglot.R
 import com.nguyen.polyglot.ui.theme.Typography
@@ -29,7 +30,7 @@ fun LoadingFeedItem() {
                         .size(32.dp)
                         .padding(end = 5.dp)
                 )
-                Text(text = "News", style = Typography.subtitle1)
+                Text(text = stringResource(id = R.string.news), style = Typography.subtitle1)
             }
             Spacer(modifier = Modifier.padding(5.dp))
             ShimmerAnimation(modifier = Modifier
@@ -62,7 +63,7 @@ fun LoadingFeedItem() {
                     .size(32.dp)
                     .padding(end = 5.dp)
             )
-            Text(text = "Share", style = Typography.subtitle1)
+            Text(text = stringResource(id = R.string.share), style = Typography.subtitle1)
         }
         }
 

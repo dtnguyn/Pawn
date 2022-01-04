@@ -9,7 +9,9 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.nguyen.polyglot.R
 import com.nguyen.polyglot.model.Word
 import com.nguyen.polyglot.ui.components.home.DailyWordCard
 import com.nguyen.polyglot.ui.theme.LightGreen
@@ -32,7 +34,7 @@ fun WordActionMenu(
                 onLookUpDefinition(word)
             },
             content = {
-                Text(text = "Look up definitions", style = Typography.h6)
+                Text(text = stringResource(id = R.string.look_up_definitions), style = Typography.h6)
             },
             shape = RoundedCornerShape(30.dp),
             colors = ButtonDefaults.buttonColors(LightRed),
@@ -44,7 +46,7 @@ fun WordActionMenu(
                 onLookUpImages(word)
             },
             content = {
-                Text(text = "Find images", style = Typography.h6)
+                Text(text = stringResource(id = R.string.find_images), style = Typography.h6)
             },
             shape = RoundedCornerShape(30.dp),
             colors = ButtonDefaults.buttonColors(LightGreen),

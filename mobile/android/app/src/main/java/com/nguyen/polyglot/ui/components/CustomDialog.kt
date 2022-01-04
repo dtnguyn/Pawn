@@ -12,9 +12,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.nguyen.polyglot.R
 import com.nguyen.polyglot.ui.theme.ReallyRed
 import com.nguyen.polyglot.ui.theme.Typography
 
@@ -61,7 +63,7 @@ fun CustomDialog(title: String, content: String, icon: Int, onDismiss: () -> Uni
                         .height(70.dp)
                         .padding(vertical = 10.dp, horizontal = 30.dp)
                 ) {
-                    Text(text = "Try Again", style = Typography.h6, color = Color.White)
+                    Text(text = stringResource(id = R.string.try_again), style = Typography.h6, color = Color.White)
                 }
 
             }

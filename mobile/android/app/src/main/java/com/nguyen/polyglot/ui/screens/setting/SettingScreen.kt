@@ -13,8 +13,10 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -28,6 +30,7 @@ import com.nguyen.polyglot.util.DataStoreUtils
 import com.nguyen.polyglot.util.UIState
 import com.nguyen.polyglot.util.UtilFunctions.fromLanguageId
 import kotlinx.coroutines.launch
+import java.util.*
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -36,6 +39,7 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
     val authStatusUIState by sharedViewModel.authStatusUIState
     var user by remember { mutableStateOf(authStatusUIState.value?.user) }
     val context = LocalContext.current
+    val configuration = LocalConfiguration.current
     var dailyWordCount by remember {
         mutableStateOf(
             sharedViewModel.authStatusUIState.value.value?.user?.dailyWordCount?.toFloat() ?: 3f
@@ -151,6 +155,13 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                 authStatusUIState.value?.user?.let {
                     user = it
 
+                    user?.appLanguageId?.let { id ->
+                        val locale = Locale(id)
+                        configuration.setLocale(locale)
+                        val resources = context.resources
+                        resources.updateConfiguration(configuration, resources.displayMetrics)
+                    }
+
                     // Store the state to DataStore
                     DataStoreUtils.saveTokenToDataStore(context, authStatusUIState.value!!.token)
                     DataStoreUtils.saveUserToDataStore(context, it)
@@ -198,7 +209,7 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                     )
                 }
                 Text(
-                    text = "Settings",
+                    text = stringResource(id = R.string.settings),
                     style = Typography.h4,
                     modifier = Modifier.align(Alignment.Center)
                 )
@@ -214,7 +225,11 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
 
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
-                    Text(text = "Subscription", style = Typography.h6, color = Color.White)
+                    Text(
+                        text = stringResource(id = R.string.subscription),
+                        style = Typography.h6,
+                        color = Color.White
+                    )
                     Spacer(modifier = Modifier.padding(10.dp))
                     Card(
                         shape = RoundedCornerShape(15.dp),
@@ -227,7 +242,7 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                         Column(Modifier.padding(10.dp)) {
                             Box(Modifier.fillMaxWidth()) {
                                 Text(
-                                    text = "Free",
+                                    text = stringResource(id = R.string.free),
                                     style = Typography.h6,
                                     fontSize = 18.sp,
                                     color = Color.Black
@@ -245,7 +260,7 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
 
                             Spacer(modifier = Modifier.padding(5.dp))
                             Text(
-                                text = "Only essential features",
+                                text = stringResource(id = R.string.only_essential_features),
                                 style = Typography.body2,
                                 color = Color.Black
                             )
@@ -263,9 +278,12 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                             .clickable { }
                     ) {
                         Column(Modifier.padding(10.dp)) {
-                            Text(text = "Premium", style = Typography.h5)
                             Text(
-                                text = "$9.99 • one time",
+                                text = stringResource(id = R.string.premium),
+                                style = Typography.h5
+                            )
+                            Text(
+                                text = "$9.99 • ${stringResource(id = R.string.one_time)}",
                                 style = Typography.body2,
                             )
 
@@ -276,7 +294,7 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                                     style = Typography.h3,
                                 )
                                 Text(
-                                    text = "No Ads",
+                                    text = stringResource(id = R.string.no_ads),
                                     style = Typography.body1,
                                     modifier = Modifier
                                         .align(CenterVertically)
@@ -292,7 +310,7 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                                     style = Typography.h3,
                                 )
                                 Text(
-                                    text = "Translated video caption",
+                                    text = stringResource(id = R.string.translated_video_cation),
                                     style = Typography.body1,
                                     modifier = Modifier
                                         .align(CenterVertically)
@@ -308,7 +326,7 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                                     style = Typography.h3,
                                 )
                                 Text(
-                                    text = "Topic filter for daily words, news and videos feed",
+                                    text = stringResource(id = R.string.topic_filter),
                                     style = Typography.body1,
                                     modifier = Modifier
                                         .align(CenterVertically)
@@ -324,7 +342,7 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                                     style = Typography.h3,
                                 )
                                 Text(
-                                    text = "Support us :)",
+                                    text = stringResource(id = R.string.support),
                                     style = Typography.body1,
                                     modifier = Modifier
                                         .align(CenterVertically)
@@ -352,7 +370,10 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
             ) {
                 Column(Modifier.padding(10.dp)) {
                     Column(Modifier.padding(10.dp)) {
-                        Text(text = "App language", style = Typography.h6)
+                        Text(
+                            text = stringResource(id = R.string.app_language),
+                            style = Typography.h6
+                        )
                         Spacer(modifier = Modifier.padding(5.dp))
                         Text(
                             text = fromLanguageId(user?.appLanguageId ?: "en") ?: "English",
@@ -375,7 +396,10 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
             ) {
                 Column(Modifier.padding(10.dp)) {
                     Box(Modifier.fillMaxWidth()) {
-                        Text(text = "Notifications", style = Typography.h6)
+                        Text(
+                            text = stringResource(id = R.string.notifications),
+                            style = Typography.h6
+                        )
                         Switch(
                             checked = user?.notificationEnabled ?: true,
                             onCheckedChange = {
@@ -388,7 +412,7 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                     }
                     Spacer(modifier = Modifier.padding(5.dp))
                     Text(
-                        text = "If enabled, you will receive push notifications",
+                        text = stringResource(id = R.string.notifications_sub),
                         style = Typography.body1,
                         color = Color.Black
                     )
@@ -408,33 +432,46 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
             ) {
                 Column(Modifier.padding(10.dp)) {
                     Column(Modifier.padding(5.dp)) {
-                        Text(text = "Daily word", style = Typography.h6)
-                        Spacer(modifier = Modifier.padding(5.dp))
-                        Text(text = "Daily word count", style = Typography.h6, fontSize = 16.sp)
                         Text(
-                            text = "This will determine how many daily words you receive",
+                            text = stringResource(id = R.string.daily_words),
+                            style = Typography.h6
+                        )
+                        Spacer(modifier = Modifier.padding(5.dp))
+                        Text(
+                            text = stringResource(id = R.string.daily_word_count),
+                            style = Typography.h6,
+                            fontSize = 16.sp
+                        )
+                        Text(
+                            text = stringResource(id = R.string.daily_word_count_sub),
                             style = Typography.body1,
                             color = Color.Black
                         )
                         Spacer(modifier = Modifier.padding(5.dp))
                         Slider(
                             value = dailyWordCount,
-                            onValueChange = { coroutineScope.launch {
-                                dailyWordCount = it
-                                updateDailyWordCount(it.toInt())
-                            }},
+                            onValueChange = {
+                                coroutineScope.launch {
+                                    dailyWordCount = it
+                                    updateDailyWordCount(it.toInt())
+                                }
+                            },
                             valueRange = 0f..5f,
                             steps = 4
                         )
                         Spacer(modifier = Modifier.padding(2.dp))
                         Text(
-                            text = "${dailyWordCount.toInt()} words",
+                            text = "${dailyWordCount.toInt()} ${stringResource(id = R.string.words)}",
                             style = Typography.body1,
                             color = Color.Black,
                             modifier = Modifier.align(CenterHorizontally)
                         )
                         Spacer(modifier = Modifier.padding(5.dp))
-                        Text(text = "Daily word topic", style = Typography.h6, fontSize = 16.sp)
+                        Text(
+                            text = stringResource(id = R.string.daily_word_topic),
+                            style = Typography.h6,
+                            fontSize = 16.sp
+                        )
                         Spacer(modifier = Modifier.padding(3.dp))
 
                         Box(
@@ -456,7 +493,7 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                                 },
                                 modifier = Modifier.fillMaxWidth(0.8f)
                             ) {
-                                dailyWordTopics.forEach {topic ->
+                                dailyWordTopics.forEach { topic ->
                                     DropdownMenuItem(
                                         onClick = {
                                             coroutineScope.launch {
@@ -466,7 +503,11 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                                         },
                                         modifier = Modifier.background(color = if (topic == user?.dailyWordTopic) Grey else Color.White)
                                     ) {
-                                        Text(text = topic, style = Typography.body1, fontSize = 18.sp)
+                                        Text(
+                                            text = topic,
+                                            style = Typography.body1,
+                                            fontSize = 18.sp
+                                        )
                                     }
                                 }
 

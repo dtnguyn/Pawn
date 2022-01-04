@@ -23,6 +23,7 @@ import com.nguyen.polyglot.util.AuthTab
 import com.nguyen.polyglot.util.UtilFunctions.convertHeightToDp
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import com.nguyen.polyglot.model.AuthStatus
 import com.nguyen.polyglot.model.Token
 import com.nguyen.polyglot.ui.SharedViewModel
@@ -197,25 +198,25 @@ fun AuthScreen(
                 ) {
                     if (currentTab == AuthTab.LOGIN) {
                         Text(
-                            text = "Sign in to your account",
+                            text = stringResource(id = R.string.login_title),
                             style = Typography.h2,
                             color = Color.White,
                         )
                         Spacer(modifier = Modifier.padding(10.dp))
                         Text(
-                            text = "Welcome back!",
+                            text = stringResource(id = R.string.welcome_back),
                             style = Typography.h6,
                             color = Color.White,
                         )
                     } else {
                         Text(
-                            text = "Welcome to Polyglot!",
+                            text = stringResource(id = R.string.greeting),
                             style = Typography.h2,
                             color = Color.White,
                         )
                         Spacer(modifier = Modifier.padding(10.dp))
                         Text(
-                            text = "Learn multiple languages in one place",
+                            text = stringResource(id = R.string.register_sub),
                             style = Typography.h6,
                             color = Color.White,
                         )
@@ -268,7 +269,7 @@ fun AuthScreen(
                                 .clip(RoundedCornerShape(20.dp)),
                             contentAlignment = Center
                         ) {
-                            Text(text = "Log in", style = Typography.h6, color = Color.White)
+                            Text(text = stringResource(id = R.string.login), style = Typography.h6, color = Color.White)
                         }
 
                         Box(
@@ -282,7 +283,7 @@ fun AuthScreen(
                                 .clip(RoundedCornerShape(20.dp)),
                             contentAlignment = Center
                         ) {
-                            Text(text = "Register", style = Typography.h6, color = Color.White)
+                            Text(text = stringResource(id = R.string.register), style = Typography.h6, color = Color.White)
                         }
                     }
                 }

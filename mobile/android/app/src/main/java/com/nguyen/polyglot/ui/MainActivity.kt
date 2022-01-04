@@ -7,6 +7,11 @@ import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.nguyen.polyglot.ui.screens.account.AccountViewModel
 import com.nguyen.polyglot.ui.screens.auth.AuthViewModel
@@ -18,7 +23,10 @@ import com.nguyen.polyglot.ui.screens.search.SearchViewModel
 import com.nguyen.polyglot.ui.screens.stats.StatsViewModel
 import com.nguyen.polyglot.ui.screens.videoDetail.VideoDetailViewModel
 import com.nguyen.polyglot.ui.screens.wordReview.WordReviewViewModel
+import com.nguyen.polyglot.util.DataStoreUtils
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import java.util.*
 
 @ExperimentalPagerApi
 @ExperimentalMaterialApi
@@ -45,6 +53,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
+            SetUp()
             PolygotApp(
                 authViewModel = authViewModel,
                 homeViewModel = homeViewModel,
@@ -59,9 +68,24 @@ class MainActivity : ComponentActivity() {
                 accountViewModel = accountViewModel,
             )
         }
+    }
 
+    @Composable
+    fun SetUp(){
 
+        val context = LocalContext.current
+        val configuration = LocalConfiguration.current
 
+        LaunchedEffect(true){
+            val user = DataStoreUtils.getUserFromDataStore(context)
+            user?.appLanguageId?.let{id ->
+                val locale = Locale(id)
+                configuration.setLocale(locale)
+                val resources = context.resources
+                resources.updateConfiguration(configuration, resources.displayMetrics)
+            }
+
+        }
     }
 }
 

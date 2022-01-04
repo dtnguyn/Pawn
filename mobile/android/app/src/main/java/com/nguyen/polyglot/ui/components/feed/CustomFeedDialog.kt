@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -48,7 +49,7 @@ fun CustomFeedDialog(
                         Icon(Icons.Filled.Close, "")
                     }
                     Text(
-                        text = "Custom Feed",
+                        text = stringResource(id = R.string.custom_feed),
                         style = Typography.h4,
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -65,7 +66,7 @@ fun CustomFeedDialog(
                         .align(Alignment.CenterHorizontally)
                 )
                 Text(
-                    text = "Add news or video url from outside source",
+                    text = stringResource(id = R.string.custom_feed_subtitle),
                     fontSize = 18.sp,
                     style = Typography.body1,
                     modifier = Modifier.padding(5.dp)
@@ -73,7 +74,7 @@ fun CustomFeedDialog(
                 Spacer(Modifier.padding(3.dp))
                 Row {
                     Text(
-                        text = "News",
+                        text = stringResource(id = R.string.news),
                         color = Color.White,
                         style = Typography.body1,
                         modifier = Modifier
@@ -89,7 +90,7 @@ fun CustomFeedDialog(
                     )
                     Spacer(Modifier.padding(3.dp))
                     Text(
-                        text = "Video",
+                        text = stringResource(id = R.string.video),
                         color = Color.White,
                         style = Typography.body1,
                         modifier = Modifier
@@ -111,7 +112,7 @@ fun CustomFeedDialog(
                     onValueChange = onHandleUrlChange,
                     label = {
                         Text(
-                            text = "Enter url",
+                            text = stringResource(id = R.string.url_placholder),
                             style = Typography.body2,
                             color = Color.Gray
                         )
@@ -139,7 +140,7 @@ fun CustomFeedDialog(
                     shape = RoundedCornerShape(15.dp),
                     onClick = { onAddClick(customUrl) }) {
                     Text(
-                        text = "Add",
+                        stringResource(id = R.string.add),
                         color = Color.White,
                         style = Typography.h4,
                         modifier = Modifier.align(Alignment.CenterVertically)

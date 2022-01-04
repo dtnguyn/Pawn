@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nguyen.polyglot.R
 import com.nguyen.polyglot.ui.components.RoundButton
@@ -33,13 +34,13 @@ fun TopicMenu(topics: String, onPickTopic: (topic: String) -> Unit, isPicked: (t
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(2f)) {
-                Text(text = "Feed Topics", style = Typography.h6)
-                Text(text = "Filter your feed to specific topics!", style = Typography.body1)
+                Text(text = stringResource(id = R.string.feed_topics), style = Typography.h6)
+                Text(text = stringResource(id = R.string.feed_topics_sub), style = Typography.body1)
             }
             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
                 Button(onClick = { onFinish() }, colors = ButtonDefaults.buttonColors(Blue), shape = RoundedCornerShape(20.dp)) {
                     Text(
-                        text = "Done",
+                        text = stringResource(id = R.string.done),
                         style = Typography.body1,
                     )
                 }
@@ -62,7 +63,7 @@ fun TopicMenu(topics: String, onPickTopic: (topic: String) -> Unit, isPicked: (t
                 ) {
                     onPickTopic("sports")
                 }
-                Text(text = "Sports", style = Typography.body1)
+                Text(text = stringResource(id = R.string.sport), style = Typography.body1)
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
@@ -74,7 +75,7 @@ fun TopicMenu(topics: String, onPickTopic: (topic: String) -> Unit, isPicked: (t
                 ) {
                     onPickTopic("tech")
                 }
-                Text(text = "Tech", style = Typography.body1)
+                Text(text = stringResource(id = R.string.tech), style = Typography.body1)
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
@@ -86,7 +87,7 @@ fun TopicMenu(topics: String, onPickTopic: (topic: String) -> Unit, isPicked: (t
                 ) {
                     onPickTopic("politics")
                 }
-                Text(text = "Politics", style = Typography.body1)
+                Text(text = stringResource(id = R.string.politics), style = Typography.body1)
             }
 
             Column(
@@ -100,7 +101,7 @@ fun TopicMenu(topics: String, onPickTopic: (topic: String) -> Unit, isPicked: (t
                 ) {
                     onPickTopic("gaming")
                 }
-                Text(text = "Gaming", style = Typography.body1)
+                Text(text = stringResource(id = R.string.gaming), style = Typography.body1)
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
@@ -112,7 +113,7 @@ fun TopicMenu(topics: String, onPickTopic: (topic: String) -> Unit, isPicked: (t
                 ) {
                     onPickTopic("beauty")
                 }
-                Text(text = "Beauty", style = Typography.body1)
+                Text(text = stringResource(id = R.string.beauty), style = Typography.body1)
 
 
             }
@@ -128,7 +129,7 @@ fun TopicMenu(topics: String, onPickTopic: (topic: String) -> Unit, isPicked: (t
                 ) {
                     onPickTopic("business")
                 }
-                Text(text = "Business", style = Typography.body1)
+                Text(text = stringResource(id = R.string.business), style = Typography.body1)
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
@@ -140,7 +141,7 @@ fun TopicMenu(topics: String, onPickTopic: (topic: String) -> Unit, isPicked: (t
                 ) {
                     onPickTopic("movie")
                 }
-                Text(text = "Movie", style = Typography.body1)
+                Text(text = stringResource(id = R.string.business), style = Typography.body1)
 
             }
         }

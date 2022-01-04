@@ -16,9 +16,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.nguyen.polyglot.R
 import com.nguyen.polyglot.model.Language
 import com.nguyen.polyglot.ui.SharedViewModel
 import com.nguyen.polyglot.ui.components.stats.CustomBarChart
@@ -123,7 +125,7 @@ fun StatsScreen(
                             Text(text = currentUser?.username ?: "unknown", style = Typography.h3)
                             if (currentUser?.createdAt != null) {
                                 Text(
-                                    text = "Joined since ${
+                                    text = "${stringResource(id = R.string.joined_since)} ${
                                         SimpleDateFormat("MMM, YYYY").format(
                                             SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(
                                                 currentUser.createdAt

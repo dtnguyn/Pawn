@@ -27,6 +27,7 @@ import com.nguyen.polyglot.ui.theme.TextFieldGrey
 import com.nguyen.polyglot.ui.theme.Typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.nguyen.polyglot.ui.components.account.AvatarBottomSheetContent
 import com.nguyen.polyglot.ui.components.auth.LanguageBottomSheetContent
 import com.nguyen.polyglot.util.Constants
@@ -237,11 +238,11 @@ fun AccountScreen(
                         .align(Alignment.CenterStart)
                 )
                 Text(
-                    text = "Account",
+                    text = stringResource(id = R.string.settings),
                     style = Typography.h4,
                     modifier = Modifier.align(Alignment.TopCenter)
                 )
-                Text(text = "Logout",
+                Text(text = stringResource(id = R.string.logout),
                     style = Typography.body1,
                     color = Color.Red,
                     modifier = Modifier
@@ -279,7 +280,7 @@ fun AccountScreen(
             )
             Spacer(modifier = Modifier.padding(5.dp))
             Text(
-                text = "Change profile icon",
+                text = stringResource(id = R.string.change_profile_icon),
                 style = Typography.body1,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
@@ -349,7 +350,7 @@ fun AccountScreen(
             }
             Spacer(modifier = Modifier.padding(7.dp))
             Text(
-                text = "Native language",
+                text = stringResource(id = R.string.native_language),
                 style = Typography.body1,
                 fontSize = 18.sp,
                 modifier = Modifier.padding(start = 5.dp)
@@ -384,13 +385,14 @@ fun AccountScreen(
         }
         updateInfo?.let { info ->
             UpdateDialog(
-                title = "Update account",
+                title = stringResource(id = R.string.update_account),
                 content = info.label,
                 currentValue = info.currentValue,
-                actionButtonText = "Update",
+                actionButtonText = stringResource(id = R.string.update),
                 onDismiss = {
                     updateInfo = null
                 },
+                placeholder = stringResource(id = R.string.update_placholder),
                 onAction = {
                     coroutineScope.launch {
                         when (info.label) {

@@ -10,8 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.nguyen.polyglot.R
 import com.nguyen.polyglot.model.Language
 import com.nguyen.polyglot.ui.theme.Blue
 import com.nguyen.polyglot.ui.theme.ReallyRed
@@ -35,7 +37,7 @@ fun ChooseLanguagesHeader(pickedLanguages: List<Language>, onFinish: () -> Unit)
 
     Column(Modifier.padding(30.dp)) {
         Text(
-            text = "Choose languages that you want to learn",
+            text = stringResource(id = R.string.language_menu_title),
             style = Typography.h3,
             textAlign = TextAlign.Center
         )
@@ -45,7 +47,7 @@ fun ChooseLanguagesHeader(pickedLanguages: List<Language>, onFinish: () -> Unit)
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Your picks:", style = Typography.body1)
+            Text(text = stringResource(id = R.string.your_picks), style = Typography.body1)
 
             Button(onClick = { onFinish() }, colors = ButtonDefaults.buttonColors(Blue), shape = RoundedCornerShape(20.dp), enabled = pickedLanguages.isNotEmpty()) {
                 Text(
@@ -57,7 +59,7 @@ fun ChooseLanguagesHeader(pickedLanguages: List<Language>, onFinish: () -> Unit)
         Spacer(modifier = Modifier.padding(5.dp))
         Row(Modifier.requiredHeight(32.dp)) {
             if(pickedLanguages.isEmpty()) {
-                Text(text = "Please choose at least one language", style = Typography.body1, color = ReallyRed)
+                Text(text = stringResource(id = R.string.language_menu_warning), style = Typography.body1, color = ReallyRed)
             } else {
                 pickedLanguages.forEach { language ->
                     Image(

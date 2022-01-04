@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -45,7 +46,7 @@ fun DailyWordSection(
     Column {
         if (isLoading) {
             Text(
-                text = "Daily words",
+                text = stringResource(id = R.string.daily_words),
                 modifier = Modifier.padding(
                     horizontal = 30.dp,
                     vertical = 20.dp
@@ -62,7 +63,7 @@ fun DailyWordSection(
             )
         } else if (words.isNotEmpty()) {
             Text(
-                text = "Daily words",
+                text = stringResource(id = R.string.daily_words),
                 modifier = Modifier.padding(
                     horizontal = 30.dp,
                     vertical = 20.dp

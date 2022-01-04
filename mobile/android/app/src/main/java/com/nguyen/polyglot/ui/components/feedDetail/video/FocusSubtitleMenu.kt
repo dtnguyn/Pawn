@@ -29,8 +29,10 @@ import com.nguyen.polyglot.util.UtilFunctions.reformatString
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
+import com.nguyen.polyglot.R
 import com.nguyen.polyglot.model.Word
 import com.nguyen.polyglot.ui.SharedViewModel
 import com.nguyen.polyglot.ui.components.feedDetail.news.WordDefinition
@@ -105,7 +107,7 @@ fun FocusSubtitleMenu(
         }
         else -> {
             Column(Modifier.padding(20.dp)) {
-                Text(text = "Subtitle Action", style = Typography.h6)
+                Text(text = stringResource(id = R.string.subtitle_action), style = Typography.h6)
                 Card(
                     shape = RoundedCornerShape(30.dp),
                     modifier = Modifier
@@ -132,7 +134,7 @@ fun FocusSubtitleMenu(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 if (currentFocusWord == null) Text(
-                    text = "Press and hold on a word",
+                    text = stringResource(id = R.string.subtitle_action_instruction),
                     style = Typography.body1
                 )
                 else {
@@ -149,7 +151,7 @@ fun FocusSubtitleMenu(
                             }
                         },
                         content = {
-                            Text(text = "Find definition for \"${currentFocusWord!!}\" ", style = Typography.h6)
+                            Text(text = "${stringResource(id = R.string.find_definition_for)} \"${currentFocusWord!!}\" ", style = Typography.h6)
                         },
                         shape = RoundedCornerShape(30.dp),
                         colors = ButtonDefaults.buttonColors(LightGreen),

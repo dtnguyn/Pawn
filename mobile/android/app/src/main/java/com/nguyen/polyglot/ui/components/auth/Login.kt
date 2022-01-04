@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -31,7 +32,7 @@ fun Login(navController: NavController, onLogin: (emailOrUsername: String, passw
             value = emailOrUsername,
             onValueChange = { newValue -> emailOrUsername = newValue },
             label = {
-                Text(text = "Enter your email or username", style = Typography.body2, color = Color.Gray)
+                Text(text = stringResource(id = R.string.email_or_username_placeholder), style = Typography.body2, color = Color.Gray)
             },
             singleLine = true,
             colors = TextFieldDefaults.textFieldColors(
@@ -50,7 +51,7 @@ fun Login(navController: NavController, onLogin: (emailOrUsername: String, passw
             onValueChange = { newValue -> password = newValue },
             visualTransformation = PasswordVisualTransformation(),
             label = {
-                Text(text = "Enter your password", style = Typography.body2, color = Color.Gray)
+                Text(text = stringResource(id = R.string.password_placeholder), style = Typography.body2, color = Color.Gray)
             },
             singleLine = true,
             colors = TextFieldDefaults.textFieldColors(
@@ -65,7 +66,7 @@ fun Login(navController: NavController, onLogin: (emailOrUsername: String, passw
                 .aspectRatio(5f)
         )
         Text(
-            text = "Forgot your password? Reset",
+            text = stringResource(id = R.string.forgot_password),
             style = Typography.body2,
             color = Color.Black,
             modifier = Modifier
@@ -88,10 +89,10 @@ fun Login(navController: NavController, onLogin: (emailOrUsername: String, passw
                 .padding(horizontal = 30.dp, vertical = 10.dp)
                 .aspectRatio(5f)
         ) {
-            Text(text = "Log in", style = Typography.h6, color = Color.White)
+            Text(text = stringResource(id = R.string.login), style = Typography.h6, color = Color.White)
         }
         Text(
-            text = "Or,",
+            text = stringResource(id = R.string.or),
             style = Typography.body2,
             color = Color.Black,
             modifier = Modifier.padding(top = 10.dp, end = 40.dp, start = 40.dp, bottom = 5.dp)
@@ -116,7 +117,7 @@ fun Login(navController: NavController, onLogin: (emailOrUsername: String, passw
                     modifier = Modifier.size(64.dp)
                 )
                 Text(
-                    text = "Log in with Google",
+                    text = stringResource(id = R.string.log_in_with_Google),
                     style = Typography.body1,
                     color = Color.Black,
                     modifier = Modifier.padding(start = 20.dp)

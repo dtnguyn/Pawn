@@ -41,15 +41,19 @@ class WordRepository
         language: String,
         topic: String
     ): Flow<UIState<List<Word>>> {
+        var fakeCache: List<Word>? = null
         return mainGetNetworkBoundResource(
             query = {
-                db.dailyWordDao().getMany(SimpleDateFormat("yyyy.MM.dd").format(Date()), language)
-                    .map {
-                        val filteredList = it.filter { word -> word.display }
-                        if (it.isEmpty()) null else DailyWordMapper.mapToListNetworkEntity(
-                            filteredList
-                        )
-                    }
+                flow {
+                    emit(fakeCache)
+                }
+//                db.dailyWordDao().getMany(SimpleDateFormat("yyyy.MM.dd").format(Date()), language)
+//                    .map {
+//                        val filteredList = it.filter { word -> word.display }
+//                        if (it.isEmpty()) null else DailyWordMapper.mapToListNetworkEntity(
+//                            filteredList
+//                        )
+//                    }
             },
             fetch = {
                 Log.d(TAG, "get random words")
@@ -60,14 +64,14 @@ class WordRepository
                 else throw CustomAppException(response.message)
             },
             saveFetchResult = { words ->
-                words?.let {
-                    db.dailyWordDao().clearAll(language = language)
-                    db.dailyWordDao().insertMany(DailyWordMapper.mapToListCacheEntity(it))
-                }
+                fakeCache = words
+//                words?.let {
+//                    db.dailyWordDao().clearAll(language = language)
+//                    db.dailyWordDao().insertMany(DailyWordMapper.mapToListCacheEntity(it))
+//                }
             },
             shouldFetch = {
-//                it == null
-                true
+                it == null
             },
             tag = TAG
         )

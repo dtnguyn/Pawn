@@ -18,6 +18,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.rememberImagePainter
@@ -52,7 +53,7 @@ fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
                             .size(32.dp)
                             .padding(end = 5.dp)
                     )
-                    Text(text = "News", style = Typography.subtitle1)
+                    Text(text = stringResource(id = R.string.news), style = Typography.subtitle1)
                 }
                 Text(text = feed.title, style = Typography.h5)
                 Spacer(modifier = Modifier.padding(2.dp))
@@ -90,7 +91,7 @@ fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
                             .size(32.dp)
                             .padding(end = 5.dp)
                     )
-                    Text(text = "Share", style = Typography.subtitle1)
+                    Text(text = stringResource(id = R.string.share), style = Typography.subtitle1)
                 }
             } else {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -101,7 +102,7 @@ fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
                             .size(32.dp)
                             .padding(end = 5.dp)
                     )
-                    Text(text = "Video", style = Typography.subtitle1)
+                    Text(text = stringResource(id = R.string.video), style = Typography.subtitle1)
                 }
                 Spacer(modifier = Modifier.padding(5.dp))
 
@@ -149,7 +150,7 @@ fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
                             .size(32.dp)
                             .padding(end = 5.dp)
                     )
-                    Text(text = "Share", style = Typography.subtitle1)
+                    Text(text = stringResource(id = R.string.share), style = Typography.subtitle1)
                 }
 
             }

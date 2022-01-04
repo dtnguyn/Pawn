@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -54,7 +55,7 @@ fun WordReviewResultSuccess(
         )
         Spacer(modifier = Modifier.padding(10.dp))
         Text(
-            text = "Congratulation! You have got ${scoreInPercentage.roundToInt()}% of the answers correct!",
+            text = "${stringResource(id = R.string.success_message1)} ${scoreInPercentage.roundToInt()}% ${stringResource(id = R.string.success_message2)}",
             fontSize = 18.sp,
             style = Typography.body1,
             textAlign = TextAlign.Center
@@ -70,7 +71,7 @@ fun WordReviewResultSuccess(
                 onTryAgain()
             }) {
             Text(
-                text = "Try Again",
+                text = stringResource(id = R.string.try_again),
                 style = Typography.h4,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )

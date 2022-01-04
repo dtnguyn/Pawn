@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nguyen.polyglot.R
@@ -40,12 +41,12 @@ fun WordDefinition(word: Word?, isLoading: Boolean, onBackClick: () -> Unit, onD
             }
             Spacer(modifier = Modifier.padding(5.dp))
             Text(
-                text = "Definition",
+                text = stringResource(id = R.string.definition),
                 style = Typography.h4,
             )
         }
         Text(
-            text = "Click to get more info",
+            text = stringResource(id = R.string.click_to_get_more_info),
             style = Typography.body1,
             fontSize = 18.sp,
             modifier = Modifier

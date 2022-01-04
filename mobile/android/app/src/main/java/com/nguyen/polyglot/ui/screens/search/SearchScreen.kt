@@ -16,8 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.nguyen.polyglot.R
 import com.nguyen.polyglot.model.Language
 import com.nguyen.polyglot.ui.SharedViewModel
 import com.nguyen.polyglot.ui.components.SavedWordItem
@@ -97,7 +99,7 @@ fun SearchScreen(
                     bottom = 0.dp
                 )
             ) {
-                Text(text = "Search words", style = Typography.h1)
+                Text(text = stringResource(id = R.string.search_words), style = Typography.h1)
                 Row(
                     modifier = Modifier.padding(
                         top = 5.dp
@@ -143,7 +145,7 @@ fun SearchScreen(
                     },
                     placeholder = {
                         Text(
-                            text = "Enter words...",
+                            text = stringResource(id = R.string.word_placholder),
                             style = Typography.body2,
                             color = Color.Gray
                         )

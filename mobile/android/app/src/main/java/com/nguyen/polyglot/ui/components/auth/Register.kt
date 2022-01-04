@@ -9,8 +9,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.nguyen.polyglot.R
 import com.nguyen.polyglot.ui.theme.ReallyRed
 import com.nguyen.polyglot.ui.theme.TextFieldGrey
 import com.nguyen.polyglot.ui.theme.Typography
@@ -33,7 +35,7 @@ fun Register(
             value = username,
             onValueChange = { newValue -> username = newValue },
             label = {
-                Text(text = "Enter your username", style = Typography.body2, color = Color.Gray)
+                Text(text = stringResource(id = R.string.username_placholder), style = Typography.body2, color = Color.Gray)
             },
             singleLine = true,
             colors = TextFieldDefaults.textFieldColors(
@@ -51,7 +53,7 @@ fun Register(
             value = email,
             onValueChange = { newValue -> email = newValue },
             label = {
-                Text(text = "Enter your email", style = Typography.body2, color = Color.Gray)
+                Text(text = stringResource(id = R.string.email_placeholder), style = Typography.body2, color = Color.Gray)
             },
             singleLine = true,
             colors = TextFieldDefaults.textFieldColors(
@@ -84,7 +86,7 @@ fun Register(
                     .padding(15.dp), contentAlignment = Alignment.CenterStart
             ) {
                 if (nativeLanguage.isBlank()) Text(
-                    text = "Choose your native language",
+                    text = stringResource(id = R.string.native_language_placholder),
                     style = Typography.body2,
                     color = Color.Gray
                 )
@@ -102,7 +104,7 @@ fun Register(
             onValueChange = { newValue -> password = newValue },
             visualTransformation = PasswordVisualTransformation(),
             label = {
-                Text(text = "Enter your password", style = Typography.body2, color = Color.Gray)
+                Text(text = stringResource(id = R.string.password_placeholder), style = Typography.body2, color = Color.Gray)
             },
             singleLine = true,
             colors = TextFieldDefaults.textFieldColors(
@@ -122,7 +124,7 @@ fun Register(
             visualTransformation = PasswordVisualTransformation(),
             label = {
                 Text(
-                    text = "Enter your password again",
+                    text = stringResource(id = R.string.password_verify_placeholder),
                     style = Typography.body2,
                     color = Color.Gray
                 )
@@ -148,7 +150,7 @@ fun Register(
                 .padding(horizontal = 30.dp, vertical = 20.dp)
                 .aspectRatio(5f)
         ) {
-            Text(text = "Register", style = Typography.h6, color = Color.White)
+            Text(text = stringResource(id = R.string.register), style = Typography.h6, color = Color.White)
         }
 
     }

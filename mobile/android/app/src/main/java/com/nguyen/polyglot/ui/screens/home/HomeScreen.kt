@@ -118,6 +118,7 @@ fun HomeScreen(
 
     /** Helper variables */
     val context = LocalContext.current
+    val configuration = LocalConfiguration.current
 
 
     /**   ---OBSERVERS---   */
@@ -156,6 +157,13 @@ fun HomeScreen(
                     //Update daily word count state
                     dailyWordCount = authStatusUIState.value?.user!!.dailyWordCount
                     user = authStatusUIState.value?.user
+
+                    user?.appLanguageId?.let{id ->
+                        val locale = Locale(id)
+                        configuration.setLocale(locale)
+                        val resources = context.resources
+                        resources.updateConfiguration(configuration, resources.displayMetrics)
+                    }
 
                 } else {
                     user = null

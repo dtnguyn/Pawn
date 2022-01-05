@@ -35,7 +35,7 @@
     <string name="all">Todo</string>
     <string name="word_topic_stats">Estadísticas de temas de palabras</string>
     <string name="word_topic_stats_subtitle">Esto muestra cuántas palabras en cada categoría guardó</string>
-    <string name="your_feed">Tu feed</string>
+    <string name="your_feed">Tu Feed</string>
     <string name="feed_topics">Temas del feed</string>
     <string name="feed_topics_sub">Filtra tu feed por temas específicos</string>
     <string name="feed_subtitle">Noticias y videos generados a partir de sus palabras guardadas</string>
@@ -56,11 +56,11 @@
     <string name="logout">cerrar sesión</string>
     <string name="native_language">Lengua materna</string>
     <string name="settings">Ajustes</string>
-    <string name="subscription">Suscripción</string>
-    <string name="free">Gratis</string>
-    <string name="premium">Prima</string>
+    <string name="subscription">Subscription</string>
+    <string name="free">Free</string>
+    <string name="premium">Premium</string>
     <string name="one_time">una vez</string>
-    <string name="no_ads">no_ads</string>
+    <string name="no_ads">No ads</string>
     <string name="translated_video_cation">Título de video traducido</string>
     <string name="topic_filter">Filtro de tema para palabras y noticias diarias</string>
     <string name="support">Soporte Polyglot 🚀</string>

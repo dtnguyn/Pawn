@@ -33,7 +33,7 @@
     <string name="all">All</string>
     <string name="word_topic_stats">Word Topic Stats</string>
     <string name="word_topic_stats_subtitle">This shows how many words in each category you saved</string>
-    <string name="your_feed">Your feed</string>
+    <string name="your_feed">Your Feed</string>
     <string name="feed_topics">Feed Topics</string>
     <string name="feed_topics_sub">Filter your feed to specific topics</string>
     <string name="feed_subtitle">News and videos generated from your saved words</string>
@@ -58,7 +58,7 @@
     <string name="free">Free</string>
     <string name="premium">Premium</string>
     <string name="one_time">one time</string>
-    <string name="no_ads">no_ads</string>
+    <string name="no_ads">No ads</string>
     <string name="translated_video_cation">Translated video caption</string>
     <string name="topic_filter">Topic filter for daily words and feed</string>
     <string name="support">Support Polyglot</string>

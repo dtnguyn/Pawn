@@ -49,7 +49,7 @@ fun HomeAppBar(
             Column(
                 modifier = Modifier
             ) {
-                Text(text = "Welcome to Polyglot!", color = Color.White, style = Typography.h6)
+                Text(text = stringResource(id = R.string.greeting), color = Color.White, style = Typography.h6)
                 Spacer(modifier = Modifier.padding(5.dp))
                 Button(
                     onClick = { navController.navigate("auth") },
@@ -86,7 +86,7 @@ fun HomeAppBar(
                 ) {
                     Text(text = user.username, color = Color.White, style = Typography.h6)
                     Text(
-                        text = stringResource(R.string.greeting),
+                        text = stringResource(R.string.welcome_back),
                         color = Color.White,
                         style = Typography.body1
                     )

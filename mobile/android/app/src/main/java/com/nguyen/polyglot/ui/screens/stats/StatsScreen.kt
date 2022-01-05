@@ -93,7 +93,7 @@ fun StatsScreen(
                         colors.add(generateBackgroundColorForLanguage(it.languageId))
                     }
                     allSavedWordsCount = count
-                    pieSubtitle = "$allSavedWordsCount words"
+                    pieSubtitle = "$allSavedWordsCount"
                     pieProgress = progress
                     pieColors = colors
                     languageReports = languageReportsUIState.value
@@ -142,9 +142,9 @@ fun StatsScreen(
                     }
                     Spacer(modifier = Modifier.padding(10.dp))
                     CustomPieChart(
-                        title = if (activeLanguageId == null) "All saved words"
+                        title = if (activeLanguageId == null) stringResource(id = R.string.all_saved_words)
                         else findLanguage(activeLanguageId!!)?.value ?: "",
-                        subtitle = pieSubtitle,
+                        subtitle = "$pieSubtitle ${stringResource(id = R.string.words)}",
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(1f)
@@ -161,7 +161,7 @@ fun StatsScreen(
                     Modifier.horizontalScroll(rememberScrollState())
                 ) {
                     LanguageBox(
-                        language = Language("All", "All"),
+                        language = Language("All", stringResource(id = R.string.all)),
                         wordCount = allSavedWordsCount,
                         isActive = activeLanguageId == null,
                         onClick = {
@@ -178,7 +178,7 @@ fun StatsScreen(
                                 activeLanguageId = id
                                 activeLanguageIndex = index
                                 pieTitle = findLanguage(activeLanguageId!!)?.value ?: "unknown"
-                                pieSubtitle = "${item.savedWordCount} words"
+                                pieSubtitle = "${item.savedWordCount}"
                             }
                         )
                     }

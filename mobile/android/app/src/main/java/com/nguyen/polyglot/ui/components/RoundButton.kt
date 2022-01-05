@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
@@ -18,10 +19,12 @@ fun RoundButton(
     size: Dp,
     icon: Int,
     padding: Dp = 7.dp,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
+            .composed { modifier }
             .size(size)
             .clip(CircleShape)
             .clickable(

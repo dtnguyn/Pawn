@@ -27,32 +27,49 @@ import com.nguyen.polyglot.util.DataStoreUtils.saveRefreshTokenToAuthDataStore
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeAppBar(navController: NavController, user: User?, onAccountClick: () -> Unit, onSettingClick: () -> Unit){
+fun HomeAppBar(
+    navController: NavController,
+    user: User?,
+    onAccountClick: () -> Unit,
+    onSettingClick: () -> Unit
+) {
 
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    Row(
+    Box(
         Modifier
             .fillMaxWidth()
-            .height(120.dp)
-            .padding(horizontal = 20.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+//            .height(120.dp)
+            .padding(20.dp),
+//        horizontalArrangement = Arrangement.SpaceBetween,
+//        verticalAlignment = Alignment.CenterVertically
     ) {
-        if(user == null) {
-            Column( modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .padding(10.dp)) {
+        if (user == null) {
+            Column(
+                modifier = Modifier
+            ) {
                 Text(text = "Welcome to Polyglot!", color = Color.White, style = Typography.h6)
-                Button(onClick = { navController.navigate("auth") }, colors = ButtonDefaults.buttonColors(ReallyRed), shape = RoundedCornerShape(20.dp)) {
+                Spacer(modifier = Modifier.padding(5.dp))
+                Button(
+                    onClick = { navController.navigate("auth") },
+                    colors = ButtonDefaults.buttonColors(ReallyRed),
+                    shape = RoundedCornerShape(20.dp)
+                ) {
                     Text(text = "Login", color = Color.White, style = Typography.h6)
                 }
             }
         } else {
-            Row {
+            Row(
+                modifier = Modifier.align(Alignment.CenterStart),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Image(
-                    painter = painterResource(context.resources.getIdentifier(user.avatar ?: "human1", "drawable", "com.nguyen.polyglot")),
+                    painter = painterResource(
+                        context.resources.getIdentifier(
+                            user.avatar ?: "human1", "drawable", "com.nguyen.polyglot"
+                        )
+                    ),
                     contentDescription = "avatar",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -62,18 +79,32 @@ fun HomeAppBar(navController: NavController, user: User?, onAccountClick: () -> 
                             onAccountClick()
                         })
                 )
-                Column( modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .padding(10.dp)) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(10.dp)
+                ) {
                     Text(text = user.username, color = Color.White, style = Typography.h6)
-                    Text(text = stringResource(R.string.greeting), color = Color.White, style = Typography.body1)
+                    Text(
+                        text = stringResource(R.string.greeting),
+                        color = Color.White,
+                        style = Typography.body1
+                    )
                 }
-        }
+            }
+
+            RoundButton(
+                backgroundColor = Color.White,
+                size = 55.dp,
+                icon = R.drawable.settings,
+                padding = 12.dp,
+                modifier = Modifier.align(Alignment.CenterEnd),
+                onClick = {
+                    onSettingClick()
+                })
 
         }
-        RoundButton(backgroundColor = Color.White, size = 55.dp, icon = R.drawable.settings, padding = 12.dp, onClick = {
-            onSettingClick()
-        })
+
 
     }
 

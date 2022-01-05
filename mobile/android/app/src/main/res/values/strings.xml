@@ -61,7 +61,7 @@
     <string name="no_ads">no_ads</string>
     <string name="translated_video_cation">Translated video caption</string>
     <string name="topic_filter">Topic filter for daily words and feed</string>
-    <string name="support">Support Polyglot 🚀</string>
+    <string name="support">Support Polyglot</string>
     <string name="app_language">App language</string>
     <string name="notifications">Notifications</string>
     <string name="notifications_sub">If enabled, you will receive push notifications</string>
@@ -84,7 +84,7 @@
     <string name="politics">Politics</string>
     <string name="click_to_get_more_info">Click to get more info</string>
     <string name="example">Example: </string>
-    <string name="fail_message">Hmm... It seems like you didn't pass the review, keep on practicing!</string>
+    <string name="fail_message">Hmm... It seems like you didn\'t pass the review, keep on practicing!</string>
     <string name="try_again">Try Again</string>
     <string name="success_message1">Congratulation! You have got</string>
     <string name="success_message2">of the answers correct!</string>

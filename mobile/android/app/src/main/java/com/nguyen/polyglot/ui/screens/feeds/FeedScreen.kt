@@ -1,5 +1,6 @@
 package com.nguyen.polyglot.ui.screens
 
+import android.content.Intent
 import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import androidx.compose.foundation.*
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
 import coil.ImageLoader
 import coil.decode.GifDecoder
@@ -472,6 +474,16 @@ fun FeedScreen(
                                             )
                                             navController.navigate("${PolyglotScreens.VideoDetail.route}/${feed.id}")
                                         }
+                                    },
+                                    onShare = {
+                                        val sendIntent: Intent = Intent().apply {
+                                            action = Intent.ACTION_SEND
+                                            putExtra(Intent.EXTRA_TEXT, it)
+                                            type = "text/plain"
+                                        }
+
+                                        val shareIntent = Intent.createChooser(sendIntent, null)
+                                        startActivity(context, shareIntent, null)
                                     })
                                 }
                             }

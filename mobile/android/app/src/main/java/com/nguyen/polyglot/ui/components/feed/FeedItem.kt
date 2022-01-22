@@ -31,7 +31,7 @@ import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
-fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
+fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit, onShare: (feedUrl: String) -> Unit) {
 
     Card(
         shape = RoundedCornerShape(15.dp),
@@ -83,7 +83,9 @@ fun FeedItem(feed: Feed, onClick: (feed: Feed) -> Unit) {
 
                 Spacer(modifier = Modifier.padding(5.dp))
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable {
+                    onShare(feed.url)
+                }) {
                     Image(
                         painter = painterResource(id = R.drawable.share),
                         contentDescription = "share_icon",

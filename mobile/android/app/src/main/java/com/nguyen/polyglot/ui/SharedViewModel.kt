@@ -332,6 +332,7 @@ class SharedViewModel
         }
     }
 
+
     private fun currentSavedWordList(currentLanguage: String?): List<Word>? {
         if (currentLanguage == null) return listOf()
         return when (currentLanguage) {

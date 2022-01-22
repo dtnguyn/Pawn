@@ -82,7 +82,7 @@ fun WordReviewMenuScreen(navController: NavController) {
                         style = Typography.h5,
                     )
                     Text(
-                        text = stringResource(id = R.string.login_title),
+                        text = stringResource(id = R.string.full_review_subtitle),
                         color = Color.White,
                         style = Typography.body1,
                     )

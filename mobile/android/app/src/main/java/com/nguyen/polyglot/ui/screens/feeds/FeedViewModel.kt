@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nguyen.polyglot.model.Feed
 import com.nguyen.polyglot.repo.FeedRepository
+import com.nguyen.polyglot.util.Constants.allFeedTopics
 import com.nguyen.polyglot.util.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
@@ -20,9 +21,6 @@ class FeedViewModel@Inject constructor (
     private val feedRepo: FeedRepository,
 ): ViewModel()  {
 
-    companion object {
-        private val allTopics = listOf("sports", "gaming", "business", "tech", "beauty", "movie", "politics")
-    }
 
     private val _enFeedItems: MutableState<UIState<List<Feed>>> = mutableStateOf(UIState.Initial(listOf()))
     val enFeedItems: State<UIState<List<Feed>>> = _enFeedItems
@@ -36,8 +34,8 @@ class FeedViewModel@Inject constructor (
     private val _deFeedItems: MutableState<UIState<List<Feed>>> = mutableStateOf(UIState.Initial(listOf()))
     val deFeedItems: State<UIState<List<Feed>>> = _deFeedItems
 
-    private val _topics: MutableState<UIState<String>> = mutableStateOf(UIState.Initial(""))
-    val topics: State<UIState<String>> = _topics
+//    private val _topics: MutableState<UIState<String>> = mutableStateOf(UIState.Initial(""))
+//    val topics: State<UIState<String>> = _topics
 
     private val topicMap = HashMap<String, Boolean?>()
 
@@ -45,7 +43,7 @@ class FeedViewModel@Inject constructor (
     var currentFeedOffset = 0
 
     init {
-        allTopics.forEach {
+        allFeedTopics.forEach {
             topicMap[it] = false
         }
     }
@@ -78,67 +76,69 @@ class FeedViewModel@Inject constructor (
         }
     }
 
-    fun updateTopics(accessToken: String?) {
-        if(accessToken.isNullOrBlank()){
-            _topics.value = UIState.Error("Please login to update topics!")
-            return
-        }
-
-        var newTopicString = ""
-        allTopics.forEach {
-            if(topicMap[it] == true){
-                newTopicString += "$it,"
-            }
-        }
-        //Update topic on server
-        viewModelScope.launch {
-            feedRepo.updateTopics(accessToken, newTopicString).collectLatest {
-                _topics.value = it
-            }
-        }
-    }
+//    fun updateTopics(accessToken: String?) {
+//        if(accessToken.isNullOrBlank()){
+//            _topics.value = UIState.Error("Please login to update topics!")
+//            return
+//        }
+//
+//        var newTopicString = ""
+//        allFeedTopics.forEach {
+//            if(topicMap[it] == true){
+//                newTopicString += "$it,"
+//            }
+//        }
+//        //Update topic on server
+//        viewModelScope.launch {
+//            feedRepo.updateTopics(accessToken, newTopicString).collectLatest {
+//                _topics.value = it
+//            }
+//        }
+//    }
 
     fun pickTopic(topic: String){
-        if(topic.isNotEmpty()) {
+        if(topic.isNotBlank()) {
             topicMap[topic] = !(topicMap[topic] ?: false)
 
             // This is just for the ui to recompose
-            _topics.value = UIState.Loaded(topics.value.value)
+//            _topics.value = UIState.Loaded(topics.value.value)
         }
     }
 
-    fun getTopics(accessToken: String?) {
-        if(accessToken.isNullOrBlank()){
-            _topics.value = UIState.Error("Please login to update topics!")
-            return
-        }
-        viewModelScope.launch {
-            feedRepo.getTopics(accessToken).collectLatest {state ->
-                _topics.value = state
-
-                state.value?.let {
-                    it.split(",").map { it.trim() }.forEach { topic ->
-                        if(topic.isNotEmpty()){
-                            topicMap[topic] = true
-                        }
-                    }
-                }
-
-            }
-        }
-    }
+//    fun getTopics(accessToken: String?) {
+//        if(accessToken.isNullOrBlank()){
+//            _topics.value = UIState.Error("Please login to update topics!")
+//            return
+//        }
+//        viewModelScope.launch {
+//            feedRepo.getTopics(accessToken).collectLatest {state ->
+//                _topics.value = state
+//
+//                state.value?.let {
+//                    it.split(",").map { it.trim() }.forEach { topic ->
+//                        if(topic.isNotEmpty()){
+//                            topicMap[topic] = true
+//                        }
+//                    }
+//                }
+//
+//            }
+//        }
+//    }
 
     fun dismissTopics(){
-        allTopics.forEach {
+        allFeedTopics.forEach {
             topicMap[it] = false
         }
-        topics.value.value?.let {
-            it.split(",").map { it.trim() }.forEach { topic ->
-                if(topic.isNotEmpty()){
-                    topicMap[topic] = true
-                }
-            }
-        }
+
+
+//        topics.value.value?.let {
+//            it.split(",").map { it.trim() }.forEach { topic ->
+//                if(topic.isNotEmpty()){
+//                    topicMap[topic] = true
+//                }
+//            }
+//        }
     }
 
     fun isTopicPicked(topic: String): Boolean {

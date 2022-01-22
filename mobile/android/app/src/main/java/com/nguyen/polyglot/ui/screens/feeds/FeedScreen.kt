@@ -28,6 +28,8 @@ import com.nguyen.polyglot.ui.components.feed.*
 import com.nguyen.polyglot.ui.navigation.PolyglotScreens
 import com.nguyen.polyglot.ui.screens.feeds.FeedViewModel
 import com.nguyen.polyglot.ui.theme.*
+import com.nguyen.polyglot.util.Constants
+import com.nguyen.polyglot.util.Constants.allFeedTopics
 import com.nguyen.polyglot.util.DataStoreUtils
 import com.nguyen.polyglot.util.UIState
 import kotlinx.coroutines.launch
@@ -43,7 +45,8 @@ fun FeedScreen(
     navController: NavController
 ) {
 
-
+    val authStatusUIState by sharedViewModel.authStatusUIState
+    var user by remember { mutableStateOf(authStatusUIState.value?.user) }
 
     val enFeedUIState: UIState<List<Feed>> by feedViewModel.enFeedItems
     var enFeedItems by remember { mutableStateOf(enFeedUIState.value) }
@@ -81,8 +84,7 @@ fun FeedScreen(
 
 
 
-    val topicsUIState: UIState<String> by feedViewModel.topics
-    var topics by remember { mutableStateOf(topicsUIState.value ?: "") }
+    var topics by remember { mutableStateOf(user?.feedTopics ?: "") }
 
     val context = LocalContext.current
     val currentPickedLanguage: Language? by sharedViewModel.currentPickedLanguage
@@ -108,31 +110,102 @@ fun FeedScreen(
             }
         }.build()
 
+    suspend fun updateFeedTopics(newFeedTopics: String) {
+        Log.d("AccountScreen", "Debug Account Screen 1")
+        if (authStatusUIState.value == null) return
+        if (user == null) return
+        Log.d("AccountScreen", "Debug Account Screen 2")
 
-    LaunchedEffect(true) {
-        feedViewModel.getTopics(DataStoreUtils.getAccessTokenFromDataStore(context))
+        sharedViewModel.updateUser(
+            accessToken = DataStoreUtils.getAccessTokenFromDataStore(context),
+            currentAuthStatus = authStatusUIState.value!!,
+            username = user!!.username,
+            email = user!!.email,
+            avatar = user!!.avatar,
+            dailyWordCount = user!!.dailyWordCount,
+            notificationEnabled = user!!.notificationEnabled,
+            nativeLanguageId = user!!.nativeLanguageId,
+            appLanguageId = user!!.appLanguageId,
+            dailyWordTopic = user!!.dailyWordTopic,
+            feedTopics = newFeedTopics
+        )
     }
 
-    LaunchedEffect(topicsUIState) {
-        when (topicsUIState) {
+
+    LaunchedEffect(bottomSheetScaffoldState.isVisible) {
+        if(bottomSheetScaffoldState.isVisible.not()){
+            feedViewModel.dismissTopics()
+
+            user?.feedTopics?.let {
+                feedViewModel.dismissTopics()
+                it.split(",").map { it.trim() }.forEach { topic ->
+                    if(topic.isNotEmpty()){
+                        feedViewModel.pickTopic(topic)
+                    }
+                }
+                topics = it
+            }
+
+        }
+//        feedViewModel.getTopics(DataStoreUtils.getAccessTokenFromDataStore(context))
+    }
+
+//    LaunchedEffect(topicsUIState) {
+//        when (topicsUIState) {
+//            is UIState.Initial -> {
+//
+//            }
+//            is UIState.Loading -> {
+//                Log.d("FeedScreen", "topics loading")
+//            }
+//            is UIState.Error -> {
+//                Log.d("FeedScreen", "topics error: ${topicsUIState.errorMsg}")
+//            }
+//            is UIState.Loaded -> {
+//                Log.d("FeedScreen", "topics loaded: ${topicsUIState.value}")
+//                if (topicsUIState.value != null) {
+//                    topics = topicsUIState.value!!
+//                }
+//            }
+//        }
+//    }
+
+    LaunchedEffect(authStatusUIState) {
+        when (authStatusUIState) {
             is UIState.Initial -> {
 
             }
-            is UIState.Loading -> {
-                Log.d("FeedScreen", "topics loading")
-            }
+
             is UIState.Error -> {
-                Log.d("FeedScreen", "topics error: ${topicsUIState.errorMsg}")
+
+            }
+            is UIState.Loading -> {
+
             }
             is UIState.Loaded -> {
-                Log.d("FeedScreen", "topics loaded: ${topicsUIState.value}")
-                if (topicsUIState.value != null) {
-                    topics = topicsUIState.value!!
+                Log.d("AccountScreen", "authStatus Loaded ${authStatusUIState.value}")
+
+                authStatusUIState.value?.user?.let {
+                    user = it
+
+                    user?.feedTopics?.let {
+                        feedViewModel.dismissTopics()
+                        it.split(",").map { it.trim() }.forEach { topic ->
+                            if(topic.isNotEmpty()){
+                                feedViewModel.pickTopic(topic)
+                            }
+                        }
+                        topics = it
+                    }
+
+
+                    // Store the state to DataStore
+                    DataStoreUtils.saveTokenToDataStore(context, authStatusUIState.value!!.token)
+                    DataStoreUtils.saveUserToDataStore(context, it)
                 }
             }
         }
     }
-
 
 
     LaunchedEffect(currentPickedLanguage) {
@@ -262,17 +335,24 @@ fun FeedScreen(
                 topics = topics,
                 onPickTopic = {
                     feedViewModel.pickTopic(it)
+                    Log.d("FeedScreen", "topics: $topics | $it" )
+//                    topics = "$topics, $it,"
+                    topics += "$it,"
+
                 },
                 isPicked = {
                     feedViewModel.isTopicPicked(it)
                 },
                 onFinish = {
                     coroutineScope.launch {
-                        feedViewModel.updateTopics(
-                            DataStoreUtils.getAccessTokenFromDataStore(
-                                context
-                            )
-                        )
+                        var newTopicString = ""
+                        allFeedTopics.forEach {
+                            if(feedViewModel.isTopicPicked(it)){
+                                newTopicString += "$it,"
+                            }
+                        }
+                        updateFeedTopics(newTopicString)
+                        topics = newTopicString
                         bottomSheetScaffoldState.hide()
                     }
                 },

@@ -1,6 +1,7 @@
 package com.nguyen.polyglot.ui.screens.setting
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.nguyen.polyglot.R
 import com.nguyen.polyglot.ui.SharedViewModel
+import com.nguyen.polyglot.ui.components.CircularLoadingBar
 import com.nguyen.polyglot.ui.components.auth.LanguageBottomSheetContent
 import com.nguyen.polyglot.ui.theme.*
 import com.nguyen.polyglot.util.Constants
@@ -49,6 +51,7 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
 
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
     val coroutineScope = rememberCoroutineScope()
+    var loading by remember { mutableStateOf(false) }
 
 
     fun toggleBottomSheet() {
@@ -144,14 +147,15 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
             }
 
             is UIState.Error -> {
-
+                Toast.makeText(context, authStatusUIState.errorMsg, Toast.LENGTH_SHORT).show()
+                loading = false
             }
             is UIState.Loading -> {
-
+                loading = true
             }
             is UIState.Loaded -> {
                 Log.d("SettingScreen", "authStatus Loaded ${authStatusUIState.value}")
-
+                loading = false
                 authStatusUIState.value?.user?.let {
                     user = it
 
@@ -519,4 +523,9 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
 
         }
     }
+
+    if(loading){
+        CircularLoadingBar()
+    }
+
 }

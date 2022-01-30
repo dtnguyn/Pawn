@@ -33,33 +33,39 @@ fun WordCollapseSection(wordDetail: WordDetail?, loading: Boolean){
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (wordDetail == null || loading) {
-                ShimmerAnimation(
-                    modifier = Modifier
-                        .width(250.dp)
-                        .height(50.dp),
-                    shape = RoundedCornerShape(30.dp)
-                )
-                Spacer(modifier = Modifier.padding(5.dp))
-                ShimmerAnimation(
-                    modifier = Modifier
-                        .width(100.dp)
-                        .height(50.dp),
-                    shape = RoundedCornerShape(30.dp)
-                )
-            } else {
-                Text(text = wordDetail.value, style = Typography.h1, color = Color.White)
-                Spacer(modifier = Modifier.padding(5.dp))
-                wordDetail.pronunciations.forEach {
-                    if (it.symbol != null) {
-                        Text(
-                            text = it.symbol,
-                            style = Typography.body2,
-                            color = Color.White
-                        )
-                    }
+            when {
+                loading -> {
+                    ShimmerAnimation(
+                        modifier = Modifier
+                            .width(250.dp)
+                            .height(50.dp),
+                        shape = RoundedCornerShape(30.dp)
+                    )
+                    Spacer(modifier = Modifier.padding(5.dp))
+                    ShimmerAnimation(
+                        modifier = Modifier
+                            .width(100.dp)
+                            .height(50.dp),
+                        shape = RoundedCornerShape(30.dp)
+                    )
                 }
-                Spacer(modifier = Modifier.padding(10.dp))
+                wordDetail == null -> {
+                    Text(text = "Word not found! Try again!", style = Typography.h6, color = Color.White)
+                }
+                else -> {
+                    Text(text = wordDetail.value, style = Typography.h1, color = Color.White)
+                    Spacer(modifier = Modifier.padding(5.dp))
+                    wordDetail.pronunciations.forEach {
+                        if (it.symbol != null) {
+                            Text(
+                                text = it.symbol,
+                                style = Typography.body2,
+                                color = Color.White
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.padding(10.dp))
+                }
             }
         }
     }

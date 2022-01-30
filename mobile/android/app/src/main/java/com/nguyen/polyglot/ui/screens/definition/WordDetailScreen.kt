@@ -3,6 +3,7 @@ package com.nguyen.polyglot.ui.screens
 import android.media.MediaPlayer
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -87,7 +88,7 @@ fun WordDetailScreen(
             is UIState.Error -> {
                 // Show error dialog
                 loading = false
-                Log.d(TAG, "error ${wordDetailUIState.errorMsg}")
+                Toast.makeText(context, wordDetailUIState.errorMsg, Toast.LENGTH_SHORT).show()
             }
             is UIState.Loaded -> {
                 if (wordDetailUIState.value != null) {

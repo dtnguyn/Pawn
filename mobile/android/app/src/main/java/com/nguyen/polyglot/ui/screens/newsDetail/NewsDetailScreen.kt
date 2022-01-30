@@ -3,6 +3,7 @@ package com.nguyen.polyglot.ui.screens.newsDetail
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -100,7 +101,7 @@ fun NewsDetailScreen(
             }
             is UIState.Error -> {
                 loading = false
-
+                Toast.makeText(context, newsDetailUIState.errorMsg, Toast.LENGTH_SHORT).show()
             }
             is UIState.Loaded -> {
                 loading = false
@@ -128,7 +129,7 @@ fun NewsDetailScreen(
 
             }
             is UIState.Error -> {
-
+                Toast.makeText(context, wordDefinitionUIState.errorMsg, Toast.LENGTH_SHORT).show()
             }
             is UIState.Loaded -> {
                 wordDefinition = wordDefinitionUIState.value

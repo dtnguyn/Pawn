@@ -1,6 +1,7 @@
 package com.nguyen.polyglot.ui.screens
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -148,6 +149,8 @@ fun HomeScreen(
             is UIState.Loading -> {
                 Log.d(TAG, "authStatusUIState Loading")
                 isLoadingUser = true
+                Toast.makeText(context, authStatusUIState.errorMsg, Toast.LENGTH_SHORT).show()
+
             }
             is UIState.Loaded -> {
                 Log.d(TAG, "authStatusUIState Loaded ${authStatusUIState.value}")
@@ -192,7 +195,7 @@ fun HomeScreen(
             is UIState.Initial -> {
             }
             is UIState.Error -> {
-
+                Toast.makeText(context, pickedLanguagesUIState.errorMsg, Toast.LENGTH_SHORT).show()
             }
             is UIState.Loading -> {
             }
@@ -239,11 +242,14 @@ fun HomeScreen(
                 if (currentPickedLanguage?.id == "en_US") {
                     isLoadingDailyWords = false
                 }
+                Toast.makeText(context, dailyEnWordsUIState.errorMsg, Toast.LENGTH_SHORT).show()
+
             }
             is UIState.Loading -> {
                 if (currentPickedLanguage?.id == "en_US") {
                     isLoadingDailyWords = true
                 }
+
             }
             is UIState.Loaded -> {
                 if (currentPickedLanguage?.id == "en_US") {
@@ -265,6 +271,8 @@ fun HomeScreen(
                 if (currentPickedLanguage?.id == "es") {
                     isLoadingDailyWords = false
                 }
+                Toast.makeText(context, dailyEsWordsUIState.errorMsg, Toast.LENGTH_SHORT).show()
+
             }
             is UIState.Loading -> {
                 if (currentPickedLanguage?.id == "es") {
@@ -290,6 +298,8 @@ fun HomeScreen(
                 if (currentPickedLanguage?.id == "fr") {
                     isLoadingDailyWords = false
                 }
+                Toast.makeText(context, dailyFrWordsUIState.errorMsg, Toast.LENGTH_SHORT).show()
+
             }
             is UIState.Loading -> {
                 if (currentPickedLanguage?.id == "fr") {
@@ -315,6 +325,8 @@ fun HomeScreen(
                 if (currentPickedLanguage?.id == "de") {
                     isLoadingDailyWords = false
                 }
+                Toast.makeText(context, dailyDeWordsUIState.errorMsg, Toast.LENGTH_SHORT).show()
+
             }
             is UIState.Loading -> {
                 if (currentPickedLanguage?.id == "de") {
@@ -344,6 +356,8 @@ fun HomeScreen(
         when (savedEnWordsUIState) {
             is UIState.Error -> {
                 Log.d(TAG, "saved words error: ${savedEnWordsUIState.errorMsg}")
+                Toast.makeText(context, savedEnWordsUIState.errorMsg, Toast.LENGTH_SHORT).show()
+
             }
             is UIState.Initial -> {
                 savedEnWords = savedEnWordsUIState.value
@@ -361,6 +375,8 @@ fun HomeScreen(
         when (savedEsWordsUIState) {
             is UIState.Error -> {
                 Log.d(TAG, "saved words error: ${savedEsWordsUIState.errorMsg}")
+                Toast.makeText(context, savedEnWordsUIState.errorMsg, Toast.LENGTH_SHORT).show()
+
             }
             is UIState.Initial -> {
                 savedEsWords = savedEsWordsUIState.value
@@ -378,6 +394,8 @@ fun HomeScreen(
         when (savedFrWordsUIState) {
             is UIState.Error -> {
                 Log.d(TAG, "saved words error: ${savedFrWordsUIState.errorMsg}")
+                Toast.makeText(context, savedFrWordsUIState.errorMsg, Toast.LENGTH_SHORT).show()
+
             }
             is UIState.Initial -> {
                 savedFrWords = savedFrWordsUIState.value
@@ -395,6 +413,8 @@ fun HomeScreen(
         when (savedDeWordsUIState) {
             is UIState.Error -> {
                 Log.d(TAG, "saved words error: ${savedDeWordsUIState.errorMsg}")
+                Toast.makeText(context, savedDeWordsUIState.errorMsg, Toast.LENGTH_SHORT).show()
+
             }
             is UIState.Initial -> {
                 savedDeWords = savedDeWordsUIState.value

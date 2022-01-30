@@ -1,5 +1,6 @@
 package com.nguyen.polyglot.ui.screens
 
+import android.widget.Toast
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -15,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -53,7 +55,7 @@ fun SearchScreen(
     var searchJob: Job? = null
     val coroutineScope = rememberCoroutineScope()
     val currentPickedLanguage: Language? by sharedViewModel.currentPickedLanguage
-
+    val context = LocalContext.current
 
     LaunchedEffect(autoCompleteWordsUIState) {
         when (autoCompleteWordsUIState) {
@@ -66,6 +68,8 @@ fun SearchScreen(
             is UIState.Error -> {
                 loading = false
                 autoCompleteWords = listOf()
+                Toast.makeText(context, autoCompleteWordsUIState.errorMsg, Toast.LENGTH_SHORT).show()
+
             }
             is UIState.Loaded -> {
                 loading = false

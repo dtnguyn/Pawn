@@ -1,6 +1,7 @@
 package com.nguyen.polyglot.ui.screens.account
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,6 +29,7 @@ import com.nguyen.polyglot.ui.theme.Typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.nguyen.polyglot.ui.components.CircularLoadingBar
 import com.nguyen.polyglot.ui.components.account.AvatarBottomSheetContent
 import com.nguyen.polyglot.ui.components.auth.LanguageBottomSheetContent
 import com.nguyen.polyglot.util.Constants
@@ -57,6 +59,7 @@ fun AccountScreen(
     var bottomSheetMenu by remember { mutableStateOf("avatar") }
     val resources = LocalContext.current.resources
     var currentPickedAvatar by remember { mutableStateOf(user?.avatar ?: "human1") }
+    var loading by remember { mutableStateOf(false) }
 
 
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
@@ -160,12 +163,16 @@ fun AccountScreen(
             }
 
             is UIState.Error -> {
-
+                loading = false
+                Toast.makeText(context, authStatusUIState.errorMsg, Toast.LENGTH_SHORT).show()
             }
             is UIState.Loading -> {
+                loading = true
+                Log.d("AccountScreen", "authStatus loading ${authStatusUIState.value}")
 
             }
             is UIState.Loaded -> {
+                loading = false
                 Log.d("AccountScreen", "authStatus Loaded ${authStatusUIState.value}")
 
                 authStatusUIState.value?.user?.let {
@@ -407,5 +414,10 @@ fun AccountScreen(
             )
         }
     }
+
+    if(loading){
+        CircularLoadingBar()
+    }
+
 
 }

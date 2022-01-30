@@ -3,6 +3,7 @@ package com.nguyen.polyglot.ui.screens
 import android.content.Intent
 import android.os.Build.VERSION.SDK_INT
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -179,7 +180,7 @@ fun FeedScreen(
             }
 
             is UIState.Error -> {
-
+                Toast.makeText(context, authStatusUIState.errorMsg, Toast.LENGTH_SHORT).show()
             }
             is UIState.Loading -> {
 
@@ -232,6 +233,7 @@ fun FeedScreen(
             is UIState.Error -> {
                 Log.d("FeedScreen", "error ${enFeedUIState.errorMsg}")
                 isLoading = false
+                Toast.makeText(context, enFeedUIState.errorMsg, Toast.LENGTH_SHORT).show()
             }
 
             is UIState.Loaded -> {
@@ -258,6 +260,8 @@ fun FeedScreen(
             is UIState.Error -> {
                 Log.d("FeedScreen", "error ${esFeedUIState.errorMsg}")
                 isLoading = false
+                Toast.makeText(context, esFeedUIState.errorMsg, Toast.LENGTH_SHORT).show()
+
             }
 
             is UIState.Loaded -> {
@@ -285,6 +289,8 @@ fun FeedScreen(
             is UIState.Error -> {
                 Log.d("FeedScreen", "error ${frFeedUIState.errorMsg}")
                 isLoading = false
+                Toast.makeText(context, frFeedUIState.errorMsg, Toast.LENGTH_SHORT).show()
+
             }
 
             is UIState.Loaded -> {
@@ -313,6 +319,8 @@ fun FeedScreen(
             is UIState.Error -> {
                 Log.d("FeedScreen", "error ${deFeedUIState.errorMsg}")
                 isLoading = false
+                Toast.makeText(context, deFeedUIState.errorMsg, Toast.LENGTH_SHORT).show()
+
             }
 
             is UIState.Loaded -> {

@@ -3,6 +3,7 @@ package com.nguyen.polyglot.ui.screens.newsDetail
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -108,7 +109,7 @@ fun VideoDetailScreen(
 
             }
             is UIState.Error -> {
-
+                Toast.makeText(context, videoSubtitleUIState.errorMsg, Toast.LENGTH_SHORT).show()
             }
             is UIState.Loaded -> {
                 Log.d("VideoDetailScreen", "videoSubtitle value ${videoSubtitleUIState.value}")

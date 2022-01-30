@@ -3,6 +3,7 @@ package com.nguyen.polyglot.ui.screens.wordReview
 import android.media.MediaPlayer
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -27,6 +28,7 @@ import androidx.navigation.NavController
 import com.nguyen.polyglot.R
 import com.nguyen.polyglot.model.ReviewQuestion
 import com.nguyen.polyglot.ui.SharedViewModel
+import com.nguyen.polyglot.ui.components.CircularLoadingBar
 import com.nguyen.polyglot.ui.components.RoundButton
 import com.nguyen.polyglot.ui.theme.*
 import com.nguyen.polyglot.util.UIState
@@ -48,6 +50,7 @@ fun WordReviewScreen(
     val correctAnswerCount by viewModel.correctAnswerCount
     var currentChoice by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
+    var loading by remember { mutableStateOf(false) }
 
 
     fun answerColor(question: ReviewQuestion, answer: String): Color {
@@ -76,15 +79,16 @@ fun WordReviewScreen(
         when (questionsUIState) {
 
             is UIState.Initial -> {
-
             }
             is UIState.Loading -> {
-
+                loading = true
             }
             is UIState.Error -> {
-
+                Toast.makeText(context, questionsUIState.errorMsg, Toast.LENGTH_SHORT).show()
+                loading = false
             }
             is UIState.Loaded -> {
+                loading = false
                 questions = questionsUIState.value
                 Log.d("WordReviewScreen", "questions: ${questionsUIState.value?.size}")
             }
@@ -278,7 +282,10 @@ fun WordReviewScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
             }
         }
+    }
 
+    if(loading){
+        CircularLoadingBar()
     }
 }
 

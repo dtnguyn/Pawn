@@ -31,6 +31,10 @@ class SearchViewModel
             _autoCompleteWordsUIState.value = UIState.Error("No current language provided!")
             return
         }
+        if(search.isBlank()) {
+            _autoCompleteWordsUIState.value = UIState.Loaded(listOf())
+            return
+        }
         viewModelScope.launch {
             wordRepo.getAutoCompleteWords(search, targetLanguage).collectLatest {
                 _autoCompleteWordsUIState.value = it

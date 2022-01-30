@@ -34,7 +34,9 @@ import com.nguyen.polyglot.ui.theme.*
 import com.nguyen.polyglot.util.UIState
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import com.nguyen.polyglot.model.Word
 import com.nguyen.polyglot.ui.SharedViewModel
 import com.nguyen.polyglot.util.DataStoreUtils
@@ -62,6 +64,7 @@ fun WordDetailScreen(
     val savedEsWordsUIState: UIState<List<Word>> by sharedViewModel.savedEsWordsUIState
     val savedFrWordsUIState: UIState<List<Word>> by sharedViewModel.savedFrWordsUIState
     val savedDeWordsUIState: UIState<List<Word>> by sharedViewModel.savedDeWordsUIState
+    val localClipboardManager = LocalClipboardManager.current
     var wordDetail by remember { mutableStateOf(wordDetailUIState.value) }
     var isSaved by remember {
         mutableStateOf(
@@ -147,7 +150,12 @@ fun WordDetailScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        RoundedSquareButton(backgroundColor = LightGreen, icon = R.drawable.copy) {}
+                        RoundedSquareButton(backgroundColor = LightGreen, icon = R.drawable.copy) {
+                            wordDetail?.let { detail ->
+                                localClipboardManager.setText(AnnotatedString(detail.value))
+                                Toast.makeText(context, "Word copied to clipboard!", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                         RoundButton(
                             backgroundColor = LightGrey,
                             size = 70.dp,

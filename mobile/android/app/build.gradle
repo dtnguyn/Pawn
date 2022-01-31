@@ -114,8 +114,9 @@ dependencies {
     implementation("io.coil-kt:coil-gif:1.4.0")
 
 
-
-
+    // Google Play billing
+    def billing_version = "4.0.0"
+    implementation "com.android.billingclient:billing:$billing_version"
 
 
 

@@ -1,5 +1,6 @@
 package com.nguyen.polyglot.ui
 
+import android.app.Activity
 import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -54,6 +55,7 @@ import com.nguyen.polyglot.util.DataStoreUtils
 @ExperimentalFoundationApi
 @Composable
 fun PolygotApp(
+    activity: Activity,
     authViewModel: AuthViewModel,
     homeViewModel: HomeViewModel,
     wordDetailViewModel: WordDetailViewModel,
@@ -222,7 +224,7 @@ fun PolygotApp(
                     AccountScreen(navController = navController, sharedViewModel = sharedViewModel, viewModel = accountViewModel)
                 }
                 composable(PolyglotScreens.Setting.route) {
-                    SettingScreen(navController = navController, sharedViewModel = sharedViewModel)
+                    SettingScreen(activity = activity, navController = navController, sharedViewModel = sharedViewModel)
                 }
             }
         }

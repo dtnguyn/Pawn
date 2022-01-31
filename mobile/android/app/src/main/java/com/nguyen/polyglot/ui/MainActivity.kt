@@ -1,9 +1,12 @@
 package com.nguyen.polyglot.ui
 
+import android.content.Context
+import android.content.ContextWrapper
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
@@ -55,6 +58,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             SetUp()
             PolygotApp(
+                activity = this,
                 authViewModel = authViewModel,
                 homeViewModel = homeViewModel,
                 sharedViewModel = sharedViewModel,
@@ -87,5 +91,8 @@ class MainActivity : ComponentActivity() {
 
         }
     }
+
+
+
 }
 

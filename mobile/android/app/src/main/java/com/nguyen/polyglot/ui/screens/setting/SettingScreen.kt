@@ -1,7 +1,11 @@
 package com.nguyen.polyglot.ui.screens.setting
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.android.billingclient.api.*
 import com.nguyen.polyglot.R
 import com.nguyen.polyglot.ui.SharedViewModel
 import com.nguyen.polyglot.ui.components.CircularLoadingBar
@@ -28,6 +33,7 @@ import com.nguyen.polyglot.ui.components.auth.LanguageBottomSheetContent
 import com.nguyen.polyglot.ui.theme.*
 import com.nguyen.polyglot.util.Constants
 import com.nguyen.polyglot.util.Constants.dailyWordTopics
+import com.nguyen.polyglot.util.Constants.productIds
 import com.nguyen.polyglot.util.DataStoreUtils
 import com.nguyen.polyglot.util.UIState
 import com.nguyen.polyglot.util.UtilFunctions.fromLanguageId
@@ -36,7 +42,7 @@ import java.util.*
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel) {
+fun SettingScreen(activity: Activity, navController: NavController, sharedViewModel: SharedViewModel) {
 
     val authStatusUIState by sharedViewModel.authStatusUIState
     var user by remember { mutableStateOf(authStatusUIState.value?.user) }
@@ -52,6 +58,59 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
     val coroutineScope = rememberCoroutineScope()
     var loading by remember { mutableStateOf(false) }
+
+    var skuDetails: SkuDetails? = null
+
+
+    val billingClient = BillingClient.newBuilder(context)
+        .enablePendingPurchases()
+        .setListener { billingResult, mutableList ->
+            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && mutableList != null) {
+                for (purchase in mutableList) {
+                    if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED && !purchase.isAcknowledged) {
+                        coroutineScope.launch {
+                            sharedViewModel.purchasePremium(
+                                DataStoreUtils.getAccessTokenFromDataStore(
+                                    context
+                                ),
+                                purchase.orderId,
+                                purchase.purchaseToken,
+                                purchase.purchaseTime.toString()
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        .build()
+
+
+    billingClient.startConnection(object: BillingClientStateListener {
+        override fun onBillingServiceDisconnected() {
+
+        }
+
+        override fun onBillingSetupFinished(result: BillingResult) {
+            if(result.responseCode == BillingClient.BillingResponseCode.OK){
+                val getProductDetailsQuery = SkuDetailsParams.newBuilder().setSkusList(productIds).setType(BillingClient.SkuType.INAPP).build()
+                billingClient.querySkuDetailsAsync(getProductDetailsQuery, object: SkuDetailsResponseListener {
+                    override fun onSkuDetailsResponse(
+                        billingResult: BillingResult,
+                        list: MutableList<SkuDetails>?
+                    ) {
+                        if(billingResult.responseCode == BillingClient.BillingResponseCode.OK && list != null){
+                            skuDetails = list.first()
+                        }
+                    }
+
+                })
+            }
+        }
+
+    })
+
+
+
 
 
     fun toggleBottomSheet() {
@@ -139,6 +198,7 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
             feedTopics = user!!.feedTopics
         )
     }
+
 
     LaunchedEffect(authStatusUIState) {
         when (authStatusUIState) {
@@ -279,7 +339,13 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
                         modifier = Modifier
                             .clip(RoundedCornerShape(15.dp))
                             .fillMaxWidth()
-                            .clickable { }
+                            .clickable {
+                                billingClient.launchBillingFlow(activity, BillingFlowParams.newBuilder().setSkuDetails(skuDetails!!).build())
+
+//                                skuDetails?.let {
+//                                    billingClient.launchBillingFlow(activity, BillingFlowParams.newBuilder().setSkuDetails(it).build())
+//                                }
+                            }
                     ) {
                         Column(Modifier.padding(10.dp)) {
                             Text(
@@ -524,8 +590,14 @@ fun SettingScreen(navController: NavController, sharedViewModel: SharedViewModel
         }
     }
 
-    if(loading){
+    if (loading) {
         CircularLoadingBar()
     }
 
+}
+
+fun Context.getActivity(): AppCompatActivity? = when (this) {
+    is AppCompatActivity -> this
+    is ContextWrapper -> baseContext.getActivity()
+    else -> null
 }

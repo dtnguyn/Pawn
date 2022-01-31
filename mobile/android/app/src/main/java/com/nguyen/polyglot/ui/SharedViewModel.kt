@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.nguyen.polyglot.model.*
 import com.nguyen.polyglot.repo.AuthRepository
 import com.nguyen.polyglot.repo.LanguageRepository
+import com.nguyen.polyglot.repo.PurchaseRepository
 import com.nguyen.polyglot.repo.WordRepository
 import com.nguyen.polyglot.util.SupportedLanguage
 import com.nguyen.polyglot.util.UIState
@@ -28,6 +29,7 @@ class SharedViewModel
     private val authRepo: AuthRepository,
     private val wordRepo: WordRepository,
     private val languageRepo: LanguageRepository,
+    private val purchaseRepo: PurchaseRepository,
 ) : ViewModel() {
 
     /** ---STATES--- */
@@ -70,6 +72,9 @@ class SharedViewModel
         mutableStateOf(UIState.Initial(listOf()))
     val savedDeWordsUIState: State<UIState<List<Word>>> = _savedDeWordsUIState
     private val savedDeWordMap = HashMap<String, Boolean>()
+
+    private val _premiumUIState: MutableState<UIState<Boolean>> = mutableStateOf(UIState.Initial(false))
+    val premiumState: State<UIState<Boolean>> = _premiumUIState
 
 
     /** A hash map that helps update picked languages quicker */
@@ -291,6 +296,17 @@ class SharedViewModel
         }
     }
 
+    fun purchasePremium(accessToken: String?, orderId: String, purchaseToken: String, purchaseTime: String) {
+        if(accessToken == null) {
+            _premiumUIState.value = UIState.Error("Please log in first!")
+            return
+        }
+
+        viewModelScope.launch {
+            _premiumUIState.value = purchaseRepo.purchasePremium(accessToken, orderId, purchaseToken, purchaseTime)
+        }
+    }
+
     private fun updateSavedWordList(language: String, wordsUIState: UIState<List<Word>>) {
         when (language) {
             SupportedLanguage.ENGLISH.id -> {
@@ -351,5 +367,7 @@ class SharedViewModel
             else -> listOf()
         }
     }
+
+
 
 }

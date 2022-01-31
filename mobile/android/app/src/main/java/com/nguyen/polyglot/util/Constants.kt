@@ -17,6 +17,8 @@ object Constants {
 
     val dailyWordTopics = listOf("Random", "Common", "Food", "Traffic", "Weather", "Sport", "Science", "Nature", "Music", "Movie", "Money", "Emotion", "Clothing")
     val allFeedTopics = listOf("sports", "gaming", "business", "tech", "beauty", "movie", "politics")
+    val productIds = listOf("polyglot_premium")
+
     val humanIcons = listOf(
         "human1",
         "human2",

@@ -41,4 +41,10 @@ object RepoModule {
     fun provideUserRepo(client: HttpClient, database: PolyglotDatabase): UserRepository {
         return UserRepository(client, database)
     }
+
+    @Singleton
+    @Provides
+    fun providePurchaseRepo(client: HttpClient, database: PolyglotDatabase): PurchaseRepository {
+        return PurchaseRepository(client, database)
+    }
 }

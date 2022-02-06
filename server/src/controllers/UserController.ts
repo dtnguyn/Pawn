@@ -149,6 +149,7 @@ export const updateUser = async (
   userId: string,
   username: string,
   email: string,
+  isPremium: boolean,
   avatar: string | undefined,
   dailyWordCount: number,
   notificationEnabled: boolean,
@@ -164,6 +165,7 @@ export const updateUser = async (
     {
       username,
       email,
+      isPremium,
       avatar,
       dailyWordCount,
       notificationEnabled,

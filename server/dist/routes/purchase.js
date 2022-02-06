@@ -19,12 +19,10 @@ const middlewares_1 = require("../utils/middlewares");
 const router = express_1.Router();
 router.post("/", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
-        console.log("purchasing premium...");
         const userId = req.user.id;
         const token = req.body.purchaseToken;
         const orderId = req.body.orderId;
         const purchaseTime = req.body.purchaseTime;
-        console.log("purchase params", userId, token, orderId, purchaseTime);
         if (!userId) {
             throw new CustomError_1.default("Please log in first!");
         }
@@ -37,7 +35,7 @@ router.post("/", middlewares_1.checkAuthentication, (req, res) => __awaiter(this
         if (!purchaseTime) {
             throw new CustomError_1.default("Please provide purchase time!");
         }
-        const result = yield PurchaseController_1.executePurchase(token, purchaseTime, orderId, userId);
+        const result = yield PurchaseController_1.purchasePremium(token, purchaseTime, orderId);
         console.log("Purchase premium result", result);
         return res.send(new ApiResponse_1.default(true, "", result));
     }

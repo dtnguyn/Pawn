@@ -10,14 +10,13 @@ const isPurchaseValid = async (token: string) => {
   return results.length == 0;
 };
 
-export const executePurchase = async (
+export const purchasePremium = async (
   token: string,
   time: string,
-  orderId: string,
-  userId: string
+  orderId: string
 ) => {
   const result = await isPurchaseValid(token);
-
+  console.log("Purchase isValid", result);
   if (result) {
     //Make a purchase
 
@@ -29,9 +28,6 @@ export const executePurchase = async (
       isValid: true,
       purchaseToken: token,
     });
-
-    const userRepo = getRepository(User);
-    await userRepo.update({ id: userId }, { isPremium: true });
 
     return true;
   } else {

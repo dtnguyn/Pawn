@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { executePurchase } from "../controllers/PurchaseController";
+import { purchasePremium } from "../controllers/PurchaseController";
 import ApiResponse from "../utils/ApiResponse";
 import CustomError from "../utils/CustomError";
 import { checkAuthentication } from "../utils/middlewares";
@@ -8,13 +8,10 @@ const router = Router();
 
 router.post("/", checkAuthentication, async (req, res) => {
   try {
-    console.log("purchasing premium...");
     const userId = (req.user as any).id as string;
     const token = req.body.purchaseToken;
     const orderId = req.body.orderId;
     const purchaseTime = req.body.purchaseTime;
-
-    console.log("purchase params", userId, token, orderId, purchaseTime);
 
     if (!userId) {
       throw new CustomError("Please log in first!");
@@ -32,7 +29,7 @@ router.post("/", checkAuthentication, async (req, res) => {
       throw new CustomError("Please provide purchase time!");
     }
 
-    const result = await executePurchase(token, purchaseTime, orderId, userId);
+    const result = await purchasePremium(token, purchaseTime, orderId);
 
     console.log("Purchase premium result", result);
 

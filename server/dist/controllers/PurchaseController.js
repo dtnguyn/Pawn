@@ -10,14 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const Purchase_1 = require("../entity/Purchase");
 const typeorm_1 = require("typeorm");
-const User_1 = require("../entity/User");
 const isPurchaseValid = (token) => __awaiter(this, void 0, void 0, function* () {
     const repo = typeorm_1.getRepository(Purchase_1.Purchase);
     const results = yield repo.find({ purchaseToken: token });
     return results.length == 0;
 });
-exports.executePurchase = (token, time, orderId, userId) => __awaiter(this, void 0, void 0, function* () {
+exports.purchasePremium = (token, time, orderId) => __awaiter(this, void 0, void 0, function* () {
     const result = yield isPurchaseValid(token);
+    console.log("Purchase isValid", result);
     if (result) {
         const repo = typeorm_1.getRepository(Purchase_1.Purchase);
         yield repo.insert({
@@ -26,8 +26,6 @@ exports.executePurchase = (token, time, orderId, userId) => __awaiter(this, void
             isValid: true,
             purchaseToken: token,
         });
-        const userRepo = typeorm_1.getRepository(User_1.User);
-        yield userRepo.update({ id: userId }, { isPremium: true });
         return true;
     }
     else {

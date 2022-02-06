@@ -84,6 +84,17 @@ createConnection({
     //     .getOne()
     // );
     console.log(await getRepository(Purchase).find());
+    // console.log(await getRepository(User).find());
+
+    // console.log(await getRepository(Purchase).delete({ isValid: true }));
+
+    // console.log(
+    //   await getRepository(User).update(
+    //     { username: "adron" },
+    //     { isPremium: false }
+    //   )
+    // );
+
     // await getRepository(User).delete({ nativeLanguageId: "vi" });
     app.listen(4000, () => {
       console.log("Server is running on port 4000");

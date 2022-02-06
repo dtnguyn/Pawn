@@ -232,6 +232,7 @@ router.put("/user", checkAuthentication, async (req, res) => {
       userId,
       req.body.username,
       req.body.email,
+      req.body.isPremium,
       req.body.avatar,
       req.body.dailyWordCount,
       req.body.notificationEnabled,

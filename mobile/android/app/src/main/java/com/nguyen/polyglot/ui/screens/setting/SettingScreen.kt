@@ -68,6 +68,7 @@ fun SettingScreen(activity: Activity, navController: NavController, sharedViewMo
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && mutableList != null) {
                 for (purchase in mutableList) {
                     if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED && !purchase.isAcknowledged) {
+                        Log.d("PurchasePremium", "debug 1")
                         coroutineScope.launch {
                             sharedViewModel.purchasePremium(
                                 DataStoreUtils.getAccessTokenFromDataStore(

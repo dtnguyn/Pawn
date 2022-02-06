@@ -297,6 +297,7 @@ class SharedViewModel
     }
 
     fun purchasePremium(accessToken: String?, orderId: String, purchaseToken: String, purchaseTime: String) {
+        Log.d("PurchasePremium", "debug 2")
         if(accessToken == null) {
             _premiumUIState.value = UIState.Error("Please log in first!")
             return

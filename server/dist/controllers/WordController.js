@@ -62,7 +62,6 @@ exports.getDailyRandomWords = (count, topic, language) => __awaiter(this, void 0
             .andWhere("word.language = :language", { language })
             .getMany()).map((word) => word.value);
     }
-    console.log("all words results: ", allWords);
     const arr = [];
     while (results.length < wordCount) {
         let i = 0;

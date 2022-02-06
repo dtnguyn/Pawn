@@ -20,6 +20,8 @@ import language from "./routes/language";
 import { importAllWords } from "./controllers/WordController";
 import { DailyWord } from "./entity/DailyWord";
 import feed from "./routes/feed";
+import purchase from "./routes/purchase";
+import { Purchase } from "./entity/Purchase";
 
 createConnection({
   type: "postgres",
@@ -43,6 +45,7 @@ createConnection({
     ChatMessage,
     ChatImage,
     VerificationCode,
+    Purchase,
   ],
 })
   .then(async (_) => {
@@ -53,6 +56,7 @@ createConnection({
     app.use("/word", word);
     app.use("/language", language);
     app.use("/feed", feed);
+    app.use("/purchase", purchase);
 
     // await importAllWords();
     // console.log(await getRepository(User).delete({ email: "test@test.com" }));
@@ -79,7 +83,7 @@ createConnection({
     //     .orWhere("user.email = :email", { email: "adron2" })
     //     .getOne()
     // );
-    console.log(await getRepository(User).find());
+    console.log(await getRepository(Purchase).find());
     // await getRepository(User).delete({ nativeLanguageId: "vi" });
     app.listen(4000, () => {
       console.log("Server is running on port 4000");

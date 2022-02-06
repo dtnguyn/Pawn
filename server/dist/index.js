@@ -31,6 +31,8 @@ const auth_1 = __importDefault(require("./routes/auth"));
 const word_1 = __importDefault(require("./routes/word"));
 const language_1 = __importDefault(require("./routes/language"));
 const feed_1 = __importDefault(require("./routes/feed"));
+const purchase_1 = __importDefault(require("./routes/purchase"));
+const Purchase_1 = require("./entity/Purchase");
 typeorm_1.createConnection({
     type: "postgres",
     host: "localhost",
@@ -53,6 +55,7 @@ typeorm_1.createConnection({
         ChatMessage_1.ChatMessage,
         ChatImage_1.ChatImage,
         VerificationCode_1.VerificationCode,
+        Purchase_1.Purchase,
     ],
 })
     .then((_) => __awaiter(this, void 0, void 0, function* () {
@@ -62,7 +65,8 @@ typeorm_1.createConnection({
     app.use("/word", word_1.default);
     app.use("/language", language_1.default);
     app.use("/feed", feed_1.default);
-    console.log(yield typeorm_1.getRepository(User_1.User).find());
+    app.use("/purchase", purchase_1.default);
+    console.log(yield typeorm_1.getRepository(Purchase_1.Purchase).find());
     app.listen(4000, () => {
         console.log("Server is running on port 4000");
     });

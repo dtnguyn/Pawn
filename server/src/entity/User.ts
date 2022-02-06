@@ -52,6 +52,9 @@ export class User {
   @Column({ default: true })
   notificationEnabled: boolean;
 
+  @Column({ default: false })
+  isPremium: boolean;
+
   @OneToMany(() => SavedWord, (word) => word.user)
   savedWords: SavedWord[];
 

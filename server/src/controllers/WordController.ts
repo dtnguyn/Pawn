@@ -109,7 +109,7 @@ export const getDailyRandomWords = async (
     ).map((word) => word.value);
   }
 
-  console.log("all words results: ", allWords);
+  // console.log("all words results: ", allWords);
 
   const arr: any[] = [];
   while (results.length < wordCount) {

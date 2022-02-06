@@ -57,6 +57,10 @@ __decorate([
     __metadata("design:type", Boolean)
 ], User.prototype, "notificationEnabled", void 0);
 __decorate([
+    typeorm_1.Column({ default: false }),
+    __metadata("design:type", Boolean)
+], User.prototype, "isPremium", void 0);
+__decorate([
     typeorm_1.OneToMany(() => SavedWord_1.SavedWord, (word) => word.user),
     __metadata("design:type", Array)
 ], User.prototype, "savedWords", void 0);

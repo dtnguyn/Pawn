@@ -28,9 +28,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.nguyen.polyglot.R
+import com.nguyen.polyglot.User
 import com.nguyen.polyglot.model.SubtitlePart
 import com.nguyen.polyglot.model.Word
 import com.nguyen.polyglot.ui.components.BackHandler
+import com.nguyen.polyglot.ui.components.CustomDialog
 import com.nguyen.polyglot.ui.components.feedDetail.news.WordActionMenu
 import com.nguyen.polyglot.ui.components.feedDetail.video.FocusSubtitleMenu
 import com.nguyen.polyglot.ui.components.feedDetail.video.SubtitleBox
@@ -60,6 +62,8 @@ fun VideoDetailScreen(
     val videoSubtitleUIState by viewModel.videoSubtitleUIState
     var videoSubtitle by remember { mutableStateOf(videoSubtitleUIState.value) }
 
+    var user by remember { mutableStateOf(sharedViewModel.authStatusUIState.value.value?.user) }
+    var showPremiumDialog by remember { mutableStateOf(false) }
 
     var currentIndexState by remember { mutableStateOf(viewModel.currentSubtitleIndex) }
     var currentIndex = viewModel.currentSubtitleIndex
@@ -185,12 +189,21 @@ fun VideoDetailScreen(
 
                         }
 
+
+
                         Row(modifier = Modifier.align(Alignment.CenterEnd)) {
                             Text(text = stringResource(id = R.string.translated), style = Typography.body1)
 
                             Switch(
                                 checked = isTranslated,
-                                onCheckedChange = { isTranslated = it }
+                                onCheckedChange = {
+                                    if(user?.isPremium == true){
+                                        isTranslated = it
+                                    } else {
+                                        player?.pause()
+                                        showPremiumDialog = true
+                                    }
+                                }
                             )
                         }
                     }
@@ -272,6 +285,22 @@ fun VideoDetailScreen(
             }
 
         }
+
+        if(showPremiumDialog)
+            CustomDialog(
+                title = "Premium Plan Required",
+                content = "This feature requires Premium plan! You can go to the App Settings and buy the Premium plan to unlock this feature.",
+                icon = R.drawable.ic_lock_red_32,
+                onDismissText = "Go Premium",
+                onDismiss = {
+                    showPremiumDialog = false
+                },
+                onAction = {
+                    player?.pause()
+                    showPremiumDialog = false
+                    navController.navigate("setting")
+                }
+            )
     }
 
 

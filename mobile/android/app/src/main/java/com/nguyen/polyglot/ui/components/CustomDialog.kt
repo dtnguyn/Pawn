@@ -21,7 +21,7 @@ import com.nguyen.polyglot.ui.theme.ReallyRed
 import com.nguyen.polyglot.ui.theme.Typography
 
 @Composable
-fun CustomDialog(title: String, content: String, icon: Int, onDismiss: () -> Unit) {
+fun CustomDialog(title: String, content: String, icon: Int, onDismissText: String = stringResource(id = R.string.try_again), onDismiss: () -> Unit, onAction: () -> Unit) {
     Dialog(
         onDismissRequest = { onDismiss() },
     ) {
@@ -54,7 +54,7 @@ fun CustomDialog(title: String, content: String, icon: Int, onDismiss: () -> Uni
 
                 Button(
                     onClick = {
-                        onDismiss()
+                        onAction()
                     },
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(ReallyRed),
@@ -63,7 +63,7 @@ fun CustomDialog(title: String, content: String, icon: Int, onDismiss: () -> Uni
                         .height(70.dp)
                         .padding(vertical = 10.dp, horizontal = 30.dp)
                 ) {
-                    Text(text = stringResource(id = R.string.try_again), style = Typography.h6, color = Color.White)
+                    Text(text = onDismissText, style = Typography.h6, color = Color.White)
                 }
 
             }

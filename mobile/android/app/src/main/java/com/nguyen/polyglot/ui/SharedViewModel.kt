@@ -73,8 +73,8 @@ class SharedViewModel
     val savedDeWordsUIState: State<UIState<List<Word>>> = _savedDeWordsUIState
     private val savedDeWordMap = HashMap<String, Boolean>()
 
-    private val _premiumUIState: MutableState<UIState<Boolean>> = mutableStateOf(UIState.Initial(false))
-    val premiumState: State<UIState<Boolean>> = _premiumUIState
+    private val _purchasePremiumUIState: MutableState<UIState<Boolean>> = mutableStateOf(UIState.Initial(false))
+    val purchasePremiumUIState: State<UIState<Boolean>> = _purchasePremiumUIState
 
 
     /** A hash map that helps update picked languages quicker */
@@ -261,6 +261,7 @@ class SharedViewModel
         email: String,
         nativeLanguageId: String,
         appLanguageId: String,
+        isPremium: Boolean,
         avatar: String?,
         dailyWordCount: Int,
         notificationEnabled: Boolean,
@@ -284,6 +285,7 @@ class SharedViewModel
                 nativeLanguageId,
                 appLanguageId,
                 avatar,
+                isPremium,
                 dailyWordCount,
                 notificationEnabled,
                 dailyWordTopic,
@@ -299,12 +301,12 @@ class SharedViewModel
     fun purchasePremium(accessToken: String?, orderId: String, purchaseToken: String, purchaseTime: String) {
         Log.d("PurchasePremium", "debug 2")
         if(accessToken == null) {
-            _premiumUIState.value = UIState.Error("Please log in first!")
+            _purchasePremiumUIState.value = UIState.Error("Please log in first!")
             return
         }
 
         viewModelScope.launch {
-            _premiumUIState.value = purchaseRepo.purchasePremium(accessToken, orderId, purchaseToken, purchaseTime)
+            _purchasePremiumUIState.value = purchaseRepo.purchasePremium(accessToken, orderId, purchaseToken, purchaseTime)
         }
     }
 

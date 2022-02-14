@@ -16,4 +16,5 @@ message UserDs {
   string appLanguageId = 10;
   string feedTopics = 11;
   string dailyWordTopic = 12;
+  bool isPremium = 13;
 }

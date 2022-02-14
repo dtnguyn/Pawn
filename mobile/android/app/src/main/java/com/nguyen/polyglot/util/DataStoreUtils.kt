@@ -67,7 +67,8 @@ object DataStoreUtils{
                     createdAt = user.createdAt,
                     appLanguageId = user.appLanguageId,
                     feedTopics = user.feedTopics,
-                    dailyWordTopic = user.dailyWordTopic
+                    dailyWordTopic = user.dailyWordTopic,
+                    isPremium = user.isPremium
                 )
             }
         }.first()
@@ -112,6 +113,7 @@ object DataStoreUtils{
                     .setAppLanguageId(user.appLanguageId)
                     .setDailyWordTopic(user.dailyWordTopic)
                     .setFeedTopics(user.feedTopics)
+                    .setIsPremium(user.isPremium)
                     .build()
             }
         }

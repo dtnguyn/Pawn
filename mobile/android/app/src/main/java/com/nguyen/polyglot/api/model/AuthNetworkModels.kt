@@ -27,6 +27,7 @@ data class UpdateUserBody (
     val nativeLanguageId: String,
     val appLanguageId: String,
     val avatar: String?,
+    val isPremium: Boolean,
     val dailyWordCount: Int,
     val notificationEnabled: Boolean,
     val dailyWordTopic: String,

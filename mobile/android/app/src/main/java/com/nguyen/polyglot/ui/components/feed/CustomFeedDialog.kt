@@ -32,6 +32,7 @@ fun CustomFeedDialog(
     customUrl: String,
     currentType: String,
     imageLoader: ImageLoader,
+    isLocked: Boolean,
     onDismiss: () -> Unit,
     onHandleUrlChange: (url: String) -> Unit,
     onChangeType: (type: String) -> Unit,
@@ -132,20 +133,38 @@ fun CustomFeedDialog(
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(5f),
-                    colors = ButtonDefaults.buttonColors(ReallyRed),
-                    shape = RoundedCornerShape(15.dp),
-                    onClick = { onAddClick(customUrl) }) {
-                    Text(
-                        stringResource(id = R.string.add),
-                        color = Color.White,
-                        style = Typography.h4,
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    )
+                if(isLocked){
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(5f),
+                        colors = ButtonDefaults.buttonColors(ReallyRed),
+                        shape = RoundedCornerShape(15.dp),
+                        onClick = { onAddClick(customUrl) }) {
+                        Text(
+                            "Unlock Premium Plan",
+                            color = Color.White,
+                            style = Typography.h6,
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                        )
+                    }
+                } else {
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(5f),
+                        colors = ButtonDefaults.buttonColors(ReallyRed),
+                        shape = RoundedCornerShape(15.dp),
+                        onClick = { onAddClick(customUrl) }) {
+                        Text(
+                            stringResource(id = R.string.add),
+                            color = Color.White,
+                            style = Typography.h4,
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                        )
+                    }
                 }
+
 
             }
         }

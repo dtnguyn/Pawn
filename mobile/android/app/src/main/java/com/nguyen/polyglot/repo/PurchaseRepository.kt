@@ -21,7 +21,6 @@ class PurchaseRepository
 ){
 
     suspend fun purchasePremium(accessToken: String, orderId: String, token: String, time: String): UIState<Boolean> {
-        Log.d("PurchasePremium", "debug 3")
         val response: ApiResponse<Boolean> = apiClient.post("${Constants.apiURL}/purchase/") {
             contentType(ContentType.Application.Json)
             body = PurchaseNetworkModels(orderId, token, time)
@@ -29,11 +28,7 @@ class PurchaseRepository
                 append(HttpHeaders.Authorization, "Bearer $accessToken")
             }
         }
-
-        Log.d("PurchasePremium", "debug 4")
         return if(response.status){
-            Log.d("PurchasePremium", "debug 5")
-
             UIState.Loaded(response.data)
         } else {
             UIState.Error(response.message)

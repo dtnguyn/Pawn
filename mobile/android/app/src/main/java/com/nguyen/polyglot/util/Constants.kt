@@ -13,7 +13,7 @@ object Constants {
 
     val allLanguages = listOf(Language("vi", "Vietnamese"), Language("en", "English"))
 
-    const val apiURL = "http://192.168.0.239:4000"
+    const val apiURL = "http://192.168.0.235:4000"
 
     val dailyWordTopics = listOf("Random", "Common", "Food", "Traffic", "Weather", "Sport", "Science", "Nature", "Music", "Movie", "Money", "Emotion", "Clothing")
     val allFeedTopics = listOf("sports", "gaming", "business", "tech", "beauty", "movie", "politics")

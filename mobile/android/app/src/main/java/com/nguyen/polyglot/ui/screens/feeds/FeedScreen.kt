@@ -24,9 +24,11 @@ import androidx.navigation.NavController
 import coil.ImageLoader
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
+import com.nguyen.polyglot.R
 import com.nguyen.polyglot.model.Feed
 import com.nguyen.polyglot.model.Language
 import com.nguyen.polyglot.ui.SharedViewModel
+import com.nguyen.polyglot.ui.components.CustomDialog
 import com.nguyen.polyglot.ui.components.feed.*
 import com.nguyen.polyglot.ui.navigation.PolyglotScreens
 import com.nguyen.polyglot.ui.screens.feeds.FeedViewModel
@@ -50,6 +52,7 @@ fun FeedScreen(
 
     val authStatusUIState by sharedViewModel.authStatusUIState
     var user by remember { mutableStateOf(authStatusUIState.value?.user) }
+    var showPremiumDialog by remember { mutableStateOf(false) }
 
     val enFeedUIState: UIState<List<Feed>> by feedViewModel.enFeedItems
     var enFeedItems by remember { mutableStateOf(enFeedUIState.value) }
@@ -125,6 +128,7 @@ fun FeedScreen(
             username = user!!.username,
             email = user!!.email,
             avatar = user!!.avatar,
+            isPremium = user!!.isPremium,
             dailyWordCount = user!!.dailyWordCount,
             notificationEnabled = user!!.notificationEnabled,
             nativeLanguageId = user!!.nativeLanguageId,
@@ -344,14 +348,20 @@ fun FeedScreen(
             TopicMenu(
                 topics = topics,
                 onPickTopic = {
-                    feedViewModel.pickTopic(it)
-                    Log.d("FeedScreen", "topics: $topics | $it" )
-//                    topics = "$topics, $it,"
-                    topics += "$it,"
-
+                    if(user?.isPremium == true){
+                        feedViewModel.pickTopic(it)
+                        topics += "$it,"
+                    } else {
+                        showPremiumDialog = true
+                    }
                 },
+                isLocked = user?.isPremium == false,
                 isPicked = {
-                    feedViewModel.isTopicPicked(it)
+                    if(user?.isPremium == true){
+                        feedViewModel.isTopicPicked(it)
+                    } else {
+                        false
+                    }
                 },
                 onFinish = {
                     coroutineScope.launch {
@@ -498,33 +508,53 @@ fun FeedScreen(
                         }
                     }
                 }
-
             }
+            if(showPremiumDialog)
+                CustomDialog(
+                    title = "Premium Plan Required",
+                    content = "This feature requires Premium plan! You can go to the App Settings and buy the Premium plan to unlock this feature.",
+                    icon = R.drawable.ic_lock_red_32,
+                    onDismissText = "Go Premium",
+                    onDismiss = {
+                        showPremiumDialog = false
+                    },
+                    onAction = {
+                        showPremiumDialog = false
+                        navController.navigate("setting")
+                    }
+                )
 
             if (customFeedDialog) {
                 CustomFeedDialog(
                     customUrl = customFeedUrl,
                     currentType = customFeedType,
+                    isLocked = user?.isPremium == false,
                     imageLoader = imageLoader,
                     onDismiss = { customFeedDialog = false },
                     onHandleUrlChange = { customFeedUrl = it },
                     onChangeType = { customFeedType = it },
                     onAddClick = {
-                        feedViewModel.saveFeedScrollingState(
-                            feedScrollState.firstVisibleItemIndex,
-                            feedScrollState.firstVisibleItemScrollOffset
-                        )
-                        if (customFeedType == "news"){
-                            val url = it.replace("/", "<")
-                            val date = null
-                            val thumbnail = null
-                            val title = null
-                            navController.navigate("${PolyglotScreens.NewsDetail.route}/${UUID.randomUUID()}/${url}")
+                        if(user?.isPremium == true){
+                            feedViewModel.saveFeedScrollingState(
+                                feedScrollState.firstVisibleItemIndex,
+                                feedScrollState.firstVisibleItemScrollOffset
+                            )
+                            if (customFeedType == "news"){
+                                val url = it.replace("/", "<")
+                                val date = null
+                                val thumbnail = null
+                                val title = null
+                                navController.navigate("${PolyglotScreens.NewsDetail.route}/${UUID.randomUUID()}/${url}")
+                            } else {
+                                val videoId = it.substring(it.length - 11, it.length)
+                                Log.d("FeedScreen", "videoId: $videoId")
+                                navController.navigate("${PolyglotScreens.VideoDetail.route}/${videoId}")
+                            }
                         } else {
-                            val videoId = it.substring(it.length - 11, it.length)
-                            Log.d("FeedScreen", "videoId: $videoId")
-                            navController.navigate("${PolyglotScreens.VideoDetail.route}/${videoId}")
+                            customFeedDialog = false
+                            navController.navigate("setting")
                         }
+
                     }
                 )
             }

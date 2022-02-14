@@ -29,6 +29,7 @@ import com.android.billingclient.api.*
 import com.nguyen.polyglot.R
 import com.nguyen.polyglot.ui.SharedViewModel
 import com.nguyen.polyglot.ui.components.CircularLoadingBar
+import com.nguyen.polyglot.ui.components.CustomDialog
 import com.nguyen.polyglot.ui.components.auth.LanguageBottomSheetContent
 import com.nguyen.polyglot.ui.theme.*
 import com.nguyen.polyglot.util.Constants
@@ -42,10 +43,20 @@ import java.util.*
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SettingScreen(activity: Activity, navController: NavController, sharedViewModel: SharedViewModel) {
+fun SettingScreen(
+    activity: Activity,
+    navController: NavController,
+    sharedViewModel: SharedViewModel
+) {
 
     val authStatusUIState by sharedViewModel.authStatusUIState
+    val purchasePremiumUIState by sharedViewModel.purchasePremiumUIState
+
     var user by remember { mutableStateOf(authStatusUIState.value?.user) }
+    var showPremiumDialog by remember { mutableStateOf(false) }
+
+    var isPremium by remember { mutableStateOf(authStatusUIState.value?.user?.isPremium ?: false) }
+    var purchaseToken by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     var dailyWordCount by remember {
@@ -60,7 +71,11 @@ fun SettingScreen(activity: Activity, navController: NavController, sharedViewMo
     var loading by remember { mutableStateOf(false) }
 
     var skuDetails: SkuDetails? = null
+    val scrollState = rememberScrollState()
 
+    suspend fun acknowledgePurchase(purchase: Purchase) {
+
+    }
 
     val billingClient = BillingClient.newBuilder(context)
         .enablePendingPurchases()
@@ -68,8 +83,8 @@ fun SettingScreen(activity: Activity, navController: NavController, sharedViewMo
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && mutableList != null) {
                 for (purchase in mutableList) {
                     if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED && !purchase.isAcknowledged) {
-                        Log.d("PurchasePremium", "debug 1")
                         coroutineScope.launch {
+                            purchaseToken = purchase.purchaseToken
                             sharedViewModel.purchasePremium(
                                 DataStoreUtils.getAccessTokenFromDataStore(
                                     context
@@ -86,25 +101,28 @@ fun SettingScreen(activity: Activity, navController: NavController, sharedViewMo
         .build()
 
 
-    billingClient.startConnection(object: BillingClientStateListener {
+    billingClient.startConnection(object : BillingClientStateListener {
         override fun onBillingServiceDisconnected() {
 
         }
 
         override fun onBillingSetupFinished(result: BillingResult) {
-            if(result.responseCode == BillingClient.BillingResponseCode.OK){
-                val getProductDetailsQuery = SkuDetailsParams.newBuilder().setSkusList(productIds).setType(BillingClient.SkuType.INAPP).build()
-                billingClient.querySkuDetailsAsync(getProductDetailsQuery, object: SkuDetailsResponseListener {
-                    override fun onSkuDetailsResponse(
-                        billingResult: BillingResult,
-                        list: MutableList<SkuDetails>?
-                    ) {
-                        if(billingResult.responseCode == BillingClient.BillingResponseCode.OK && list != null){
-                            skuDetails = list.first()
+            if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                val getProductDetailsQuery = SkuDetailsParams.newBuilder().setSkusList(productIds)
+                    .setType(BillingClient.SkuType.INAPP).build()
+                billingClient.querySkuDetailsAsync(
+                    getProductDetailsQuery,
+                    object : SkuDetailsResponseListener {
+                        override fun onSkuDetailsResponse(
+                            billingResult: BillingResult,
+                            list: MutableList<SkuDetails>?
+                        ) {
+                            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && list != null) {
+                                skuDetails = list.first()
+                            }
                         }
-                    }
 
-                })
+                    })
             }
         }
 
@@ -134,6 +152,7 @@ fun SettingScreen(activity: Activity, navController: NavController, sharedViewMo
             username = user!!.username,
             email = user!!.email,
             avatar = user!!.avatar,
+            isPremium = user!!.isPremium,
             dailyWordCount = user!!.dailyWordCount,
             notificationEnabled = user!!.notificationEnabled,
             nativeLanguageId = user!!.nativeLanguageId,
@@ -153,6 +172,7 @@ fun SettingScreen(activity: Activity, navController: NavController, sharedViewMo
             username = user!!.username,
             email = user!!.email,
             avatar = user!!.avatar,
+            isPremium = user!!.isPremium,
             dailyWordCount = user!!.dailyWordCount,
             notificationEnabled = newStatus,
             nativeLanguageId = user!!.nativeLanguageId,
@@ -172,6 +192,7 @@ fun SettingScreen(activity: Activity, navController: NavController, sharedViewMo
             username = user!!.username,
             email = user!!.email,
             avatar = user!!.avatar,
+            isPremium = user!!.isPremium,
             dailyWordCount = newDailyWordCount,
             notificationEnabled = user!!.notificationEnabled,
             nativeLanguageId = user!!.nativeLanguageId,
@@ -191,11 +212,32 @@ fun SettingScreen(activity: Activity, navController: NavController, sharedViewMo
             username = user!!.username,
             email = user!!.email,
             avatar = user!!.avatar,
+            isPremium = user!!.isPremium,
             dailyWordCount = user!!.dailyWordCount,
             notificationEnabled = user!!.notificationEnabled,
             nativeLanguageId = user!!.nativeLanguageId,
             appLanguageId = user!!.appLanguageId,
             dailyWordTopic = newTopic,
+            feedTopics = user!!.feedTopics
+        )
+    }
+
+    suspend fun updateUserPremiumStatus(status: Boolean) {
+        if (authStatusUIState.value == null) return
+        if (user == null) return
+
+        sharedViewModel.updateUser(
+            accessToken = DataStoreUtils.getAccessTokenFromDataStore(context),
+            currentAuthStatus = authStatusUIState.value!!,
+            username = user!!.username,
+            email = user!!.email,
+            avatar = user!!.avatar,
+            isPremium = status,
+            dailyWordCount = user!!.dailyWordCount,
+            notificationEnabled = user!!.notificationEnabled,
+            nativeLanguageId = user!!.nativeLanguageId,
+            appLanguageId = user!!.appLanguageId,
+            dailyWordTopic = user!!.dailyWordTopic,
             feedTopics = user!!.feedTopics
         )
     }
@@ -227,11 +269,56 @@ fun SettingScreen(activity: Activity, navController: NavController, sharedViewMo
                         resources.updateConfiguration(configuration, resources.displayMetrics)
                     }
 
+                    isPremium = it.isPremium
+
                     // Store the state to DataStore
                     DataStoreUtils.saveTokenToDataStore(context, authStatusUIState.value!!.token)
                     DataStoreUtils.saveUserToDataStore(context, it)
                 }
             }
+        }
+    }
+
+    LaunchedEffect(purchasePremiumUIState) {
+        when (purchasePremiumUIState) {
+
+            is UIState.Initial -> {
+
+            }
+            is UIState.Loading -> {
+
+            }
+            is UIState.Error -> {
+
+            }
+            is UIState.Loaded -> {
+                if (purchasePremiumUIState.value == true && purchaseToken != null) {
+                    Log.d("AcknowledgePurchase", "Debug1 $purchaseToken")
+                    val acknowledgePurchaseParams =
+                        AcknowledgePurchaseParams.newBuilder().setPurchaseToken(purchaseToken!!)
+                            .build()
+                    billingClient.acknowledgePurchase(acknowledgePurchaseParams) { result ->
+                        Log.d(
+                            "AcknowledgePurchase",
+                            "Debug2 ${result.responseCode} ${BillingClient.BillingResponseCode.OK}"
+                        )
+                        if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                            Log.d("AcknowledgePurchase", "Debug3")
+                            coroutineScope.launch {
+                                updateUserPremiumStatus(true)
+                            }
+                            purchaseToken = null
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Unable to acknowledge purchase at this time! Your purchase will be refunded.",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                }
+            }
+
         }
     }
 
@@ -256,7 +343,7 @@ fun SettingScreen(activity: Activity, navController: NavController, sharedViewMo
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
                 .padding(20.dp)
         ) {
             Box(modifier = Modifier.fillMaxWidth()) {
@@ -312,15 +399,18 @@ fun SettingScreen(activity: Activity, navController: NavController, sharedViewMo
                                     fontSize = 18.sp,
                                     color = Color.Black
                                 )
-                                Image(
-                                    painter = painterResource(id = R.drawable.check_icon_blue_32),
-                                    contentDescription = "Check icon",
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .align(
-                                            CenterEnd
-                                        )
-                                )
+                                if (isPremium.not()) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.check_icon_blue_32),
+                                        contentDescription = "Check icon",
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .align(
+                                                CenterEnd
+                                            )
+                                    )
+                                }
+
                             }
 
                             Spacer(modifier = Modifier.padding(5.dp))
@@ -341,18 +431,36 @@ fun SettingScreen(activity: Activity, navController: NavController, sharedViewMo
                             .clip(RoundedCornerShape(15.dp))
                             .fillMaxWidth()
                             .clickable {
-                                billingClient.launchBillingFlow(activity, BillingFlowParams.newBuilder().setSkuDetails(skuDetails!!).build())
-
-//                                skuDetails?.let {
-//                                    billingClient.launchBillingFlow(activity, BillingFlowParams.newBuilder().setSkuDetails(it).build())
-//                                }
+                                billingClient.launchBillingFlow(
+                                    activity,
+                                    BillingFlowParams
+                                        .newBuilder()
+                                        .setSkuDetails(skuDetails!!)
+                                        .build()
+                                )
                             }
                     ) {
+
                         Column(Modifier.padding(10.dp)) {
-                            Text(
-                                text = stringResource(id = R.string.premium),
-                                style = Typography.h5
-                            )
+
+                            Box(Modifier.fillMaxWidth()) {
+                                Text(
+                                    text = stringResource(id = R.string.premium),
+                                    style = Typography.h5
+                                )
+                                if (isPremium) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.check_icon_blue_32),
+                                        contentDescription = "Check icon",
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .align(
+                                                CenterEnd
+                                            )
+                                    )
+                                }
+
+                            }
                             Text(
                                 text = "$9.99 • ${stringResource(id = R.string.one_time)}",
                                 style = Typography.body2,
@@ -538,11 +646,22 @@ fun SettingScreen(activity: Activity, navController: NavController, sharedViewMo
                             modifier = Modifier.align(CenterHorizontally)
                         )
                         Spacer(modifier = Modifier.padding(5.dp))
-                        Text(
-                            text = stringResource(id = R.string.daily_word_topic),
-                            style = Typography.h6,
-                            fontSize = 16.sp
-                        )
+                        Row() {
+                            Text(
+                                text = stringResource(id = R.string.daily_word_topic),
+                                style = Typography.h6,
+                                fontSize = 16.sp,
+                            )
+                            if (isPremium.not())
+                                Image(
+                                    painter = painterResource(id = R.drawable.ic_lock_red_32),
+                                    contentDescription = "Lock icon",
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .padding(start = 5.dp)
+                                )
+                        }
+
                         Spacer(modifier = Modifier.padding(3.dp))
 
                         Box(
@@ -568,7 +687,11 @@ fun SettingScreen(activity: Activity, navController: NavController, sharedViewMo
                                     DropdownMenuItem(
                                         onClick = {
                                             coroutineScope.launch {
-                                                updateDailyWordTopic(topic)
+                                                if(isPremium){
+                                                    updateDailyWordTopic(topic)
+                                                } else {
+                                                    showPremiumDialog = true
+                                                }
                                                 topicMenuExpanded = false
                                             }
                                         },
@@ -589,6 +712,22 @@ fun SettingScreen(activity: Activity, navController: NavController, sharedViewMo
             }
 
         }
+        if(showPremiumDialog)
+            CustomDialog(
+                title = "Premium Plan Required",
+                content = "This feature requires Premium plan! You can go to the App Settings and buy the Premium plan to unlock this feature.",
+                icon = R.drawable.ic_lock_red_32,
+                onDismissText = "Go Premium",
+                onDismiss = {
+                    showPremiumDialog = false
+                },
+                onAction = {
+                    showPremiumDialog = false
+                    coroutineScope.launch {
+                        scrollState.scrollTo(0)
+                    }
+                }
+            )
     }
 
     if (loading) {

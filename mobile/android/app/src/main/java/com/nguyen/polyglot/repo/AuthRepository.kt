@@ -180,6 +180,7 @@ class AuthRepository
         nativeLanguageId: String,
         appLanguageId: String,
         avatar: String?,
+        isPremium: Boolean,
         dailyWordCount: Int,
         notificationEnabled: Boolean,
         dailyWordTopic: String,
@@ -191,7 +192,7 @@ class AuthRepository
 
                 val response: ApiResponse<User?> = apiClient.put("${Constants.apiURL}/auth/user") {
                     contentType(ContentType.Application.Json)
-                    body = UpdateUserBody(username, email, nativeLanguageId, appLanguageId, avatar, dailyWordCount, notificationEnabled, dailyWordTopic, feedTopics)
+                    body = UpdateUserBody(username, email, nativeLanguageId, appLanguageId, avatar, isPremium,dailyWordCount, notificationEnabled, dailyWordTopic, feedTopics)
                     headers {
                         append(HttpHeaders.Authorization, "Bearer $accessToken")
                     }

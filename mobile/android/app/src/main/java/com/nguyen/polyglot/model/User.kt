@@ -8,6 +8,7 @@ data class User(
     val avatar: String?,
     val dailyWordCount: Int,
     val feedTopics: String,
+    var isPremium: Boolean,
     val dailyWordTopic: String,
     val notificationEnabled: Boolean,
     val nativeLanguageId: String,

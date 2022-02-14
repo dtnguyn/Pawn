@@ -1,5 +1,6 @@
 package com.nguyen.polyglot.ui.components.feed
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -8,6 +9,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nguyen.polyglot.R
@@ -18,7 +20,7 @@ import com.nguyen.polyglot.ui.theme.LightGrey
 import com.nguyen.polyglot.ui.theme.Typography
 
 @Composable
-fun TopicMenu(topics: String, onPickTopic: (topic: String) -> Unit, isPicked: (topic: String) -> Boolean, onFinish: () -> Unit, onDismiss: () -> Unit) {
+fun TopicMenu(topics: String, isLocked: Boolean, onPickTopic: (topic: String) -> Unit, isPicked: (topic: String) -> Boolean, onFinish: () -> Unit, onDismiss: () -> Unit) {
 
 
     var topicList by remember { mutableStateOf(topics.split(",").map { it.trim() }) }
@@ -34,16 +36,30 @@ fun TopicMenu(topics: String, onPickTopic: (topic: String) -> Unit, isPicked: (t
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(2f)) {
-                Text(text = stringResource(id = R.string.feed_topics), style = Typography.h6)
+                Row {
+                    Text(text = stringResource(id = R.string.feed_topics), style = Typography.h6)
+                }
                 Text(text = stringResource(id = R.string.feed_topics_sub), style = Typography.body1)
             }
             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
-                Button(onClick = { onFinish() }, colors = ButtonDefaults.buttonColors(Blue), shape = RoundedCornerShape(20.dp)) {
-                    Text(
-                        text = stringResource(id = R.string.done),
-                        style = Typography.body1,
+
+                if(isLocked){
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_lock_red_32),
+                        contentDescription = "Lock icon",
+                        modifier = Modifier
+                            .size(50.dp)
+                            .padding(start = 5.dp)
                     )
+                } else {
+                    Button(onClick = { onFinish() }, colors = ButtonDefaults.buttonColors(Blue), shape = RoundedCornerShape(20.dp)) {
+                        Text(
+                            text = stringResource(id = R.string.done),
+                            style = Typography.body1,
+                        )
+                    }
                 }
+
             }
 
         }

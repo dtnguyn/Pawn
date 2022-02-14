@@ -316,7 +316,8 @@ fun AuthScreen(
                 title = "Whoops!",
                 content = errorMsg,
                 icon = R.drawable.error,
-                onDismiss = { coroutineScope.launch { authViewModel.clearError() } }
+                onDismiss = { coroutineScope.launch { authViewModel.clearError() } },
+                onAction = { coroutineScope.launch { authViewModel.clearError() } }
             )
         }
         if (isLoading) {

@@ -82,6 +82,7 @@
     <string name="beauty">Beauty</string>
     <string name="movie">Movie</string>
     <string name="politics">Politics</string>
+    <string name="entertainment">Entertainment</string>
     <string name="click_to_get_more_info">Click to get more info</string>
     <string name="example">Example: </string>
     <string name="fail_message">Hmm... It seems like you didn\'t pass the review, keep on practicing!</string>

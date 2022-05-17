@@ -13,14 +13,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.moderndev.polyglot.R
-import com.moderndev.polyglot.ui.components.RoundButton
 import com.moderndev.polyglot.ui.theme.Blue
-import com.moderndev.polyglot.ui.theme.LightGreen
-import com.moderndev.polyglot.ui.theme.LightGrey
 import com.moderndev.polyglot.ui.theme.Typography
 
 @Composable
-fun TopicMenu(topics: String, isLocked: Boolean, onPickTopic: (topic: String) -> Unit, isPicked: (topic: String) -> Boolean, onFinish: () -> Unit, onDismiss: () -> Unit) {
+fun TopicMenu(
+    topics: String,
+    isLocked: Boolean,
+    onPickTopic: (topic: String) -> Unit,
+    isPicked: (topic: String) -> Boolean,
+    onFinish: () -> Unit,
+    onDismiss: () -> Unit
+) {
 
 
     var topicList by remember { mutableStateOf(topics.split(",").map { it.trim() }) }
@@ -43,7 +47,7 @@ fun TopicMenu(topics: String, isLocked: Boolean, onPickTopic: (topic: String) ->
             }
             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
 
-                if(isLocked){
+                if (isLocked) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_lock_red_32),
                         contentDescription = "Lock icon",
@@ -52,7 +56,11 @@ fun TopicMenu(topics: String, isLocked: Boolean, onPickTopic: (topic: String) ->
                             .padding(start = 5.dp)
                     )
                 } else {
-                    Button(onClick = { onFinish() }, colors = ButtonDefaults.buttonColors(Blue), shape = RoundedCornerShape(20.dp)) {
+                    Button(
+                        onClick = { onFinish() },
+                        colors = ButtonDefaults.buttonColors(Blue),
+                        shape = RoundedCornerShape(20.dp)
+                    ) {
                         Text(
                             text = stringResource(id = R.string.done),
                             style = Typography.body1,
@@ -67,99 +75,81 @@ fun TopicMenu(topics: String, isLocked: Boolean, onPickTopic: (topic: String) ->
 
         Spacer(modifier = Modifier.padding(10.dp))
 
-        Row(Modifier.fillMaxWidth()) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.weight(1f)
-            ) {
-                RoundButton(
-                    backgroundColor = if (isPicked("sport")) LightGreen else LightGrey,
-                    size = 64.dp,
-                    icon = if (isPicked("sport")) R.drawable.sports_picked else R.drawable.sports
-                ) {
-                    onPickTopic("sport")
-                }
-                Text(text = stringResource(id = R.string.sport), style = Typography.body1)
-
-                Spacer(modifier = Modifier.padding(10.dp))
-
-
-                RoundButton(
-                    backgroundColor = if (isPicked("tech")) LightGreen else LightGrey,
-                    size = 64.dp,
-                    icon = if (isPicked("tech")) R.drawable.technology_picked else R.drawable.technology
-                ) {
-                    onPickTopic("tech")
-                }
-                Text(text = stringResource(id = R.string.tech), style = Typography.body1)
-
-                Spacer(modifier = Modifier.padding(10.dp))
-
-
-                RoundButton(
-                    backgroundColor = if (isPicked("politics")) LightGreen else LightGrey,
-                    size = 64.dp,
-                    icon = if (isPicked("politics")) R.drawable.politics_picked else R.drawable.politics
-                ) {
-                    onPickTopic("politics")
-                }
-                Text(text = stringResource(id = R.string.politics), style = Typography.body1)
-            }
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.weight(1f)
-            ) {
-                RoundButton(
-                    backgroundColor = if (isPicked("gaming")) LightGreen else LightGrey,
-                    size = 64.dp,
-                    icon = if (isPicked("gaming")) R.drawable.gaming_picked else R.drawable.gaming
-                ) {
-                    onPickTopic("gaming")
-                }
-                Text(text = stringResource(id = R.string.gaming), style = Typography.body1)
-
-                Spacer(modifier = Modifier.padding(10.dp))
-
-
-                RoundButton(
-                    backgroundColor = if (isPicked("beauty")) LightGreen else LightGrey,
-                    size = 64.dp,
-                    icon = if (isPicked("beauty")) R.drawable.beauty_picked else R.drawable.beauty
-                ) {
-                    onPickTopic("beauty")
-                }
-                Text(text = stringResource(id = R.string.beauty), style = Typography.body1)
-
-
-            }
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.weight(1f)
-            ) {
-                RoundButton(
-                    backgroundColor = if (isPicked("business")) LightGreen else LightGrey,
-                    size = 64.dp,
-                    icon = if (isPicked("business")) R.drawable.business_picked else R.drawable.business
-                ) {
-                    onPickTopic("business")
-                }
-                Text(text = stringResource(id = R.string.business), style = Typography.body1)
-
-                Spacer(modifier = Modifier.padding(10.dp))
-
-
-                RoundButton(
-                    backgroundColor = if (isPicked("entertainment")) LightGreen else LightGrey,
-                    size = 64.dp,
-                    icon = if (isPicked("entertainment")) R.drawable.entertainment_picked else R.drawable.entertainment
-                ) {
-                    onPickTopic("entertainment")
-                }
-                Text(text = "Entertainment", style = Typography.body1)
-
-            }
+        TopicItem(
+            text = stringResource(id = R.string.sport),
+            icon = R.drawable.sports,
+            iconPicked = R.drawable.sports_picked,
+            isPicked = isPicked("sport")
+        ) {
+            onPickTopic("sport")
         }
+
+        Spacer(modifier = Modifier.padding(10.dp))
+
+        TopicItem(
+            text = stringResource(id = R.string.tech),
+            icon = R.drawable.technology,
+            iconPicked = R.drawable.technology_picked,
+            isPicked = isPicked("tech")
+        ) {
+            onPickTopic("tech")
+        }
+
+        Spacer(modifier = Modifier.padding(10.dp))
+
+        TopicItem(
+            text = stringResource(id = R.string.politics),
+            icon = R.drawable.politics,
+            iconPicked = R.drawable.politics_picked,
+            isPicked = isPicked("politics")
+        ) {
+            onPickTopic("politics")
+        }
+
+        Spacer(modifier = Modifier.padding(10.dp))
+
+        TopicItem(
+            text = stringResource(id = R.string.gaming),
+            icon = R.drawable.gaming,
+            iconPicked = R.drawable.gaming_picked,
+            isPicked = isPicked("gaming")
+        ) {
+            onPickTopic("gaming")
+        }
+
+        Spacer(modifier = Modifier.padding(10.dp))
+
+        TopicItem(
+            text = stringResource(id = R.string.beauty),
+            icon = R.drawable.beauty,
+            iconPicked = R.drawable.beauty_picked,
+            isPicked = isPicked("beauty")
+        ) {
+            onPickTopic("beauty")
+        }
+
+        Spacer(modifier = Modifier.padding(10.dp))
+
+        TopicItem(
+            text = stringResource(id = R.string.business),
+            icon = R.drawable.business,
+            iconPicked = R.drawable.business_picked,
+            isPicked = isPicked("business")
+        ) {
+            onPickTopic("business")
+        }
+
+        Spacer(modifier = Modifier.padding(10.dp))
+
+        TopicItem(
+            text = stringResource(id = R.string.entertainment),
+            icon = R.drawable.entertainment,
+            iconPicked = R.drawable.entertainment_picked,
+            isPicked = isPicked("entertainment")
+        ) {
+            onPickTopic("entertainment")
+        }
+
+        Spacer(modifier = Modifier.padding(10.dp))
     }
 }

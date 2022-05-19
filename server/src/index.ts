@@ -83,7 +83,7 @@ createConnection({
     //     .orWhere("user.email = :email", { email: "adron2" })
     //     .getOne()
     // );
-    console.log(await getRepository(Purchase).find());
+    console.log(await getRepository(User).find());
     // console.log(await getRepository(User).find());
 
     // console.log(await getRepository(Purchase).delete({ isValid: true }));
@@ -91,7 +91,7 @@ createConnection({
     // console.log(
     //   await getRepository(User).update(
     //     { username: "adron" },
-    //     { isPremium: false }
+    //     { isPremium: true }
     //   )
     // );
 

@@ -27,7 +27,7 @@ router.get("/", checkAuthentication, async (req, res) => {
 
     var feedTopics = (req as any).user.feedTopics as string;
 
-    if (feedTopics == undefined || feedTopics == null) {
+    if (feedTopics == undefined || feedTopics == null || !user.isPremium) {
       feedTopics = "";
     }
 
@@ -82,6 +82,8 @@ router.post("/topics", checkAuthentication, async (req, res) => {
     if (!newTopicsString) {
       throw new CustomError("Invalid input for updating topics!");
     }
+
+    console.log("update topic sting", newTopicsString);
 
     await updateTopics(userId, newTopicsString);
     res.send(new ApiResponse(true, "", newTopicsString));

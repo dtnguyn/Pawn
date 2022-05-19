@@ -27,7 +27,7 @@ router.get("/", middlewares_1.checkAuthentication, (req, res) => __awaiter(this,
             throw new CustomError_1.default("Please login first!");
         }
         var feedTopics = req.user.feedTopics;
-        if (feedTopics == undefined || feedTopics == null) {
+        if (feedTopics == undefined || feedTopics == null || !user.isPremium) {
             feedTopics = "";
         }
         const language = req.query.language;
@@ -77,6 +77,7 @@ router.post("/topics", middlewares_1.checkAuthentication, (req, res) => __awaite
         if (!newTopicsString) {
             throw new CustomError_1.default("Invalid input for updating topics!");
         }
+        console.log("update topic sting", newTopicsString);
         yield FeedController_1.updateTopics(userId, newTopicsString);
         res.send(new ApiResponse_1.default(true, "", newTopicsString));
     }

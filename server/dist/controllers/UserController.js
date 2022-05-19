@@ -17,6 +17,8 @@ const User_1 = require("../entity/User");
 const VerificationCode_1 = require("../entity/VerificationCode");
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const CustomError_1 = __importDefault(require("../utils/CustomError"));
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 function createUser(username, nativeLanguageId, email, password, avatar) {
     return __awaiter(this, void 0, void 0, function* () {
         const userRepo = typeorm_1.getRepository(User_1.User);
@@ -78,13 +80,15 @@ function findOneRefreshToken(token) {
 exports.findOneRefreshToken = findOneRefreshToken;
 exports.verifyCode = (email, code) => __awaiter(this, void 0, void 0, function* () {
     const verifyRepo = typeorm_1.getRepository(VerificationCode_1.VerificationCode);
+    let result = false;
     if (yield verifyRepo.findOne({ email, code })) {
         yield verifyRepo.delete({ email });
         return true;
     }
     else {
-        return false;
+        result = false;
     }
+    return result;
 });
 exports.sendVerificationCode = (email) => __awaiter(this, void 0, void 0, function* () {
     const userRepo = typeorm_1.getRepository(User_1.User);
@@ -97,24 +101,24 @@ exports.sendVerificationCode = (email) => __awaiter(this, void 0, void 0, functi
         else {
             yield verifyRepo.insert({ email, code });
         }
-        let testAccount = yield nodemailer_1.default.createTestAccount();
         const transporter = nodemailer_1.default.createTransport({
-            host: "smtp.ethereal.email",
+            host: "mail.privateemail.com",
             port: 587,
             secure: false,
             auth: {
-                user: testAccount.user,
-                pass: testAccount.pass,
+                user: process.env.POLYGLOT_EMAIL,
+                pass: process.env.POLYGLOT_EMAIL_PASSWORD,
+            },
+            tls: {
+                rejectUnauthorized: false,
             },
         });
-        let info = yield transporter.sendMail({
-            from: testAccount.user,
+        yield transporter.sendMail({
+            from: process.env.POLYGLOT_EMAIL,
             to: email,
             subject: "Verification code",
             text: `Please use this code to verify your account: ${code}`,
         });
-        console.log("Message sent to: ", email);
-        console.log("Preview URL: %s", nodemailer_1.default.getTestMessageUrl(info));
         return code;
     }
     else {
@@ -129,13 +133,14 @@ exports.deleteRefreshToken = (refreshToken) => __awaiter(this, void 0, void 0, f
         throw new CustomError_1.default("Unable to logout!");
     }
 });
-exports.changePassword = (email, code, hashPW) => __awaiter(this, void 0, void 0, function* () {
-    if (yield exports.verifyCode(email, code)) {
+exports.changePassword = (email, hashPW) => __awaiter(this, void 0, void 0, function* () {
+    try {
         const userRepo = typeorm_1.getRepository(User_1.User);
         yield userRepo.update({ email }, { password: hashPW });
     }
-    else
-        throw new CustomError_1.default("Invalid verification code!");
+    catch (error) {
+        throw new CustomError_1.default("Unable to reset password!");
+    }
 });
 exports.updateUser = (userId, username, email, isPremium, avatar, dailyWordCount, notificationEnabled, nativeLanguageId, appLanguageId, dailyWordTopic, feedTopics) => __awaiter(this, void 0, void 0, function* () {
     const userRepo = typeorm_1.getRepository(User_1.User);

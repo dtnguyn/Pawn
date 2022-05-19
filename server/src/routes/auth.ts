@@ -24,6 +24,7 @@ import {
 import ApiResponse from "../utils/ApiResponse";
 import CustomError from "../utils/CustomError";
 import { User } from "../entity/User";
+import { VerifyCodeAction } from "src/utils/types";
 dotenv.config();
 
 const router = Router();
@@ -82,12 +83,17 @@ router.get("/", checkAuthentication, (req, res) => {
 
 router.get("/verify/code", async (req, res) => {
   try {
-    const email = req.body.email;
+    const email = req.query.email as string;
 
-    const code = await sendVerificationCode(email);
+    console.log("Prepare to send verify code")
 
-    res.send(new ApiResponse(true, "", code));
+    // const email = "adron0914@gmail.com";
+
+    await sendVerificationCode(email);
+
+    res.send(new ApiResponse(true, "", null));
   } catch (error) {
+    console.log("Error: ", error.message)
     if (error instanceof CustomError) {
       res.send(new ApiResponse(false, error.message, null));
     } else {
@@ -100,10 +106,29 @@ router.post("/verify/code", async (req, res) => {
   try {
     const email = req.body.email;
     const code = req.body.code;
+    const action = req.body.action as VerifyCodeAction;
+    console.log("updating password: ", email, code, action)
 
     const result = await verifyCode(email, code);
 
-    res.send(new ApiResponse(true, "", code));
+    if(result){
+      switch(action.actionTitle){
+        case "reset_password": {
+          const newPassword = action.actionValue as string
+          const hashPW = bcrypt.hashSync(
+            newPassword,
+            parseInt(process.env.SALT_ROUNDS!)
+          );
+          console.log("New hash password: ", hashPW)
+          changePassword(email, hashPW)
+          break;
+        }
+      }
+      res.send(new ApiResponse(true, "", null));
+    } else {
+      res.send(new ApiResponse(false, "Wrong verification code!", null));
+    }
+
   } catch (error) {
     if (error instanceof CustomError) {
       res.send(new ApiResponse(false, error.message, null));
@@ -112,6 +137,7 @@ router.post("/verify/code", async (req, res) => {
     }
   }
 });
+
 
 router.post("/register", async (req, res) => {
   try {
@@ -200,26 +226,6 @@ router.delete("/logout", async (req, res) => {
   }
 });
 
-router.patch("/password", async (req, res) => {
-  try {
-    const email = req.body.email;
-    const newPassword = req.body.newPassword;
-    const code = req.body.code;
-    const hashPW = bcrypt.hashSync(
-      newPassword,
-      parseInt(process.env.SALT_ROUNDS!)
-    );
-    await changePassword(email, code, hashPW);
-
-    return res.send(new ApiResponse(true, "", null));
-  } catch (error) {
-    if (error instanceof CustomError) {
-      return res.send(new ApiResponse(false, error.message, null));
-    } else {
-      return res.send(new ApiResponse(false, "Something went wrong", null));
-    }
-  }
-});
 
 router.put("/user", checkAuthentication, async (req, res) => {
   try {
@@ -242,7 +248,7 @@ router.put("/user", checkAuthentication, async (req, res) => {
       req.body.feedTopics
     );
 
-    console.log("Update user successfully!");
+    console.log("Update user successfully!", newUser);
 
     return res.send(new ApiResponse(true, "", newUser));
   } catch (error) {

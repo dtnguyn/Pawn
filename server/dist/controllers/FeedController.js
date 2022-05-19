@@ -18,10 +18,19 @@ const unfluff_1 = __importDefault(require("unfluff"));
 const moment_1 = __importDefault(require("moment"));
 exports.getFeeds = (savedWords, language, feedTopics) => __awaiter(this, void 0, void 0, function* () {
     const queryValues = savedWords.map((savedWord) => savedWord.value);
-    const newsFeeds = yield getNews(queryValues, language, feedTopics);
-    const videoFeeds = yield getVideos(queryValues, language, feedTopics);
+    const topicsArr = feedTopics
+        .split(/[ ,]+/)
+        .filter((item) => item != "");
+    const topicMap = new Map();
+    for (const topic of topicsArr) {
+        topicMap.set(topic, true);
+    }
+    const videoTopic = topicsArr.length == 0 ? topicsArr[0] : "";
+    const newsFeeds = yield getNews(queryValues, language, topicMap);
+    const videoFeeds = [];
     const feeds = newsFeeds.concat(videoFeeds);
     shuffle(feeds);
+    console.log(feeds);
     return feeds;
 });
 exports.getFeedDetail = (id, feedType, feedUrl) => __awaiter(this, void 0, void 0, function* () {
@@ -90,7 +99,7 @@ const getNewsDetail = (id, newsUrl) => __awaiter(this, void 0, void 0, function*
     };
     return feedDetail;
 });
-const getNews = (queryValues, language, topics) => __awaiter(this, void 0, void 0, function* () {
+const getNews = (queryValues, language, topicMap) => __awaiter(this, void 0, void 0, function* () {
     try {
         let queryString = "";
         queryValues.forEach((query, index) => {
@@ -125,6 +134,8 @@ const getNews = (queryValues, language, topics) => __awaiter(this, void 0, void 
                 }
                 return null;
             });
+            console.log("result", newsFeeds.map((item) => `${item.topic} ${topicMap.get(item.topic ? item.topic : "null") === true}`));
+            console.log("map", topicMap);
             return newsFeeds.filter((news) => news != null);
         }
         else
@@ -135,7 +146,7 @@ const getNews = (queryValues, language, topics) => __awaiter(this, void 0, void 
         return [];
     }
 });
-const getVideos = (queryValues, language, topics) => __awaiter(this, void 0, void 0, function* () {
+const getVideos = (queryValues, language, topic) => __awaiter(this, void 0, void 0, function* () {
     try {
         let queryString = "";
         queryValues.forEach((query, index) => {
@@ -153,6 +164,7 @@ const getVideos = (queryValues, language, topics) => __awaiter(this, void 0, voi
             relevanceLanguage: language,
             videoCaption: "closedCaption",
             type: "video",
+            topic,
         });
         const videos = result.body.items;
         if (videos) {

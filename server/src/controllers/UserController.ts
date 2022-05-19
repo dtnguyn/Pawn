@@ -4,6 +4,8 @@ import { User } from "../entity/User";
 import { VerificationCode } from "../entity/VerificationCode";
 import nodemailer from "nodemailer";
 import CustomError from "../utils/CustomError";
+import dotenv from "dotenv";
+dotenv.config();
 
 export async function createUser(
   username: string,
@@ -70,12 +72,15 @@ export async function findOneRefreshToken(token: string) {
 
 export const verifyCode = async (email: string, code: string) => {
   const verifyRepo = getRepository(VerificationCode);
+  let result = false
   if (await verifyRepo.findOne({ email, code })) {
     await verifyRepo.delete({ email });
     return true;
   } else {
-    return false;
+    result = false
   }
+
+  return result;
 };
 
 export const sendVerificationCode = async (email: string) => {
@@ -83,7 +88,6 @@ export const sendVerificationCode = async (email: string) => {
 
   if (email && (await userRepo.findOne({ email }))) {
     // send mail with defined transport object
-
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 
     const verifyRepo = getRepository(VerificationCode);
@@ -94,31 +98,26 @@ export const sendVerificationCode = async (email: string) => {
       await verifyRepo.insert({ email, code });
     }
 
-    let testAccount = await nodemailer.createTestAccount();
-
     const transporter = nodemailer.createTransport({
-      host: "smtp.ethereal.email",
+      host: "mail.privateemail.com",
       port: 587,
       secure: false, // true for 465, false for other ports
       auth: {
-        user: testAccount.user, // generated ethereal user
-        pass: testAccount.pass, // generated ethereal password
+        user: process.env.POLYGLOT_EMAIL, // generated ethereal user
+        pass:  process.env.POLYGLOT_EMAIL_PASSWORD, // generated ethereal password
       },
+      tls: {
+        // do not fail on invalid certs
+        rejectUnauthorized: false,
+      },    
     });
 
-    let info = await transporter.sendMail({
-      from: testAccount.user, // sender address
+    await transporter.sendMail({
+      from:  process.env.POLYGLOT_EMAIL, // sender address
       to: email, // list of receivers
       subject: "Verification code", // Subject line
       text: `Please use this code to verify your account: ${code}`, // plain text body
     });
-
-    console.log("Message sent to: ", email);
-    // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-    // Preview only available when sending through an Ethereal account
-    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
 
     return code;
   } else {
@@ -136,13 +135,15 @@ export const deleteRefreshToken = async (refreshToken: string) => {
 
 export const changePassword = async (
   email: string,
-  code: string,
   hashPW: string
 ) => {
-  if (await verifyCode(email, code)) {
+  try {
     const userRepo = getRepository(User);
     await userRepo.update({ email }, { password: hashPW });
-  } else throw new CustomError("Invalid verification code!");
+  } catch(error) {
+    throw new CustomError("Unable to reset password!")
+  }
+  
 };
 
 export const updateUser = async (

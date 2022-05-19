@@ -20,11 +20,25 @@ export const getFeeds = async (
 ) => {
   const queryValues = savedWords.map((savedWord) => savedWord.value);
 
-  const newsFeeds = await getNews(queryValues, language, feedTopics);
-  const videoFeeds = await getVideos(queryValues, language, feedTopics);
+  const topicsArr: string[] = feedTopics
+    .split(/[ ,]+/)
+    .filter((item) => item != "");
+
+  const topicMap = new Map<string, boolean | undefined>();
+  for (const topic of topicsArr) {
+    topicMap.set(topic, true);
+  }
+
+  const videoTopic = topicsArr.length == 0 ? topicsArr[0] : "";
+
+  const newsFeeds = await getNews(queryValues, language, topicMap);
+  // const videoFeeds = await getVideos(queryValues, language, videoTopic);
+  const videoFeeds = [] as FeedJSON[];
 
   const feeds = newsFeeds.concat(videoFeeds);
   shuffle(feeds);
+
+  console.log(feeds);
 
   return feeds;
 };
@@ -117,7 +131,7 @@ const getNewsDetail = async (id: string, newsUrl: string) => {
 const getNews = async (
   queryValues: string[],
   language: string,
-  topics: string
+  topicMap: Map<string, boolean | undefined>
 ) => {
   try {
     let queryString = "";
@@ -155,7 +169,22 @@ const getNews = async (
         return null;
       });
 
-      return newsFeeds.filter((news) => news != null);
+      console.log(
+        "result",
+        newsFeeds.map(
+          (item) =>
+            `${item.topic} ${
+              topicMap.get(item.topic ? item.topic : "null") === true
+            }`
+        )
+      );
+      console.log("map", topicMap);
+
+      return newsFeeds.filter(
+        (news) => news != null
+        // &&
+        // topicMap.get(news.topic ? news.topic : "null") === true
+      ) as FeedJSON[];
     } else return [];
   } catch (error) {
     console.log("Error when getting news feed: ", error.message);
@@ -166,7 +195,7 @@ const getNews = async (
 const getVideos = async (
   queryValues: string[],
   language: string,
-  topics: string
+  topic: string
 ) => {
   try {
     let queryString = "";
@@ -184,6 +213,7 @@ const getVideos = async (
         relevanceLanguage: language,
         videoCaption: "closedCaption",
         type: "video",
+        topic,
       });
 
     const videos = result.body.items as any[];
@@ -209,7 +239,7 @@ const getVideos = async (
         }
       });
 
-      return videoFeeds.filter((video) => video != undefined);
+      return videoFeeds.filter((video) => video != undefined) as FeedJSON[];
     } else return [];
   } catch (error) {
     console.log("Error when get videos feed: ", error.message);

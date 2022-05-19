@@ -80,3 +80,8 @@ export type WordTopicReport = {
   value: string;
   wordCount: number;
 };
+
+export type VerifyCodeAction = {
+  actionTitle: "reset_password"
+  actionValue: any | null
+}

@@ -66,11 +66,13 @@ router.get("/", middlewares_1.checkAuthentication, (req, res) => {
 });
 router.get("/verify/code", (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
-        const email = req.body.email;
-        const code = yield UserController_1.sendVerificationCode(email);
-        res.send(new ApiResponse_1.default(true, "", code));
+        const email = req.query.email;
+        console.log("Prepare to send verify code");
+        yield UserController_1.sendVerificationCode(email);
+        res.send(new ApiResponse_1.default(true, "", null));
     }
     catch (error) {
+        console.log("Error: ", error.message);
         if (error instanceof CustomError_1.default) {
             res.send(new ApiResponse_1.default(false, error.message, null));
         }
@@ -83,8 +85,24 @@ router.post("/verify/code", (req, res) => __awaiter(this, void 0, void 0, functi
     try {
         const email = req.body.email;
         const code = req.body.code;
+        const action = req.body.action;
+        console.log("updating password: ", email, code, action);
         const result = yield UserController_1.verifyCode(email, code);
-        res.send(new ApiResponse_1.default(true, "", code));
+        if (result) {
+            switch (action.actionTitle) {
+                case "reset_password": {
+                    const newPassword = action.actionValue;
+                    const hashPW = bcrypt_1.default.hashSync(newPassword, parseInt(process.env.SALT_ROUNDS));
+                    console.log("New hash password: ", hashPW);
+                    UserController_1.changePassword(email, hashPW);
+                    break;
+                }
+            }
+            res.send(new ApiResponse_1.default(true, "", null));
+        }
+        else {
+            res.send(new ApiResponse_1.default(false, "Wrong verification code!", null));
+        }
     }
     catch (error) {
         if (error instanceof CustomError_1.default) {
@@ -162,24 +180,6 @@ router.delete("/logout", (req, res) => __awaiter(this, void 0, void 0, function*
         }
     }
 }));
-router.patch("/password", (req, res) => __awaiter(this, void 0, void 0, function* () {
-    try {
-        const email = req.body.email;
-        const newPassword = req.body.newPassword;
-        const code = req.body.code;
-        const hashPW = bcrypt_1.default.hashSync(newPassword, parseInt(process.env.SALT_ROUNDS));
-        yield UserController_1.changePassword(email, code, hashPW);
-        return res.send(new ApiResponse_1.default(true, "", null));
-    }
-    catch (error) {
-        if (error instanceof CustomError_1.default) {
-            return res.send(new ApiResponse_1.default(false, error.message, null));
-        }
-        else {
-            return res.send(new ApiResponse_1.default(false, "Something went wrong", null));
-        }
-    }
-}));
 router.put("/user", middlewares_1.checkAuthentication, (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         const userId = req.user.id;
@@ -187,7 +187,7 @@ router.put("/user", middlewares_1.checkAuthentication, (req, res) => __awaiter(t
             throw new CustomError_1.default("Please login first!");
         }
         const newUser = yield UserController_1.updateUser(userId, req.body.username, req.body.email, req.body.isPremium, req.body.avatar, req.body.dailyWordCount, req.body.notificationEnabled, req.body.nativeLanguageId, req.body.appLanguageId, req.body.dailyWordTopic, req.body.feedTopics);
-        console.log("Update user successfully!");
+        console.log("Update user successfully!", newUser);
         return res.send(new ApiResponse_1.default(true, "", newUser));
     }
     catch (error) {

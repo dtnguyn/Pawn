@@ -1,5 +1,6 @@
 package com.moderndev.polyglot.ui.screens.auth
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,21 +10,50 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.moderndev.polyglot.R
+import com.moderndev.polyglot.ui.components.CircularLoadingBar
 import com.moderndev.polyglot.ui.components.RoundedSquareButton
 import com.moderndev.polyglot.ui.theme.LightGrey
 import com.moderndev.polyglot.ui.theme.ReallyRed
 import com.moderndev.polyglot.ui.theme.Typography
+import com.moderndev.polyglot.util.UIState
 
 @Composable
-fun VerifyCodeScreen(navController: NavController) {
+fun VerifyCodeScreen(navController: NavController, viewModel: AuthViewModel) {
 
 
     var code by remember { mutableStateOf("") }
+
+    var errorMsg by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    val updatePasswordStatus by viewModel.updatePasswordStatus
+
+
+    LaunchedEffect(updatePasswordStatus){
+        when(updatePasswordStatus){
+            is UIState.Initial -> {
+                viewModel.resetVerificationCode()
+            }
+            is UIState.Error -> {
+                isLoading = false
+                Toast.makeText(context, viewModel.updatePasswordStatus.value.errorMsg ?: "Something went wrong!", Toast.LENGTH_SHORT).show()
+            }
+            is UIState.Loading -> {
+                isLoading = true
+            }
+            is UIState.Loaded -> {
+                isLoading = false
+                navController.popBackStack("auth", false)
+            }
+        }
+    }
 
 
     Scaffold(backgroundColor = Color.White) {
@@ -84,7 +114,7 @@ fun VerifyCodeScreen(navController: NavController) {
 
 
             Button(
-                onClick = { navController.navigate("verify") },
+                onClick = { viewModel.updatePassword(code) },
                 shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.buttonColors(ReallyRed),
                 modifier = Modifier
@@ -94,8 +124,9 @@ fun VerifyCodeScreen(navController: NavController) {
             ) {
                 Text(text = "Submit", style = Typography.h6, color = Color.White)
             }
-
         }
-
+        if (isLoading) {
+            CircularLoadingBar()
+        }
     }
 }

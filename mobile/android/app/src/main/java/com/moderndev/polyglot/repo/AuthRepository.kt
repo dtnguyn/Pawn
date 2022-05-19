@@ -107,6 +107,44 @@ class AuthRepository
 
     }
 
+    suspend fun sendVerificationCode(email: String): Flow<UIState<Boolean>>{
+        var result: Boolean? = null
+        return mainGetNetworkBoundResource(
+            query = {
+                flow { emit(result) }
+            },
+            fetch = {
+                val response: ApiResponse<Void> = apiClient.get("${Constants.apiURL}/auth/verify/code?email=${email}")
+                if(response.status) result = response.status
+                else throw CustomAppException(response.message)
+                result
+            },
+            saveFetchResult = {},
+            tag = TAG
+        )
+    }
+
+    suspend fun updatePassword(email: String, newPassword: String, verificationCode: String): Flow<UIState<Boolean>>{
+        var result: Boolean? = null
+        return mainGetNetworkBoundResource(
+            query = {
+                flow { emit(result) }
+            },
+            fetch = {
+                val response: ApiResponse<Void> =
+                    apiClient.post("${Constants.apiURL}/auth/verify/code") {
+                        contentType(ContentType.Application.Json)
+                        body = CheckVerificationCodeBody(email, verificationCode, ActionVerifyCode("reset_password", newPassword))
+                    }
+                if(response.status) result = response.status
+                else throw CustomAppException(response.message)
+                result
+            },
+            saveFetchResult = {},
+            tag = TAG
+        )
+    }
+
     suspend fun checkAuthStatus(accessToken: String?, refreshToken: String?): Flow<UIState<AuthStatus>> {
         var currentUser: User? = null
         var currentToken = Token(accessToken, refreshToken)

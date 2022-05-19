@@ -73,7 +73,7 @@ dependencies {
     //Markdown library
     implementation 'com.github.jeziellago:compose-markdown:0.2.6'
 
-    def ktor_version = "1.6.0"
+    def ktor_version = "1.6.1"
     implementation "io.ktor:ktor-client-core:$ktor_version"
     implementation "io.ktor:ktor-client-android:$ktor_version"
     implementation "io.ktor:ktor-client-gson:$ktor_version"

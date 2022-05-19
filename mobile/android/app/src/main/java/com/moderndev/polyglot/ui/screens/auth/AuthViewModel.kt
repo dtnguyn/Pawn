@@ -28,6 +28,14 @@ class AuthViewModel
     private val _tokenUIState: MutableState<UIState<Token>> = mutableStateOf(UIState.Loaded(Token(null, null)))
     val tokenUIState: State<UIState<Token>> = _tokenUIState
 
+    private val _sendVerifyCodeStatus: MutableState<UIState<Boolean>> = mutableStateOf(UIState.Initial(null))
+    val sendVerifyCodeStatus: State<UIState<Boolean>> = _sendVerifyCodeStatus
+
+    private var emailOfUpdatePassword = ""
+    private var valueOfUpdatedPassword = ""
+
+    private val _updatePasswordStatus: MutableState<UIState<Boolean>> = mutableStateOf(UIState.Initial(null))
+    val updatePasswordStatus: State<UIState<Boolean>> = _updatePasswordStatus
 
     /** ---INTENTS--- */
 
@@ -67,6 +75,38 @@ class AuthViewModel
             }
             authRepo.login(emailOrUsername, password).collectLatest {
                 _tokenUIState.value = it
+            }
+        }
+    }
+
+    fun sendCode(email: String, updatedPassword: String) {
+        if(email != "" && updatedPassword != ""){
+            viewModelScope.launch {
+                authRepo.sendVerificationCode(email).collectLatest {
+                    _sendVerifyCodeStatus.value = it
+                    if(it is UIState.Loaded){
+                        emailOfUpdatePassword = email
+                        valueOfUpdatedPassword = updatedPassword
+                    }
+                }
+            }
+        }
+    }
+
+    fun resetVerificationCode(){
+        _sendVerifyCodeStatus.value = UIState.Initial(null)
+    }
+
+    fun updatePassword(verifyCode: String){
+        viewModelScope.launch {
+            if(emailOfUpdatePassword != "" && valueOfUpdatedPassword != ""){
+                authRepo.updatePassword(emailOfUpdatePassword, valueOfUpdatedPassword, verifyCode).collectLatest {
+                    if(it is UIState.Loaded){
+                        emailOfUpdatePassword = ""
+                        valueOfUpdatedPassword = ""
+                        _updatePasswordStatus.value = it
+                    }
+                }
             }
         }
     }

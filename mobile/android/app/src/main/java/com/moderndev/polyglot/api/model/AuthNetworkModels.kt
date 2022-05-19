@@ -33,3 +33,18 @@ data class UpdateUserBody (
     val dailyWordTopic: String,
     val feedTopics: String,
 )
+
+data class SendVerificationCodeBody(
+    val email: String
+)
+
+data class CheckVerificationCodeBody(
+    val email: String,
+    val code: String,
+    val action: ActionVerifyCode
+)
+
+data class ActionVerifyCode(
+    val actionTitle: String,
+    val actionValue: Any?
+)

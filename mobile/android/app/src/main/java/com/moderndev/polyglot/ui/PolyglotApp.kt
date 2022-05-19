@@ -168,10 +168,11 @@ fun PolygotApp(
                 }
                 composable(PolyglotScreens.ChangePassword.route) {
                     ChangePasswordScreen(
-                        navController = navController
+                        navController = navController,
+                        viewModel = authViewModel
                     )
                 }
-                composable(PolyglotScreens.VerifyCode.route) { VerifyCodeScreen(navController = navController) }
+                composable(PolyglotScreens.VerifyCode.route) { VerifyCodeScreen(navController = navController, viewModel = authViewModel) }
                 composable(
                     "${PolyglotScreens.NewsDetail.route}/{feedId}/{feedUrl}",
                     arguments = listOf()

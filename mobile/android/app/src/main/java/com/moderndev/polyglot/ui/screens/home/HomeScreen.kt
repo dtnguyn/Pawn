@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -18,6 +19,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -155,12 +157,12 @@ fun HomeScreen(
                 Log.d(TAG, "authStatusUIState Loaded ${authStatusUIState.value}")
                 isLoadingUser = false
 
-                if(authStatusUIState.value?.user != null){
+                if (authStatusUIState.value?.user != null) {
                     //Update daily word count state
                     dailyWordCount = authStatusUIState.value?.user!!.dailyWordCount
                     user = authStatusUIState.value?.user
 
-                    user?.appLanguageId?.let{id ->
+                    user?.appLanguageId?.let { id ->
                         val locale = Locale(id)
                         configuration.setLocale(locale)
                         val resources = context.resources
@@ -216,7 +218,11 @@ fun HomeScreen(
             isLoadingDailyWords = false
             Log.d("get access token", "token ${getAccessTokenFromDataStore(context)}")
 
-            homeViewModel.getDailyWords(user?.dailyWordCount ?: 3, currentPickedLanguage!!.id, user?.dailyWordTopic ?: "Random")
+            homeViewModel.getDailyWords(
+                user?.dailyWordCount ?: 3,
+                currentPickedLanguage!!.id,
+                user?.dailyWordTopic ?: "Random"
+            )
             sharedViewModel.getSavedWords(
                 getAccessTokenFromDataStore(context),
                 currentPickedLanguage
@@ -559,12 +565,16 @@ fun HomeScreen(
                                             navController.navigate("${PolyglotScreens.WordDetail.route}/${it}/${currentPickedLanguage?.id}")
                                         },
                                         onToggleSaveWord = {
-                                            coroutineScope.launch {
-                                                sharedViewModel.toggleSavedWord(
-                                                    it,
-                                                    getAccessTokenFromDataStore(context),
-                                                    currentPickedLanguage?.id
-                                                )
+                                            if(user == null){
+                                                coroutineScope.launch {
+                                                    sharedViewModel.toggleSavedWord(
+                                                        it,
+                                                        getAccessTokenFromDataStore(context),
+                                                        currentPickedLanguage?.id
+                                                    )
+                                                }
+                                            } else {
+                                                Toast.makeText(context, "Please log in first!", Toast.LENGTH_SHORT).show()
                                             }
                                         },
                                         checkIsSaved = { wordValue ->
@@ -581,48 +591,77 @@ fun HomeScreen(
                                         }
                                     )
                                 }
-                                stickyHeader {
-                                    Column(
-                                        Modifier
-                                            .background(Color.White)
-                                            .padding(start = 30.dp, top = 20.dp)
-                                            .fillMaxWidth()
-                                    ) {
-                                        Text(
-                                            text = stringResource(id = R.string.your_saved_words),
-                                            style = Typography.h6,
-                                            fontSize = 18.sp
-                                        )
-
-                                        Row(Modifier.padding(vertical = 5.dp)) {
-                                            RoundButton(
-                                                backgroundColor = Grey,
-                                                size = 32.dp,
-                                                icon = R.drawable.review,
-                                                onClick = {
-                                                    navController.navigate(PolyglotScreens.WordReviewMenu.route)
-                                                })
-                                        }
-                                    }
-                                }
-
-                                savedWords()?.let { savedWords ->
-                                    items(savedWords.size) { index ->
-                                        val word = savedWords[index]
-                                        Box(Modifier.padding(horizontal = 30.dp)) {
-                                            SavedWordItem(
-                                                word = word.value,
-                                                pronunciationSymbol = word.pronunciationSymbol,
-                                                pronunciationAudio = word.pronunciationAudio,
-                                                index = index,
-                                                onClick = {
-                                                    navController.navigate("${PolyglotScreens.WordDetail.route}/${savedWords[index].value}/${currentPickedLanguage?.id}")
-                                                }
+                                if(user != null){
+                                    stickyHeader {
+                                        Column(
+                                            Modifier
+                                                .background(Color.White)
+                                                .padding(start = 30.dp, top = 20.dp)
+                                                .fillMaxWidth()
+                                        ) {
+                                            Text(
+                                                text = stringResource(id = R.string.your_saved_words),
+                                                style = Typography.h6,
+                                                fontSize = 18.sp
                                             )
-                                        }
 
+                                            Row(Modifier.padding(vertical = 5.dp)) {
+                                                RoundButton(
+                                                    backgroundColor = Grey,
+                                                    size = 32.dp,
+                                                    icon = R.drawable.review,
+                                                    onClick = {
+                                                        navController.navigate(PolyglotScreens.WordReviewMenu.route)
+                                                    })
+                                            }
+                                        }
+                                    }
+
+                                    savedWords()?.let { savedWords ->
+                                        if (savedWords.isEmpty()) {
+                                            item {
+                                                Text(
+                                                    text = stringResource(id = R.string.empty_saved_words_msg),
+                                                    style = Typography.subtitle1,
+                                                    textAlign = TextAlign.Center,
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(30.dp)
+                                                        .align(CenterHorizontally)
+                                                )
+                                            }
+                                        } else {
+                                            items(savedWords.size) { index ->
+                                                val word = savedWords[index]
+                                                Box(Modifier.padding(horizontal = 30.dp)) {
+                                                    SavedWordItem(
+                                                        word = word.value,
+                                                        pronunciationSymbol = word.pronunciationSymbol,
+                                                        pronunciationAudio = word.pronunciationAudio,
+                                                        index = index,
+                                                        onClick = {
+                                                            navController.navigate("${PolyglotScreens.WordDetail.route}/${savedWords[index].value}/${currentPickedLanguage?.id}")
+                                                        }
+                                                    )
+                                                }
+
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    item {
+                                        Text(
+                                            text = stringResource(id = R.string.not_log_in_saved_words_msg),
+                                            style = Typography.subtitle1,
+                                            textAlign = TextAlign.Center,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(30.dp)
+                                                .align(CenterHorizontally)
+                                        )
                                     }
                                 }
+
                             }
 
                         }

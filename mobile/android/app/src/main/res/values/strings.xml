@@ -98,5 +98,7 @@
     <string name="question">What is the definition of the word in the following audio?</string>
     <string name="check_answer">Check Answer</string>
     <string name="back">Back</string>
+    <string name="empty_saved_words_msg">Your saved words list is empty! Click the heart button to start building your vocabulary.</string>
+    <string name="not_log_in_saved_words_msg">Log in to unlock all features and start building your vocabulary</string>
 
 </resources>

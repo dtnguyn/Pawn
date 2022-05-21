@@ -99,5 +99,8 @@
     <string name="question">Định nghĩa của từ trong âm thanh sau đây là gì?</string>
     <string name="check_answer">Kiểm tra câu trả lời</string>
     <string name="back">Trở lại</string>
+    <string name="empty_saved_words_msg">Your saved words list is empty! Click the heart button to start building your vocabulary.</string>
+    <string name="not_log_in_saved_words_msg">Log in to unlock all features and start building your vocabulary</string>
+
 
 </resources>

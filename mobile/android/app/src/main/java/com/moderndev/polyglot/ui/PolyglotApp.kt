@@ -46,6 +46,7 @@ import com.moderndev.polyglot.ui.screens.wordReview.WordReviewScreen
 import com.moderndev.polyglot.ui.screens.wordReview.WordReviewViewModel
 import com.moderndev.polyglot.ui.theme.PawnTheme
 import com.moderndev.polyglot.util.DataStoreUtils
+import com.moderndev.polyglot.util.UIState
 
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -70,12 +71,13 @@ fun PolygotApp(
 ) {
 
     val navController = rememberNavController()
-    val items = listOf(
+    val items = arrayListOf(
         PolyglotScreens.Home,
         PolyglotScreens.Search,
-        PolyglotScreens.Feeds,
-        PolyglotScreens.Stats
+//        PolyglotScreens.Feeds,
+//        PolyglotScreens.Stats
     )
+    val authStatusUIState: UIState<AuthStatus> by sharedViewModel.authStatusUIState
 
     val context = LocalContext.current
     LaunchedEffect(true) {
@@ -89,6 +91,26 @@ fun PolygotApp(
                 )
             )
         )
+    }
+
+    LaunchedEffect(authStatusUIState) {
+        when (authStatusUIState) {
+            is UIState.Initial -> {
+
+            }
+            is UIState.Error -> {
+
+            }
+            is UIState.Loading -> {
+
+            }
+            is UIState.Loaded -> {
+                if(authStatusUIState.value?.user != null){
+                    items.add(PolyglotScreens.Feeds)
+                    items.add(PolyglotScreens.Stats)
+                }
+            }
+        }
     }
 
     PawnTheme {

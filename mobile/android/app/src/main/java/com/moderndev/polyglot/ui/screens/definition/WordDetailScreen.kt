@@ -36,6 +36,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.viewinterop.AndroidView
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
+import com.moderndev.polyglot.BuildConfig
 import com.moderndev.polyglot.model.Word
 import com.moderndev.polyglot.ui.SharedViewModel
 import com.moderndev.polyglot.util.DataStoreUtils
@@ -269,10 +274,30 @@ fun WordDetailScreen(
                     wordDetail?.let {
                         if (it.definitions.isNotEmpty()) {
                             items(it.definitions.size) { index ->
-                                DefinitionItem(
-                                    index = index,
-                                    definition = it.definitions[index]
-                                )
+                                Column {
+                                    if (index != 0 && index % 2 == 0) {
+                                        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth().background(Color.White)) {
+                                            AndroidView(
+                                                factory = { context ->
+                                                    AdView(context).apply {
+                                                        adSize = AdSize.LARGE_BANNER
+                                                        adUnitId =
+                                                            if (BuildConfig.BUILD_TYPE == "debug") "ca-app-pub-3940256099942544/6300978111" else context.getString(
+                                                                R.string.banner_id
+                                                            )
+                                                        loadAd(
+                                                            AdRequest.Builder().build()
+                                                        )
+                                                    }
+                                                }
+                                            )
+                                        }
+                                    }
+                                    DefinitionItem(
+                                        index = index,
+                                        definition = it.definitions[index]
+                                    )
+                                }
                             }
                         }
                     }

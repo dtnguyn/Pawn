@@ -24,6 +24,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.jetpack.composeadmobads.loadInterstitial
+import com.jetpack.composeadmobads.showInterstitial
 import com.moderndev.polyglot.R
 import com.moderndev.polyglot.model.SubtitlePart
 import com.moderndev.polyglot.ui.components.BackHandler
@@ -80,7 +82,8 @@ fun VideoDetailScreen(
     val playerView = YouTubePlayerView(context)
     var player: YouTubePlayer? by remember { mutableStateOf(null) }
 
-
+    loadInterstitial(context)
+    showInterstitial(context)
 
     LaunchedEffect(true) {
         if (videoSubtitleUIState !is UIState.Loaded) {

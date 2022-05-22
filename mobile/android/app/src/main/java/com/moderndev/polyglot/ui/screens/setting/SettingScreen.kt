@@ -111,18 +111,12 @@ fun SettingScreen(
                 val getProductDetailsQuery = SkuDetailsParams.newBuilder().setSkusList(productIds)
                     .setType(BillingClient.SkuType.INAPP).build()
                 billingClient.querySkuDetailsAsync(
-                    getProductDetailsQuery,
-                    object : SkuDetailsResponseListener {
-                        override fun onSkuDetailsResponse(
-                            billingResult: BillingResult,
-                            list: MutableList<SkuDetails>?
-                        ) {
-                            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && list != null) {
-                                skuDetails = list.first()
-                            }
-                        }
-
-                    })
+                    getProductDetailsQuery
+                ) { billingResult, list ->
+                    if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && list != null) {
+                        skuDetails = list.first()
+                    }
+                }
             }
         }
 
@@ -309,6 +303,9 @@ fun SettingScreen(
                             }
                             purchaseToken = null
                         } else {
+                            coroutineScope.launch {
+                                updateUserPremiumStatus(false)
+                            }
                             Toast.makeText(
                                 context,
                                 "Unable to acknowledge purchase at this time! Your purchase will be refunded.",
@@ -318,7 +315,6 @@ fun SettingScreen(
                     }
                 }
             }
-
         }
     }
 

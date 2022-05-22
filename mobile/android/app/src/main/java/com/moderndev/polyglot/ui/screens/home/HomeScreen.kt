@@ -22,8 +22,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
+import com.moderndev.polyglot.BuildConfig
 import com.moderndev.polyglot.R
 import com.moderndev.polyglot.model.AuthStatus
 import com.moderndev.polyglot.model.Language
@@ -121,7 +126,7 @@ fun HomeScreen(
     /** Helper variables */
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
-
+    val adWidth = LocalConfiguration.current.screenWidthDp - 32
 
     /**   ---OBSERVERS---   */
 
@@ -565,7 +570,7 @@ fun HomeScreen(
                                             navController.navigate("${PolyglotScreens.WordDetail.route}/${it}/${currentPickedLanguage?.id}")
                                         },
                                         onToggleSaveWord = {
-                                            if(user == null){
+                                            if (user == null) {
                                                 coroutineScope.launch {
                                                     sharedViewModel.toggleSavedWord(
                                                         it,
@@ -574,7 +579,11 @@ fun HomeScreen(
                                                     )
                                                 }
                                             } else {
-                                                Toast.makeText(context, "Please log in first!", Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(
+                                                    context,
+                                                    "Please log in first!",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
                                             }
                                         },
                                         checkIsSaved = { wordValue ->
@@ -591,7 +600,7 @@ fun HomeScreen(
                                         }
                                     )
                                 }
-                                if(user != null){
+                                if (user != null) {
                                     stickyHeader {
                                         Column(
                                             Modifier
@@ -599,6 +608,7 @@ fun HomeScreen(
                                                 .padding(start = 30.dp, top = 20.dp)
                                                 .fillMaxWidth()
                                         ) {
+
                                             Text(
                                                 text = stringResource(id = R.string.your_saved_words),
                                                 style = Typography.h6,
@@ -632,18 +642,42 @@ fun HomeScreen(
                                             }
                                         } else {
                                             items(savedWords.size) { index ->
-                                                val word = savedWords[index]
-                                                Box(Modifier.padding(horizontal = 30.dp)) {
-                                                    SavedWordItem(
-                                                        word = word.value,
-                                                        pronunciationSymbol = word.pronunciationSymbol,
-                                                        pronunciationAudio = word.pronunciationAudio,
-                                                        index = index,
-                                                        onClick = {
-                                                            navController.navigate("${PolyglotScreens.WordDetail.route}/${savedWords[index].value}/${currentPickedLanguage?.id}")
-                                                        }
-                                                    )
+
+                                                Column {
+                                                    if (index % 3 == 0) {
+                                                        AndroidView(
+                                                            modifier = Modifier.align(
+                                                                CenterHorizontally
+                                                            ),
+                                                            factory = { context ->
+                                                                AdView(context).apply {
+                                                                    adSize = AdSize.BANNER
+                                                                    adUnitId =
+                                                                        if (BuildConfig.BUILD_TYPE == "debug") "ca-app-pub-3940256099942544/6300978111" else context.getString(
+                                                                            R.string.banner_id
+                                                                        )
+                                                                    loadAd(
+                                                                        AdRequest.Builder().build()
+                                                                    )
+                                                                }
+                                                            }
+                                                        )
+                                                    }
+
+                                                    val word = savedWords[index]
+                                                    Box(Modifier.padding(horizontal = 30.dp)) {
+                                                        SavedWordItem(
+                                                            word = word.value,
+                                                            pronunciationSymbol = word.pronunciationSymbol,
+                                                            pronunciationAudio = word.pronunciationAudio,
+                                                            index = index,
+                                                            onClick = {
+                                                                navController.navigate("${PolyglotScreens.WordDetail.route}/${savedWords[index].value}/${currentPickedLanguage?.id}")
+                                                            }
+                                                        )
+                                                    }
                                                 }
+
 
                                             }
                                         }

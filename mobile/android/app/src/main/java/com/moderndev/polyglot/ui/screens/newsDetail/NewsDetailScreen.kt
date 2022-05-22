@@ -26,6 +26,15 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.jetpack.composeadmobads.addInterstitialCallbacks
+import com.jetpack.composeadmobads.loadInterstitial
+import com.jetpack.composeadmobads.showInterstitial
 import com.moderndev.polyglot.R
 import com.moderndev.polyglot.model.FeedDetail
 import com.moderndev.polyglot.model.NewsDetail
@@ -75,8 +84,8 @@ fun NewsDetailScreen(
         initialValue = ModalBottomSheetValue.Hidden
     )
 
-
-
+    loadInterstitial(context)
+    showInterstitial(context)
 
 
     LaunchedEffect(true) {

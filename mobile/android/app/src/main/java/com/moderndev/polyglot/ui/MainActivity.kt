@@ -12,6 +12,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.android.gms.ads.MobileAds
+import com.jetpack.composeadmobads.addInterstitialCallbacks
 import com.moderndev.polyglot.ui.screens.account.AccountViewModel
 import com.moderndev.polyglot.ui.screens.auth.AuthViewModel
 import com.moderndev.polyglot.ui.screens.definition.WordDetailViewModel
@@ -50,6 +52,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
         setContent {
             SetUp()
             PolygotApp(
@@ -67,6 +70,10 @@ class MainActivity : ComponentActivity() {
                 accountViewModel = accountViewModel,
             )
         }
+
+        MobileAds.initialize(this)
+        addInterstitialCallbacks(this)
+
     }
 
     @Composable

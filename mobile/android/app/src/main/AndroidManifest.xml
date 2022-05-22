@@ -11,6 +11,9 @@
         android:usesCleartextTraffic="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.Pawn">
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-9280842546374512~8194558281"/>
         <activity
             android:name="com.moderndev.polyglot.ui.MainActivity"
             android:exported="true"

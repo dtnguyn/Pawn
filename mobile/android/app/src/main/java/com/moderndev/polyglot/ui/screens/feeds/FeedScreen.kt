@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -19,11 +19,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
 import coil.ImageLoader
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.moderndev.polyglot.BuildConfig
 import com.moderndev.polyglot.R
 import com.moderndev.polyglot.model.Feed
 import com.moderndev.polyglot.model.Language
@@ -32,13 +40,12 @@ import com.moderndev.polyglot.ui.components.CustomDialog
 import com.moderndev.polyglot.ui.components.feed.*
 import com.moderndev.polyglot.ui.navigation.PolyglotScreens
 import com.moderndev.polyglot.ui.screens.feeds.FeedViewModel
-import com.moderndev.polyglot.ui.theme.*
+import com.moderndev.polyglot.ui.theme.LightGrey
 import com.moderndev.polyglot.util.Constants.allFeedTopics
 import com.moderndev.polyglot.util.DataStoreUtils
 import com.moderndev.polyglot.util.UIState
 import kotlinx.coroutines.launch
 import java.util.*
-
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -64,6 +71,8 @@ fun FeedScreen(
 
     val deFeedUIState: UIState<List<Feed>> by feedViewModel.deFeedItems
     var deFeedItems by remember { mutableStateOf(deFeedUIState.value) }
+
+
 
     fun initialFeed(languageId: String?): List<Feed>?{
         var feed: List<Feed>? = null
@@ -467,44 +476,64 @@ fun FeedScreen(
                             }
                         } else {
                             items(it.size) { index ->
-                                Box(
-                                    Modifier
-                                        .background(
-                                            LightGrey,
-                                            RoundedCornerShape(
-                                                topStart = if (index == 0) 30.dp else 0.dp,
-                                                topEnd = if (index == 0) 30.dp else 0.dp
+                                Column {
+                                    if (index != 0 && index % 2 == 0) {
+                                        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth().background(LightGrey)){
+                                            AndroidView(
+                                                factory = { context ->
+                                                    AdView(context).apply {
+                                                        adSize = AdSize.LARGE_BANNER
+                                                        adUnitId =
+                                                            if (BuildConfig.BUILD_TYPE == "debug") "ca-app-pub-3940256099942544/6300978111" else context.getString(
+                                                                R.string.banner_id
+                                                            )
+                                                        loadAd(
+                                                            AdRequest.Builder().build()
+                                                        )
+                                                    }
+                                                }
                                             )
-                                        )
-                                        .padding(horizontal = 20.dp)
-                                ) {
-                                    FeedItem(feed = it[index], onClick = { feed ->
-                                        val url = feed.url.replace("/", "<")
-                                        val thumbnail = feed.thumbnail?.replace("/", "<")
-                                        if (feed.type == "news") {
-                                            feedViewModel.saveFeedScrollingState(
-                                                feedScrollState.firstVisibleItemIndex,
-                                                feedScrollState.firstVisibleItemScrollOffset
-                                            )
-                                            navController.navigate("${PolyglotScreens.NewsDetail.route}/${feed.id}/${url}")
-                                        } else {
-                                            feedViewModel.saveFeedScrollingState(
-                                                feedScrollState.firstVisibleItemIndex,
-                                                feedScrollState.firstVisibleItemScrollOffset
-                                            )
-                                            navController.navigate("${PolyglotScreens.VideoDetail.route}/${feed.id}")
                                         }
-                                    },
-                                    onShare = {
-                                        val sendIntent: Intent = Intent().apply {
-                                            action = Intent.ACTION_SEND
-                                            putExtra(Intent.EXTRA_TEXT, it)
-                                            type = "text/plain"
-                                        }
+                                    }
+                                    Box(
+                                        Modifier
+                                            .background(
+                                                LightGrey,
+                                                RoundedCornerShape(
+                                                    topStart = if (index == 0) 30.dp else 0.dp,
+                                                    topEnd = if (index == 0) 30.dp else 0.dp
+                                                )
+                                            )
+                                            .padding(horizontal = 20.dp)
+                                    ) {
+                                        FeedItem(feed = it[index], onClick = { feed ->
+                                            val url = feed.url.replace("/", "<")
+                                            val thumbnail = feed.thumbnail?.replace("/", "<")
+                                            if (feed.type == "news") {
+                                                feedViewModel.saveFeedScrollingState(
+                                                    feedScrollState.firstVisibleItemIndex,
+                                                    feedScrollState.firstVisibleItemScrollOffset
+                                                )
+                                                navController.navigate("${PolyglotScreens.NewsDetail.route}/${feed.id}/${url}")
+                                            } else {
+                                                feedViewModel.saveFeedScrollingState(
+                                                    feedScrollState.firstVisibleItemIndex,
+                                                    feedScrollState.firstVisibleItemScrollOffset
+                                                )
+                                                navController.navigate("${PolyglotScreens.VideoDetail.route}/${feed.id}")
+                                            }
+                                        },
+                                            onShare = {
+                                                val sendIntent: Intent = Intent().apply {
+                                                    action = Intent.ACTION_SEND
+                                                    putExtra(Intent.EXTRA_TEXT, it)
+                                                    type = "text/plain"
+                                                }
 
-                                        val shareIntent = Intent.createChooser(sendIntent, null)
-                                        startActivity(context, shareIntent, null)
-                                    })
+                                                val shareIntent = Intent.createChooser(sendIntent, null)
+                                                startActivity(context, shareIntent, null)
+                                            })
+                                    }
                                 }
                             }
                         }
